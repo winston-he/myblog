@@ -11,6 +11,7 @@ class Post(models.Model):
     marked_count = models.IntegerField(default=0)
     viewed_count = models.IntegerField(default=0)
     create_time = models.DateTimeField(default=timezone.now())
+    update_time = models.DateTimeField(default=timezone.now())
     published_time = models.DateTimeField(null=True)
 
     # 发布
@@ -26,6 +27,7 @@ class Comment(models.Model):
     author = models.ForeignKey('auth.user', related_name='user_comments', on_delete=models.CASCADE)
     post = models.ForeignKey('blog.Post', related_name='post_comments', on_delete=models.CASCADE)
     content = models.CharField(max_length=140, null=False)
+    likes_count = models.IntegerField(default=0)
     create_time = models.DateTimeField(default=timezone.now())
 
     def __str__(self):
