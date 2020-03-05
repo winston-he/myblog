@@ -1,0 +1,15 @@
+{%extends "base.html"%}
+<!--{%block content%}-->
+    <ul class="list-group">
+        {%for post in post_list%}
+            <li class="list-group-item">
+                <div class="post">
+                    <h1><a href="{%url 'post_detail' pk=post.pk%}">{{post.title}}</a></h1>
+                    <div class="date">
+                        <p>Published on: {{post.published_time|date:"D M Y"}}</p>
+                    </div>
+                </div>
+            </li>
+        {%endfor%}
+    </ul>
+<!--{%endblock%}-->
