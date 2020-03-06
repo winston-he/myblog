@@ -7,6 +7,13 @@
     <p class="card-text">{{post.content}}</p>
   </div>
 </div>
+ <div class="container">
+     <ul>
+         <li>likes: {{post.likes_count}}</li>
+         <li>marked: {{post.marked_count}}</li>
+         <li>viewed: {{post.viewed_count}}</li>
+     </ul>
+ </div>
 {%if user == post.author%}
     <a class="btn btn-outline-primary" href="{%url 'post_edit' pk=post.pk%}" role="button">edit</a>
     <a class="btn btn-outline-danger" href="https://www.google.com" role="button">delete</a>
