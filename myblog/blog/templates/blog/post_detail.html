@@ -1,24 +1,55 @@
-{% extends 'blog/base.html' %}
-<!--{% block content %}-->
-<div class="card" style="width: 18rem;">
-  <img src="..." class="card-img-top" alt="...">
-  <div class="card-body">
-    <h5 class="card-title">title: {{post.title}}</h5>
-    <p class="card-text">{{post.content}}</p>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container" id="blog-detail-area">
+  <div class="card" style="width: 18rem;">
+    <img src="..." class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">title: {{post.title}}</h5>
+      <p class="card-text">{{post.content}}</p>
+    </div>
   </div>
+  <div class="visit-count">
+      <ul class="list-group list-group-horizontal">
+        <li class="list-group-item"><img src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">  {{post.likes_count}}</li>
+        <li class="list-group-item"><img src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">  {{post.marked_count}}</li>
+        <li class="list-group-item"><img src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  {{post.viewed_count}}</li>
+      </ul>
+  </div>
+      <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content"></div>
+          </div>
+      </div>
+      <button type="button" class="btn btn-outline-primary" id="post-comment">comment</button>
+  {%if user == post.author%}
+      <a class="btn btn-outline-primary" href="{%url 'post_edit' pk=post.pk%}" role="button">edit</a>
+      <a class="btn btn-outline-danger" href="{%url 'post_remove' pk=post.pk%}" role="button">delete</a>
+  {%endif%}
+  {%if not post.published_time and user == post.author%}
+      <a class="btn btn-outline-primary" href="{%url 'post_publish' pk=post.pk%}" role="button">publish</a>
+  {%endif%}
+  <ul class="list-group" id="comment-board">
+      {% for comment in post.post_comments.all %}
+          <li class="list-group-item">{{comment.content}}
+              Posted by: {{user.username}}
+              {{comment.create_time | date:"D M Y"}}
+              likes: {{comment.likes_count}}
+              dislikes: {{comment.dislikes_count}}
+          </li>
+          <ul class="list-group list-group-horizontal">
+            <li class="list-group-item"><a class="btn btn-outline-success" href="#" role="button">Like</a></li>
+            <li class="list-group-item"><a class="btn btn-outline-danger" href="#" role="button">Dislike</a></li>
+            <li class="list-group-item"><a class="btn btn-outline-dark" href="{% url 'comment_remove' pk=comment.pk %}" role="button">delete</a></li>
+          </ul>
+      {%endfor%}
+  </ul>
 </div>
- <div class="container">
-     <ul>
-         <li>likes: {{post.likes_count}}</li>
-         <li>marked: {{post.marked_count}}</li>
-         <li>viewed: {{post.viewed_count}}</li>
-     </ul>
- </div>
-{%if user == post.author%}
-    <a class="btn btn-outline-primary" href="{%url 'post_edit' pk=post.pk%}" role="button">edit</a>
-    <a class="btn btn-outline-danger" href="https://www.google.com" role="button">delete</a>
-{%endif%}
-{%if not post.published_time and user == post.author%}
-    <a class="btn btn-outline-primary" href="{%url 'post_detail' pk=post.pk%}" role="button">publish</a>
-{%endif%}
-<!--{% endblock %}-->
+{% endblock %}
+<script type="text/javascript">
+  $(function () {
+    $("#post-comment").modalForm({
+      formURL: "{% url 'comment_new' pk=post.pk%}",
+    });
+  });
+</script>

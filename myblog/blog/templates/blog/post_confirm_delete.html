@@ -1,0 +1,7 @@
+<form action="" method="post" style="display: inline;">
+    {% csrf_token %}
+    <input type="hidden" name="patient_id" value="{{ patient.id }}" />
+    <button type="submit" class="btn btn-outline-success">Confirm
+        <span class="glyphicon glyphicon-trash"></span>
+    </button>
+</form>

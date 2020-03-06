@@ -1,15 +1,26 @@
 {%extends "base.html"%}
-<!--{%block content%}-->
+{% load static %}
+ {%block content%}
+<div class="container">
     <ul class="list-group">
         {%for post in post_list%}
             <li class="list-group-item">
                 <div class="post">
                     <h1><a href="{%url 'post_detail' pk=post.pk%}">{{post.title}}</a></h1>
                     <div class="date">
-                        <p>Published on: {{post.published_time|date:"D M Y"}}</p>
+                        <p>Created on: {{post.create_time|date:"D M Y"}} by: {{post.author}}</p>
                     </div>
+                </div>
+                <div class="visit-count">
+                    <ul class="list-group list-group-horizontal">
+                      <li class="list-group-item"><img src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt=""> {{post.likes_count}}</li>
+                      <li class="list-group-item"><img src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">{{post.marked_count}}</li>
+                      <li class="list-group-item"><img src="{%static 'img/icons/view.png'%}" width=20 height=20 alt=""> {{post.viewed_count}}</li>
+                      <li class="list-group-item"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt="">{{post.post_comments.all|length}}</li>
+                    </ul>
                 </div>
             </li>
         {%endfor%}
     </ul>
-<!--{%endblock%}-->
+</div>
+ {%endblock%}
