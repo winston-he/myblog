@@ -16,9 +16,8 @@
     </div>
     {% for field in form %}
       <div class="form-group">
-        <!-- <label for="{{ field.id_for_label }}">{{ field.label }}</label> -->
         <p id="text-limit-hint">0/140</p>
-          {% render_field field class="form-control" placeholder=field.label %}
+          {% render_field field class="form-control" placeholder="say something" %}
         <div class="{% if field.errors %} invalid{% endif %}">
           {% for error in field.errors %}
             <p class="help-block">{{ error }}</p>

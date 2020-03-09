@@ -1,6 +1,31 @@
-.list-group-item {
-  border: dashed red;
+div {
+  display: block;
 }
+
+.login-component {
+  width: 380px;
+  position: relative;
+  left: 50%;
+  top: 37px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  padding-bottom: 30px;
+}
+
+#login-submit-btn {
+    height: 40px;
+    background-color: #deb887;
+    margin-top: 17px;
+    line-height: 40px;
+    background: #2dbe61;
+    border: 1px solid #1fae52;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
 
 .post-stats {
   display: table;

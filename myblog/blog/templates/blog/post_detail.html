@@ -51,7 +51,13 @@
           <small>{{comment.create_time | date:"N d, Y P"}}</small>
         </div>
         <p class="mb-1">{{comment.content}}</p>
-        <small>Posted by: {{user.username}}</small>
+        <small>Posted by:
+            {%if comment.author == user%}
+                me
+            {%else%}
+                {{comment.author.username}}
+            {%endif%}
+            </small>
         <div class="comment-actions">
             <a href="{%url 'like_comment' pk=comment.pk%}" role="button">
               {%if user in comment.liked_by.all%}
