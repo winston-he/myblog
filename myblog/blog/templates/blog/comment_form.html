@@ -8,7 +8,6 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-
   <div class="modal-body">
     <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
       {% for error in form.non_field_errors %}
@@ -17,7 +16,8 @@
     </div>
     {% for field in form %}
       <div class="form-group">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <!-- <label for="{{ field.id_for_label }}">{{ field.label }}</label> -->
+        <p id="text-limit-hint">0/140</p>
           {% render_field field class="form-control" placeholder=field.label %}
         <div class="{% if field.errors %} invalid{% endif %}">
           {% for error in field.errors %}

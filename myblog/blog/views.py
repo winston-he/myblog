@@ -33,6 +33,13 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
 
+    def get_object(self, queryset=None):
+        post = super().get_object()
+        post.viewed_count += 1
+        post.save()
+        self.viewed_count = post.viewed_count
+        return post
+
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
@@ -72,6 +79,7 @@ class DeletePostView(LoginRequiredMixin, DeleteView):
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
+
     # template_name = 'blog/comment_form.html'
     # model = Comment
     # form_class = CommentForm
@@ -98,3 +106,39 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('post_list')
     model = Comment
     # template_name = 'blog/post_detail.html'
+
+
+@login_required
+def like_post(request, pk):
+    # if request.method == 'POST':
+    post = get_object_or_404(Post, pk=pk)
+    if not request.user.liked_posts.filter(pk=post.pk):
+        request.user.liked_posts.add(post)
+    else:
+        request.user.liked_posts.remove(post)
+    return redirect('post_detail', pk=post.pk)
+
+
+@login_required
+def mark_post(request, pk):
+    # if request.method == 'POST':
+    post = get_object_or_404(Post, pk=pk)
+    if not request.user.marked_posts.filter(pk=post.pk):
+        request.user.marked_posts.add(post)
+    else:
+        request.user.marked_posts.remove(post)
+    return redirect('post_detail', pk=post.pk)
+
+@login_required
+def like_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    request.user.liked_comments.add(comment)
+    request.user.disliked_comments.remove(comment)
+    return redirect('post_detail', pk=comment.post.pk)
+
+@login_required
+def dislike_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    request.user.liked_comments.remove(comment)
+    request.user.disliked_comments.add(comment)
+    return redirect('post_detail', pk=comment.post.pk)

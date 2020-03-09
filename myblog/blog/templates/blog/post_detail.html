@@ -9,47 +9,119 @@
       <p class="card-text">{{post.content}}</p>
     </div>
   </div>
-  <div class="visit-count">
-      <ul class="list-group list-group-horizontal">
-        <li class="list-group-item"><img src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">  {{post.likes_count}}</li>
-        <li class="list-group-item"><img src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">  {{post.marked_count}}</li>
-        <li class="list-group-item"><img src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  {{post.viewed_count}}</li>
-      </ul>
+  <div class="post-stats">
+    <a  href="{%url 'like_post' pk=post.pk%}" role="button">
+      {%if user in post.liked_by.all%}
+        <img id="like-post" src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt="">
+      {%else%}
+        <img id="like-post" src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">
+      {%endif%}
+    </a>{{post.liked_by.count}}
+    <a  href="{%url 'mark_post' pk=post.pk%}" role="button">
+      {%if user in post.marked_by.all%}
+        <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">
+      {%else%}
+        <img id="mark-post" src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">
+      {%endif%}
+    </a>{{post.marked_by.count}}
+    <img id="view-post" src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  {{post.viewed_count}}
   </div>
-      <div class="modal fade" tabindex="-1" role="dialog" id="modal">
-          <div class="modal-dialog" role="document">
-              <div class="modal-content"></div>
-          </div>
-      </div>
-      <button type="button" class="btn btn-outline-primary" id="post-comment">comment</button>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    {%if user.is_authenticated%}
+    <button type="button" id="post-comment"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt=""></button>
+    {%endif%}
   {%if user == post.author%}
-      <a class="btn btn-outline-primary" href="{%url 'post_edit' pk=post.pk%}" role="button">edit</a>
-      <a class="btn btn-outline-danger" href="{%url 'post_remove' pk=post.pk%}" role="button">delete</a>
+      <a  href="{%url 'post_edit' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
+      <a  href="{%url 'post_remove' pk=post.pk%}" role="button"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></a>
   {%endif%}
   {%if not post.published_time and user == post.author%}
-      <a class="btn btn-outline-primary" href="{%url 'post_publish' pk=post.pk%}" role="button">publish</a>
+      <a href="{%url 'post_publish' pk=post.pk%}" role="button"><img src="{%static 'img/icons/publish.png'%}" width=15 height=15 alt=""></a>
   {%endif%}
-  <ul class="list-group" id="comment-board">
-      {% for comment in post.post_comments.all %}
-          <li class="list-group-item">{{comment.content}}
-              Posted by: {{user.username}}
-              {{comment.create_time | date:"D M Y"}}
-              likes: {{comment.likes_count}}
-              dislikes: {{comment.dislikes_count}}
-          </li>
-          <ul class="list-group list-group-horizontal">
-            <li class="list-group-item"><a class="btn btn-outline-success" href="#" role="button">Like</a></li>
-            <li class="list-group-item"><a class="btn btn-outline-danger" href="#" role="button">Dislike</a></li>
-            <li class="list-group-item"><a class="btn btn-outline-dark" href="{% url 'comment_remove' pk=comment.pk %}" role="button">delete</a></li>
-          </ul>
-      {%endfor%}
-  </ul>
-</div>
-{% endblock %}
+
+  <div class="list-group">
+    {% for comment in post.post_comments.all %}
+      <div class="list-group-item list-group-item-active">
+        <div class="d-flex w-100 justify-content-between">
+          <!-- <h5 class="mb-1">List group item heading</h5> -->
+          <small>{{comment.create_time | date:"N d, Y P"}}</small>
+        </div>
+        <p class="mb-1">{{comment.content}}</p>
+        <small>Posted by: {{user.username}}</small>
+        <div class="comment-actions">
+            <a href="{%url 'like_comment' pk=comment.pk%}" role="button">
+              {%if user in comment.liked_by.all%}
+                <img src="{%static 'img/icons/thumb_up_selected.png'%}" id="like-comment" width=20 height=20>
+              {%else%}
+                <img src="{%static 'img/icons/thumb_up_unselected.png'%}" id="like-comment" width=20 height=20>
+              {%endif%}
+            </a>{{comment.liked_by.count}}
+
+            <a href="{%url 'dislike_comment' pk=comment.pk%}" role="button">
+            {%if user in comment.disliked_by.all%}
+              <img src="{%static 'img/icons/thumb_down_selected.png'%}" id="dislike-comment" width=20 height=20>
+            {%else%}
+              <img src="{%static 'img/icons/thumb_down_unselected.png'%}" id="dislike-comment" width=20 height=20>
+            {%endif%}
+            </a>{{comment.disliked_by.count}}
+
+
+
+            <a href="{% url 'comment_remove' pk=comment.pk %}" role="button"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></a>
+        </div>
+      </div>
+    {%endfor%}
+  </div>
 <script type="text/javascript">
   $(function () {
     $("#post-comment").modalForm({
       formURL: "{% url 'comment_new' pk=post.pk%}",
     });
   });
+  // $("#like-post").on('click', '.alink', function() {
+  //   var url = "{%url 'like_post' pk=post.pk%}";
+  //   $("#like-post").src = "{%static 'img/icons/red_heart.png'%}";
+  //   // var id = $(this).attr('id');
+  //   $("#like-post").location.href = url;
+  // })
+
+  $("#like-post").click(
+    function() {
+      if (this.src == "{%static 'img/icons/red_heart.png'%}")
+        this.src = "{%static 'img/icons/grey_heart.png'%}";
+      else
+        this.src = "{%static 'img/icons/red_heart.png'%}";
+  })
+
+  $("#mark-post").click(
+    function() {
+      if (this.src == "{%static 'img/icons/star.png'%}")
+        this.src = "{%static 'img/icons/grey_star.png'%}";
+      else
+        this.src = "{%static 'img/icons/star.png'%}";
+  })
+
+  //
+  $("#like-comment").click(
+    function() {
+      if (this.src == "{%static 'img/icons/thumb_up_selected.png'%}")
+        this.src = "{%static 'img/icons/thumb_up_unselected.png'%}";
+      else
+        this.src = "{%static 'img/icons/thumb_up_selected.png'%}";
+    }
+  )
+  //
+  $("#dislike-comment").click(
+    function() {
+      if (this.src == "{%static 'img/icons/thumb_down_selected.png'%}")
+        this.src = "{%static 'img/icons/thumb_down_unselected.png'%}";
+      else
+        this.src = "{%static 'img/icons/thumb_down_selected.png'%}";
+    }
+  )
 </script>
+{% endblock %}

@@ -18,6 +18,12 @@ urlpatterns = [
     url(r'^post/(?P<pk>\d+)/delete/$', views.DeletePostView.as_view(), name='post_remove'),
     url(r'^post/(?P<pk>\d+)/comment/$', views.CreateCommentView.save, name='comment_new'),
     url(r'^comment/(?P<pk>\d+)/delete/$', views.DeleteCommentView.as_view(), name='comment_remove'),
+
+    url(r'^post/(?P<pk>\d+)/like/$', views.like_post, name='like_post'),
+    url(r'^post/(?P<pk>\d+)/mark/$', views.mark_post, name='mark_post'),
+
+    url(r'^comment/(?P<pk>\d+)/like/$', views.like_comment, name='like_comment'),
+    url(r'^comment/(?P<pk>\d+)/dislike/$', views.dislike_comment, name='dislike_comment'),
 ]
 
 

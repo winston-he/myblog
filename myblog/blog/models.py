@@ -8,12 +8,15 @@ class Post(models.Model):
     author = models.ForeignKey('auth.User', related_name='posts', on_delete=models.CASCADE)
     title = models.CharField(max_length=128, null=False)
     content = models.TextField(null=False)
-    likes_count = models.PositiveIntegerField(default=0)
-    marked_count = models.PositiveIntegerField(default=0)
+    # likes_count = models.PositiveIntegerField(default=0)
+    # marked_count = models.PositiveIntegerField(default=0)
     viewed_count = models.PositiveIntegerField(default=0)
     create_time = models.DateTimeField(default=timezone.now)
     update_time = models.DateTimeField(default=timezone.now)
     published_time = models.DateTimeField(null=True)
+
+    liked_by = models.ManyToManyField(to='auth.User', related_name='liked_posts')
+    marked_by = models.ManyToManyField(to='auth.User', related_name='marked_posts')
 
     # 发布
     def publish(self):
@@ -34,6 +37,9 @@ class Comment(models.Model):
     likes_count = models.PositiveIntegerField(default=0)
     dislikes_count = models.PositiveIntegerField(default=0)
     create_time = models.DateTimeField(default=timezone.now)
+
+    liked_by = models.ManyToManyField(to='auth.User', related_name='liked_comments')
+    disliked_by = models.ManyToManyField(to='auth.User', related_name='disliked_comments')
 
     def __str__(self):
         return self.content

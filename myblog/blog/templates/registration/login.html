@@ -1,5 +1,5 @@
-{%extends 'blog/base.html' %}
-<!--{%block content%}-->
+{%extends 'blog/base-top-navbar.html' %}
+{%block content%}
 <div class="jumbotron">
     <h2>Please Login: </h2>
     <h3>(Must be SuperUser, please check admin for issues.)</h3>
@@ -13,5 +13,5 @@
         <input type="hidden" name="next" value="{{ next }}" />
     </form>
   </div>
-<!--{%endblock%}-->
+{%endblock%}
 

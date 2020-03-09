@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>MyBlog</title>
         <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
-        <link rel="stylesheet" href="{% static 'css/my_styling.css' %}">
         <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
         <link href="https://fonts.googleapis.com/css?family=Exo+2&display=swap" rel="stylesheet">
 </head>
@@ -62,35 +61,7 @@
       </div>
     </nav>
 
-    <ul class="list-group list-group-horizontal">
-        <li class="list-group-item">
-            <nav>
-              <ul class="nav flex-column">
-                <li class="nav-item">
-                  <a class="nav-link active" href="#">My Posts</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">My Comments</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">My Drafts</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Messages</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Marked Content</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link disabled" href="#">Disabled</a>
-                </li>
-              </ul>
-            </nav class="navbar navbar-expand-lg navbar-light bg-light" id="left-navbar">
-        </li>
-        <li class="list-group-item">
             {%block content%}
             {%endblock%}
-        </li>
-    </ul>
 </body>
 </html>

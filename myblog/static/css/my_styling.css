@@ -1,0 +1,19 @@
+.list-group-item {
+  border: dashed red;
+}
+
+.post-stats {
+  display: table;
+  margin: 0 auto;
+}
+
+.comment-actions {
+
+}
+
+.stats {
+  /* width: 30px;
+  height: 30px; */
+  margin: 5px 5px 5px 5px;
+  padding: 5px 5px 5px 5px;
+}
