@@ -14,17 +14,19 @@
         {{ error }}
       {% endfor %}
     </div>
-    {% for field in form %}
+
+    <!-- {% for field in form %} -->
       <div class="form-group">
         <p id="text-limit-hint">0/140</p>
-          {% render_field field class="form-control" placeholder="say something" %}
+        <input type="text" name="content" id="comment-content" class="form-control" placeholder="@" aria-label="comment" aria-describedby="basic-addon1">
+          <!-- {% render_field field class="form-control" placeholder="say something" %} -->
         <div class="{% if field.errors %} invalid{% endif %}">
           {% for error in field.errors %}
             <p class="help-block">{{ error }}</p>
           {% endfor %}
         </div>
       </div>
-    {% endfor %}
+    <!-- {% endfor %} -->
   </div>
 
   <div class="modal-footer">
@@ -32,3 +34,6 @@
   </div>
 </form>
 <!--{% endblock %}-->
+<script type="text/javascript">
+  var currTextLength = $('#comment-content').val().length;
+</script>

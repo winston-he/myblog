@@ -2,30 +2,44 @@ div {
   display: block;
 }
 
-.login-component {
+#carouselExampleIndicators {
+  position: absolute;
+  margin-top: 0px;
+  width: 100%;
+}
+
+#login-component {
+  height: 300px;
   width: 380px;
   position: relative;
-  left: 50%;
-  top: 37px;
+  left: 40%;
+  top: 100px;
   background-color: #fff;
   border: 1px solid #eee;
   padding-bottom: 30px;
 }
 
+
 #login-submit-btn {
     height: 40px;
     background-color: #deb887;
-    margin-top: 17px;
-    line-height: 40px;
+    margin-top: 40px;
+    margin-left: 40%;
+    /* line-height: 40px; */
     background: #2dbe61;
     border: 1px solid #1fae52;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 20px;
+    text-align: center;
     color: #fff;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     cursor: pointer;
 }
 
+#login-text {
+  text-align: center;
+  color: #808083;
+}
 
 .post-stats {
   display: table;
