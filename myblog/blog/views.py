@@ -43,7 +43,6 @@ class PostDetailView(DetailView):
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
-
     @staticmethod
     def save(request):
         if request.method == 'POST':
@@ -79,12 +78,6 @@ class DeletePostView(LoginRequiredMixin, DeleteView):
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
-
-    # template_name = 'blog/comment_form.html'
-    # model = Comment
-    # form_class = CommentForm
-    # success_url = reverse_lazy('post_detail')
-
     @staticmethod
     def save(request, pk):
         if request.method == 'POST':

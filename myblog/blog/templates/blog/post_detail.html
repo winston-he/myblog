@@ -33,11 +33,17 @@
         </div>
     </div>
     {%if user.is_authenticated%}
-    <button type="button" id="post-comment"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt=""></button>
+      <button type="button" id="post-comment"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt=""></button>
     {%endif%}
   {%if user == post.author%}
       <a  href="{%url 'post_edit' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
-      <a  href="{%url 'post_remove' pk=post.pk%}" role="button"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></a>
+
+      <!-- <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content"></div>
+          </div>
+      </div> -->
+      <button type="button" id="delete-post"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></button>
   {%endif%}
   {%if not post.published_time and user == post.author%}
       <a href="{%url 'post_publish' pk=post.pk%}" role="button"><img src="{%static 'img/icons/publish.png'%}" width=15 height=15 alt=""></a>
@@ -45,9 +51,8 @@
 
   <div class="list-group">
     {% for comment in post.post_comments.all %}
-      <div class="list-group-item list-group-item-active">
+      <div class="list-group-item list-group-item-active" id="comment-id_" + {{comment.pk}}>
         <div class="d-flex w-100 justify-content-between">
-          <!-- <h5 class="mb-1">List group item heading</h5> -->
           <small>{{comment.create_time | date:"N d, Y P"}}</small>
         </div>
         <p class="mb-1">{{comment.content}}</p>
@@ -66,7 +71,6 @@
                 <img src="{%static 'img/icons/thumb_up_unselected.png'%}" id="like-comment" width=20 height=20>
               {%endif%}
             </a>{{comment.liked_by.count}}
-
             <a href="{%url 'dislike_comment' pk=comment.pk%}" role="button">
             {%if user in comment.disliked_by.all%}
               <img src="{%static 'img/icons/thumb_down_selected.png'%}" id="dislike-comment" width=20 height=20>
@@ -74,10 +78,7 @@
               <img src="{%static 'img/icons/thumb_down_unselected.png'%}" id="dislike-comment" width=20 height=20>
             {%endif%}
             </a>{{comment.disliked_by.count}}
-
-
-
-            <a href="{% url 'comment_remove' pk=comment.pk %}" role="button"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></a>
+            <button type="button" class="delete-comment-btn" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
         </div>
       </div>
     {%endfor%}
@@ -85,15 +86,15 @@
 <script type="text/javascript">
   $(function () {
     $("#post-comment").modalForm({
-      formURL: "{% url 'comment_new' pk=post.pk%}",
+      formURL: "{% url 'comment_new' pk=post.pk %}",
     });
   });
-  // $("#like-post").on('click', '.alink', function() {
-  //   var url = "{%url 'like_post' pk=post.pk%}";
-  //   $("#like-post").src = "{%static 'img/icons/red_heart.png'%}";
-  //   // var id = $(this).attr('id');
-  //   $("#like-post").location.href = url;
-  // })
+
+  $(function () {
+    $("#delete-post").modalForm({
+      formURL: "{% url 'post_remove' pk=post.pk %}",
+    });
+  });
 
   $("#like-post").click(
     function() {

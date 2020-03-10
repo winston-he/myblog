@@ -1,5 +1,10 @@
 <!--{% block content %}-->
+{% load static %}
 {% load widget_tweaks %}
+<link rel="stylesheet" href="{% static 'css/my_styling.css' %}">
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/bootstrap.js' %}"></script>
 <form method="POST" action="">
   {% csrf_token %}
   <div class="modal-header">
@@ -18,8 +23,8 @@
     <!-- {% for field in form %} -->
       <div class="form-group">
         <p id="text-limit-hint">0/140</p>
-        <input type="text" name="content" id="comment-content" class="form-control" placeholder="@" aria-label="comment" aria-describedby="basic-addon1">
-          <!-- {% render_field field class="form-control" placeholder="say something" %} -->
+        <!-- <input type="textarea" cols=5 name="content" id="comment-content" class="form-control" placeholder="@" aria-label="comment" aria-describedby="basic-addon1"> -->
+        <textarea name="content" id="comment-content" rows="5" cols="60" placeholder="@" data-toggle="popover" title="Hint" data-content="Max text length is 140!"></textarea>
         <div class="{% if field.errors %} invalid{% endif %}">
           {% for error in field.errors %}
             <p class="help-block">{{ error }}</p>
@@ -30,10 +35,29 @@
   </div>
 
   <div class="modal-footer">
-    <button type="submit" class="btn btn-outline-primary">save</button>
+    <button type="submit" class="btn btn-outline-primary" id="save-comment">submit</button>
   </div>
 </form>
-<!--{% endblock %}-->
 <script type="text/javascript">
-  var currTextLength = $('#comment-content').val().length;
+  $('#comment-content').keyup(function() {
+    var currTextLength = $('#comment-content').val().length;
+    if (currTextLength > 140) {
+        $('#save-comment').prop('disabled', true);
+        $('#comment-content').popover("show");
+    }
+    else {
+      $('#save-comment').prop('disabled', false);
+      $('#comment-content').popover("hide");
+    }
+    $('#text-limit-hint').text(currTextLength + "/140");
+  })
+  $('body').on('click', function (e) {
+    $('[data-toggle=popover]').each(function () {
+        // hide any open popovers when the anywhere else in the body is clicked
+        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+            $(this).popover('hide');
+        }
+    });
+});
 </script>
+<!--{% endblock %}-->

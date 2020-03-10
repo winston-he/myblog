@@ -14,7 +14,7 @@ class PostForm(forms.ModelForm):
         fields = ('title', 'content')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'textinputclass'}),
-            'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea postcontent'}),
+            'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea postcontent', 'rows': 40, 'cols': 60}),
         }
 
 
@@ -23,7 +23,7 @@ class CommentForm(forms.ModelForm, PopRequestMixin):
     class Meta:
         model = Comment
         fields = ('content', )
-        # widgets = {
-        #     'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea'}),
-        # }
+        widgets = {
+            'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea', 'rows': 4, 'cols': 80}),
+        }
 
