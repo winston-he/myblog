@@ -1,32 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div class="container" id="blog-detail-area">
-  <div class="card" style="width: 18rem;">
-    <img src="..." class="card-img-top" alt="...">
-    <div class="card-body">
-      <h5 class="card-title">title: {{post.title}}</h5>
-      <p class="card-text">{{post.content}}</p>
-    </div>
-  </div>
-  <div class="post-stats">
-    <a  href="{%url 'like_post' pk=post.pk%}" role="button">
-      {%if user in post.liked_by.all%}
-        <img id="like-post" src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt="">
-      {%else%}
-        <img id="like-post" src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">
-      {%endif%}
-    </a>{{post.liked_by.count}}
-    <a  href="{%url 'mark_post' pk=post.pk%}" role="button">
-      {%if user in post.marked_by.all%}
-        <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">
-      {%else%}
-        <img id="mark-post" src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">
-      {%endif%}
-    </a>{{post.marked_by.count}}
-    <img id="view-post" src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  {{post.viewed_count}}
-  </div>
+<div class="container" id="blog-detail-comment-area">
+    <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example blog-detail-area">
+      <h5 class="card-title post-title">{{post.title}}</h5>
+      <div class="view-post-count">
+        <img id="view-post" src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  {{post.viewed_count}}
+      </div>
 
+      <div class="last-edit-time">
+        Last edited at {{post.update_time}}
+      </div>
+      <p class="card-text post-content">{{post.content}}</p>
+      <div class="post-stats">
+        <div class="like-post-btn">
+          <a  href="{%url 'like_post' pk=post.pk%}" role="button">
+            {%if user in post.liked_by.all%}
+              <img id="like-post" src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt="">
+            {%else%}
+              <img id="like-post" src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">
+            {%endif%}
+          </a>{{post.liked_by.count}}
+        </div>
+        <div class="mark-post-btn">
+          <a  href="{%url 'mark_post' pk=post.pk%}" role="button">
+            {%if user in post.marked_by.all%}
+              <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">
+            {%else%}
+              <img id="mark-post" src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">
+            {%endif%}
+          </a>{{post.marked_by.count}}
+        </div>
+      </div>
+      <div id="view-entire-post-btn-area">
+        <button type="button" name="button" id="view-entire-post-btn">Click to see the entire post</button>
+      </div>
+    </div>
     <div class="modal fade" tabindex="-1" role="dialog" id="modal">
         <div class="modal-dialog" role="document">
             <div class="modal-content"></div>
@@ -49,36 +58,40 @@
       <a href="{%url 'post_publish' pk=post.pk%}" role="button"><img src="{%static 'img/icons/publish.png'%}" width=15 height=15 alt=""></a>
   {%endif%}
 
-  <div class="list-group">
     {% for comment in post.post_comments.all %}
-      <div class="list-group-item list-group-item-active" id="comment-id_" + {{comment.pk}}>
-        <div class="d-flex w-100 justify-content-between">
-          <small>{{comment.create_time | date:"N d, Y P"}}</small>
+      <div class="card bg-light mb-3 comment-item">
+        <div class="card-header">
+          <div class="d-flex w-100 justify-content-between">
+            Posted by:
+                      {%if comment.author == user%}
+                          me
+                      {%else%}
+                          {{comment.author.username}}
+                      {%endif%}
+          </div>
         </div>
-        <p class="mb-1">{{comment.content}}</p>
-        <small>Posted by:
-            {%if comment.author == user%}
-                me
-            {%else%}
-                {{comment.author.username}}
-            {%endif%}
-            </small>
-        <div class="comment-actions">
-            <a href="{%url 'like_comment' pk=comment.pk%}" role="button">
-              {%if user in comment.liked_by.all%}
-                <img src="{%static 'img/icons/thumb_up_selected.png'%}" id="like-comment" width=20 height=20>
+        <div class="card-body">
+          <h6 class="card-title">
+            <small>{{comment.create_time | date:"N d, Y P"}}</small>
+          </h6>
+          <p class="card-text"><p class="mb-1">{{comment.content}}</p>
+          <div class="comment-actions">
+              <a href="{%url 'like_comment' pk=comment.pk%}" role="button">
+                {%if user in comment.liked_by.all%}
+                  <img src="{%static 'img/icons/thumb_up_selected.png'%}" id="like-comment" width=20 height=20>
+                {%else%}
+                  <img src="{%static 'img/icons/thumb_up_unselected.png'%}" id="like-comment" width=20 height=20>
+                {%endif%}
+              </a>{{comment.liked_by.count}}
+              <a href="{%url 'dislike_comment' pk=comment.pk%}" role="button">
+              {%if user in comment.disliked_by.all%}
+                <img src="{%static 'img/icons/thumb_down_selected.png'%}" id="dislike-comment" width=20 height=20>
               {%else%}
-                <img src="{%static 'img/icons/thumb_up_unselected.png'%}" id="like-comment" width=20 height=20>
+                <img src="{%static 'img/icons/thumb_down_unselected.png'%}" id="dislike-comment" width=20 height=20>
               {%endif%}
-            </a>{{comment.liked_by.count}}
-            <a href="{%url 'dislike_comment' pk=comment.pk%}" role="button">
-            {%if user in comment.disliked_by.all%}
-              <img src="{%static 'img/icons/thumb_down_selected.png'%}" id="dislike-comment" width=20 height=20>
-            {%else%}
-              <img src="{%static 'img/icons/thumb_down_unselected.png'%}" id="dislike-comment" width=20 height=20>
-            {%endif%}
-            </a>{{comment.disliked_by.count}}
-            <button type="button" class="delete-comment-btn" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
+              </a>{{comment.disliked_by.count}}
+              <button type="button" class="delete-comment-btn" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
+          </div>
         </div>
       </div>
     {%endfor%}
@@ -130,5 +143,9 @@
         this.src = "{%static 'img/icons/thumb_down_selected.png'%}";
     }
   )
+  $('#view-entire-post-btn').click(function() {
+    $('.scrollspy-example.blog-detail-area').height('400px');
+    $('#view-entire-post-btn').hide();
+  })
 </script>
 {% endblock %}

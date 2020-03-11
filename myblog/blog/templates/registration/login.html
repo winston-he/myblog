@@ -39,17 +39,21 @@
     {% endif %}
     <form method="POST" action="{% url 'login' %}">
     {% csrf_token %}
-    <div class="input-group mb-3">
+    <div class="input-group mb-3 username">
       <div class="input-group-prepend">
         <span class="input-group-text" id="inputGroup-sizing-default">username</span>
             {% render_field form.username class="form-control" placeholder="your name or email" %}
       </div>
     </div>
 
-    <div class="input-group mb-3">
+    <div class="input-group mb-3 password">
       <div class="input-group-prepend">
         <span class="input-group-text" id="inputGroup-sizing-default">password</span>
           {% render_field form.password class="form-control" %}
+        </div>
+        <div class="reset-password-link">
+          <a href=""><small>forgot password?</small></a>
+        </div>
     </div>
     <input type="submit" class='btn btn-primary' id='login-submit-btn' value="Login" />
     <!-- <input type="hidden" name="next" value="{{ next }}" /> -->

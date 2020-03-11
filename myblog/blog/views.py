@@ -41,6 +41,8 @@ class PostDetailView(DetailView):
         return post
 
 
+
+
 class CreatePostView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
     @staticmethod
