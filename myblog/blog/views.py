@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
+from django.http import HttpResponse
 
 
 # Create your views here.
@@ -18,7 +19,7 @@ class PostListView(ListView):
 
     def get_queryset(self):
         # return Post.objects.filter(published_time__isnull=False).order_by('-published_time')
-        return Post.objects.order_by('-published_time')
+        return Post.objects.order_by('-viewed_count')
 
 
 #
@@ -109,9 +110,11 @@ def like_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if not request.user.liked_posts.filter(pk=post.pk):
         request.user.liked_posts.add(post)
+        result = 1
     else:
+        result = -1
         request.user.liked_posts.remove(post)
-    return redirect('post_detail', pk=post.pk)
+    return HttpResponse(result)
 
 
 @login_required
@@ -119,21 +122,42 @@ def mark_post(request, pk):
     # if request.method == 'POST':
     post = get_object_or_404(Post, pk=pk)
     if not request.user.marked_posts.filter(pk=post.pk):
+        result = 1
         request.user.marked_posts.add(post)
     else:
+        result = -1
         request.user.marked_posts.remove(post)
-    return redirect('post_detail', pk=post.pk)
+    # return redirect('post_detail', pk=post.pk)
+    return HttpResponse(result)
+
 
 @login_required
 def like_comment(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
-    request.user.liked_comments.add(comment)
-    request.user.disliked_comments.remove(comment)
-    return redirect('post_detail', pk=comment.post.pk)
+    if request.user.disliked_comments.filter(pk=pk):
+        return HttpResponse(-1)
+    if not request.user.liked_comments.filter(pk=pk):
+        request.user.liked_comments.add(comment)
+        request.user.disliked_comments.remove(comment)
+        result = 1
+    else:
+        request.user.liked_comments.remove(comment)
+        result = 0
+    # return redirect('post_detail', pk=comment.post.pk)
+    return HttpResponse(result)
+
 
 @login_required
 def dislike_comment(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
-    request.user.liked_comments.remove(comment)
-    request.user.disliked_comments.add(comment)
-    return redirect('post_detail', pk=comment.post.pk)
+    if request.user.liked_comments.filter(pk=pk):
+        return HttpResponse(-1)
+    if not request.user.disliked_comments.filter(pk=pk):
+        request.user.liked_comments.remove(comment)
+        request.user.disliked_comments.add(comment)
+        result = 1
+    else:
+        request.user.disliked_comments.remove(comment)
+        result = 0
+    # return redirect('post_detail', pk=comment.post.pk){}
+    return HttpResponse(result)

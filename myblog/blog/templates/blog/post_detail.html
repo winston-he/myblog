@@ -1,37 +1,39 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.js' %}"></script>
 <div class="container" id="blog-detail-comment-area">
     <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example blog-detail-area">
       <h5 class="card-title post-title">{{post.title}}</h5>
-      <div class="view-post-count">
-        <img id="view-post" src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  {{post.viewed_count}}
-      </div>
-
-      <div class="last-edit-time">
-        Last edited at {{post.update_time}}
-      </div>
-      <p class="card-text post-content">{{post.content}}</p>
       <div class="post-stats">
         <div class="like-post-btn">
-          <a  href="{%url 'like_post' pk=post.pk%}" role="button">
-            {%if user in post.liked_by.all%}
-              <img id="like-post" src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt="">
-            {%else%}
-              <img id="like-post" src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">
-            {%endif%}
-          </a>{{post.liked_by.count}}
+            <a role="button" id="like-post-link">
+              {%if user in post.liked_by.all%}
+                <img id="like-post" src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt="">
+              {%else%}
+                <img id="like-post" src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">
+              {%endif%}
+            </a><div id="like-number">{{post.liked_by.count}}</div>
         </div>
         <div class="mark-post-btn">
-          <a  href="{%url 'mark_post' pk=post.pk%}" role="button">
+          <a  role="button">
             {%if user in post.marked_by.all%}
               <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">
             {%else%}
               <img id="mark-post" src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">
             {%endif%}
-          </a>{{post.marked_by.count}}
+          </a><div id="mark-number">{{post.marked_by.count}}</div>
         </div>
       </div>
+      <div class="view-post-count">
+        <img id="view-post" src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  {{post.viewed_count}}
+      </div>
+      <div class="last-edit-time">
+        Last edited at {{post.update_time}}
+      </div>
+
+      <p class="card-text post-content">{{post.content}}</p>
       <div id="view-entire-post-btn-area">
         <button type="button" name="button" id="view-entire-post-btn">Click to see the entire post</button>
       </div>
@@ -59,7 +61,7 @@
   {%endif%}
 
     {% for comment in post.post_comments.all %}
-      <div class="card bg-light mb-3 comment-item">
+      <div class="card bg-light mb-3 comment-item" id="comment-item_{{comment.pk}}">
         <div class="card-header">
           <div class="d-flex w-100 justify-content-between">
             Posted by:
@@ -76,21 +78,21 @@
           </h6>
           <p class="card-text"><p class="mb-1">{{comment.content}}</p>
           <div class="comment-actions">
-              <a href="{%url 'like_comment' pk=comment.pk%}" role="button">
+              <a role="button" >
                 {%if user in comment.liked_by.all%}
-                  <img src="{%static 'img/icons/thumb_up_selected.png'%}" id="like-comment" width=20 height=20>
+                  <img data-toggle="tooltip" title="I think you dislike it?"  data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_selected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
                 {%else%}
-                  <img src="{%static 'img/icons/thumb_up_unselected.png'%}" id="like-comment" width=20 height=20>
+                  <img data-toggle="tooltip" title="I think you dislike it?" data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_unselected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
                 {%endif%}
-              </a>{{comment.liked_by.count}}
-              <a href="{%url 'dislike_comment' pk=comment.pk%}" role="button">
+              </a><div id="comment-like-number_{{comment.pk}}">{{comment.liked_by.count}}</div>
+              <a role="button">
               {%if user in comment.disliked_by.all%}
-                <img src="{%static 'img/icons/thumb_down_selected.png'%}" id="dislike-comment" width=20 height=20>
+                <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
               {%else%}
-                <img src="{%static 'img/icons/thumb_down_unselected.png'%}" id="dislike-comment" width=20 height=20>
+                <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
               {%endif%}
-              </a>{{comment.disliked_by.count}}
-              <button type="button" class="delete-comment-btn" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
+              </a><div id="comment-dislike-number_{{comment.pk}}">{{comment.disliked_by.count}}</div>
+              <button type="button" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id="delete_{{comment_pk}}" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
           </div>
         </div>
       </div>
@@ -109,43 +111,134 @@
     });
   });
 
-  $("#like-post").click(
-    function() {
-      if (this.src == "{%static 'img/icons/red_heart.png'%}")
-        this.src = "{%static 'img/icons/grey_heart.png'%}";
-      else
-        this.src = "{%static 'img/icons/red_heart.png'%}";
-  })
-
-  $("#mark-post").click(
-    function() {
-      if (this.src == "{%static 'img/icons/star.png'%}")
-        this.src = "{%static 'img/icons/grey_star.png'%}";
-      else
-        this.src = "{%static 'img/icons/star.png'%}";
-  })
-
-  //
-  $("#like-comment").click(
-    function() {
-      if (this.src == "{%static 'img/icons/thumb_up_selected.png'%}")
-        this.src = "{%static 'img/icons/thumb_up_unselected.png'%}";
-      else
-        this.src = "{%static 'img/icons/thumb_up_selected.png'%}";
-    }
-  )
-  //
-  $("#dislike-comment").click(
-    function() {
-      if (this.src == "{%static 'img/icons/thumb_down_selected.png'%}")
-        this.src = "{%static 'img/icons/thumb_down_unselected.png'%}";
-      else
-        this.src = "{%static 'img/icons/thumb_down_selected.png'%}";
-    }
-  )
   $('#view-entire-post-btn').click(function() {
     $('.scrollspy-example.blog-detail-area').height('400px');
     $('#view-entire-post-btn').hide();
   })
+
+  $("#like-post").click(function () {
+    var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.ajax({
+      type: "POST",
+      data: postData,
+      url: "{%url 'like_post' pk=post.pk%}",
+      success: function (res) {
+        var tmp = $('#like-post').prop('src').split('/');
+        var picFileName = tmp[tmp.length - 1];
+        if (res == -1) {
+          $("#like-number").html(Number($("#like-number").html()) - 1);
+          $('#like-post').prop('src', "{%static 'img/icons/grey_heart.png'%}");
+        }
+        else {
+          $("#like-number").html(Number($("#like-number").html()) + 1);
+          $('#like-post').prop('src', "{%static 'img/icons/red_heart.png'%}");
+        }
+      }
+    });
+  });
+
+  $("#mark-post").click(function () {
+    var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.ajax({
+      type: "POST",
+      data: postData,
+      url: "{%url 'mark_post' pk=post.pk%}",
+      // data: form.serialize(),
+      success: function (res) {
+        var tmp = $('#mark-post').prop('src').split('/');
+        var picFileName = tmp[tmp.length - 1];
+        if (res == -1) {
+          $("#mark-number").html(Number($("#mark-number").html()) - 1);
+          $('#mark-post').prop('src', "{%static 'img/icons/grey_star.png'%}");
+        }
+        else {
+          $("#mark-number").html(Number($("#mark-number").html()) + 1);
+          $('#mark-post').prop('src', "{%static 'img/icons/star.png'%}");
+        }
+      }
+    });
+  });
+
+  $(".like-comment").click(function () {
+    var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.ajax({
+      type: "POST",
+      url: $(this).attr("data-href"),
+      data: postData,
+      success: function (result) {
+        var url = $(this)[0].url;
+        var comment_pk = url.match(/.*\/(\d+)\/.*/)[1];
+        var picSrc = $("#like-" + comment_pk).attr("src");
+        var tmp = picSrc.split('/');
+        var picFileName = tmp[tmp.length - 1];
+        var currCount = $("#comment-like-number_"+comment_pk).html();
+        if (result == 1) {
+           $("#comment-like-number_"+comment_pk).html(Number(currCount) + 1);
+          $("#like-" + comment_pk).prop('src', "{%static 'img/icons/thumb_up_selected.png'%}");
+        }
+        else if (result == 0) {
+          $("#comment-like-number_"+comment_pk).html(Number(currCount) - 1);
+          $("#like-" + comment_pk).prop('src', "{%static 'img/icons/thumb_up_unselected.png'%}");
+        }
+        else {
+          $("#like-" + comment_pk).tooltip({trigger:"click"});
+        }
+      }
+    });
+  });
+
+  $(".dislike-comment").click(function () {
+    var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.ajax({
+      type: "POST",
+      url: $(this).attr("data-href"),
+      data: postData,
+      success: function (result) {
+        var url = $(this)[0].url;
+        var comment_pk = url.match(/.*\/(\d+)\/.*/)[1];
+        var picSrc = $("#like-" + comment_pk).attr("src");
+        var tmp = picSrc.split('/');
+        var picFileName = tmp[tmp.length - 1];
+        var currCount = $("#comment-dislike-number_"+comment_pk).html();
+        if (result == 1) {
+           $("#comment-dislike-number_"+comment_pk).html(Number(currCount) + 1);
+          $("#dislike-" + comment_pk).prop('src', "{%static 'img/icons/thumb_down_selected.png'%}");
+        }
+        else if (result == 0) {
+          $("#comment-dislike-number_"+comment_pk).html(Number(currCount) - 1);
+          $("#dislike-" + comment_pk).prop('src', "{%static 'img/icons/thumb_down_unselected.png'%}");
+        }
+        else {
+          $("#dislike-" + comment_pk).tooltip({trigger:"click"});
+        }
+      }
+    });
+  });
+
+  $(".delete-comment-btn").click(function () {
+    var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.ajax({
+      type: "POST",
+      url: $(this).attr("data-href"),
+      data: postData,
+      success: function (result) {
+        
+      }
+    });
+  });
+
+  // $('.like-comment').tooltip().click(function () {
+  //     setTimeout(function () {
+  //         $('.like-comment').tooltip('hide');
+  //     }, 3000);
+  // });
+  // //
+  // $('.dislike-comment').tooltip().click(function () {
+  //     setTimeout(function () {
+  //         $('.dislike-comment').tooltip('hide');
+  //     }, 3000);
+  // });
+
+
 </script>
 {% endblock %}

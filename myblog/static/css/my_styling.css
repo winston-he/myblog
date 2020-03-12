@@ -143,7 +143,8 @@ div {
   margin-top: 10px;
   border: 1px solid #D3D3D3;
   border-radius: 6px;
-  background-color: #F8F9FA;
+  /* background-color: #F8F9FA; */
+  position: relative;
   box-shadow: 0px -4px 5px #808083, /* TOP */
   -4px 0px 5px #808083, /* LEFT */
   4px 0px 5px #808083, /* RIGHT */
@@ -151,14 +152,14 @@ div {
 }
 
 .last-edit-time {
-  position: absolute;
-  top: 115px;
-  left: 300px;
+  position: relative;
+  margin-top: 34px;
+  margin-left: 67px;
 }
 
 .card-title.post-title {
   position: absolute;
-  width: 60%;
+  width: 400px;
 }
 
 .card-body.post-detail {
@@ -168,18 +169,23 @@ div {
 
 .mark-post-btn {
   float: right;
+
 }
 
 .like-post-btn {
   position: absolute;
   float: right;
+  width: 40px;
   margin-left: 15px;
   margin-top: 1px;
+}
+#like-number {
+
 }
 
 .view-post-count {
   position: absolute;
-  top: 115px;
+  top: 44px;
 }
 
 .post-stats {
@@ -191,10 +197,9 @@ div {
 
 
 .card-text.post-content {
-  position: absolute;
-  padding-top: 80px;
+  position: relative;
+  padding-top: 50px;
   padding-left: 10px;
-  width: 1000px;
   /* height: 100%; */
 }
 
@@ -239,11 +244,15 @@ div {
 }
 
 #view-entire-post-btn-area {
-  margin: 250px auto;
-  /* margin-bottom: 5px; */
+  /* margin-bottom: 10px; */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
   border: none;
   width: 250px;
-  /* background-color: #F8F9FA; */
 }
 
 #view-entire-post-btn {
