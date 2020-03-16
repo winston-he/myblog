@@ -145,10 +145,7 @@ div {
   border-radius: 6px;
   /* background-color: #F8F9FA; */
   position: relative;
-  box-shadow: 0px -4px 5px #808083, /* TOP */
-  -4px 0px 5px #808083, /* LEFT */
-  4px 0px 5px #808083, /* RIGHT */
-  0px 4px 5px #808083; /* BOTTOM */
+  box-shadow: 0 1px 6px 0 rgba(32, 33, 36, 0.28);
 }
 
 .last-edit-time {
@@ -169,19 +166,27 @@ div {
 
 .mark-post-btn {
   float: right;
-
+  float: right;
+  width: 40px;
+  margin-left: 12px;
+  margin-top: 1px;
 }
 
 .like-post-btn {
   position: absolute;
   float: right;
   width: 40px;
-  margin-left: 15px;
-  margin-top: 1px;
+  margin-left: 8px;
+  margin-top: 2px;
 }
 #like-number {
-
+  float: right;
 }
+
+#mark-number {
+  float: right;
+}
+
 
 .view-post-count {
   position: absolute;
@@ -203,10 +208,13 @@ div {
   /* height: 100%; */
 }
 
-/* .like-post-btn {
+#like-post-link {
   position: absolute;
+}
 
-} */
+#mark-post-link {
+  position: absolute;
+}
 
 .post-edit-area {
   /* position: absolute; */
@@ -238,9 +246,58 @@ div {
   transition-delay: 0s, 0s;
 }
 
+.comment-actions {
+  margin-top: 10px;
+  width: 100px;
+  /* position: absolute; */
+}
+
+.comment-actions-list {
+  display: flex;
+  padding-left: 10px;
+  flex-wrap: nowrap;
+  list-style-type: none;
+}
+
+
+.comment-like-section {
+  box-sizing: border-box;
+  padding: 6px 8px;
+  margin-right: 8px;
+}
+
+
+.comment-dislike-section {
+  box-sizing: border-box;
+  padding: 6px 8px;
+  margin-right: 8px;
+}
+
+
+.comment-like-link {
+  position: absolute;
+}
+
+.comment-dislike-link {
+  position: absolute;
+  /* margin-left: 40px; */
+}
+
+
+ .thumb-up {
+  /* color: #FF0000; */
+  margin-left: 20px;
+}
+
+.thumb-down {
+  /* color: #FF0000; */
+  margin-left: 20px;
+}
+
 .delete-comment-btn {
   border: none;
   background-color: #F8F9FA;
+  float: right;
 }
 
 #view-entire-post-btn-area {
@@ -258,16 +315,12 @@ div {
 #view-entire-post-btn {
   width: 100%;
   border: none;
-  background-color: #F8F9FA;
 }
 
 .card.bg-light.mb-3.comment-item {
   margin-bottom: 2px;
   margin-top: 10px;
-  box-shadow: 0px -4px 5px #808083, /* TOP */
-  -4px 0px 5px #808083, /* LEFT */
-  4px 0px 5px #808083, /* RIGHT */
-  0px 4px 5px #808083; /* BOTTOM */
+  box-shadow: 0 1px 6px 0 rgba(32, 33, 36, 0.28);
 }
 
 #save-to-draft-btn {
@@ -290,8 +343,13 @@ div {
   border-radius: 6px;
 }
 
-.comment-actions {
+.media {
+  /* height: 300px; */
+}
 
+.comment-actions {
+  position: absolute;
+  bottom: 10px;
 }
 
 .stats {

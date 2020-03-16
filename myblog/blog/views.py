@@ -97,11 +97,11 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
         return render(request, 'blog/comment_form.html', {'form': form})
 
 
-class DeleteCommentView(LoginRequiredMixin, DeleteView):
-    login_url = '/login/'
-    success_url = reverse_lazy('post_list')
-    model = Comment
-    # template_name = 'blog/post_detail.html'
+# class DeleteCommentView(LoginRequiredMixin, DeleteView):
+#     login_url = '/login/'
+#     success_url = reverse_lazy('post_list')
+#     model = Comment
+#     # template_name = 'blog/post_detail.html'
 
 
 @login_required
@@ -161,3 +161,12 @@ def dislike_comment(request, pk):
         result = 0
     # return redirect('post_detail', pk=comment.post.pk){}
     return HttpResponse(result)
+
+
+@login_required
+def remove_comment(request, pk):
+    if request.method == "POST":
+        comment = get_object_or_404(Comment, pk=pk)
+        comment.delete()
+        return HttpResponse(1)
+

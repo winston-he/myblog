@@ -17,7 +17,7 @@
             </a><div id="like-number">{{post.liked_by.count}}</div>
         </div>
         <div class="mark-post-btn">
-          <a  role="button">
+          <a  role="button" id="mark-post-link">
             {%if user in post.marked_by.all%}
               <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">
             {%else%}
@@ -78,22 +78,32 @@
           </h6>
           <p class="card-text"><p class="mb-1">{{comment.content}}</p>
           <div class="comment-actions">
-              <a role="button" >
-                {%if user in comment.liked_by.all%}
-                  <img data-toggle="tooltip" title="I think you dislike it?"  data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_selected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
-                {%else%}
-                  <img data-toggle="tooltip" title="I think you dislike it?" data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_unselected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
-                {%endif%}
-              </a><div id="comment-like-number_{{comment.pk}}">{{comment.liked_by.count}}</div>
-              <a role="button">
-              {%if user in comment.disliked_by.all%}
-                <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
-              {%else%}
-                <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
-              {%endif%}
-              </a><div id="comment-dislike-number_{{comment.pk}}">{{comment.disliked_by.count}}</div>
-              <button type="button" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id="delete_{{comment_pk}}" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
+              <ul class="comment-actions-list">
+                <li class="comment-like-section">
+                  <a role="button" class="comment-like-link">
+                    {%if user in comment.liked_by.all%}
+                      <img data-toggle="tooltip" title="I think you dislike it?"  data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_selected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
+                    {%else%}
+                      <img data-toggle="tooltip" title="I think you dislike it?" data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_unselected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
+                    {%endif%}
+                  </a>
+                  <div class="thumb-up" id="comment-like-number_{{comment.pk}}">{{comment.liked_by.count}}</div>
+                </li>
+                <li>
+                  <div class="comment-dislike-section">
+                    <a role="button" class="comment-dislike-link">
+                    {%if user in comment.disliked_by.all%}
+                      <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
+                    {%else%}
+                      <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
+                    {%endif%}
+                    </a><div class="thumb-down" id="comment-dislike-number_{{comment.pk}}">{{comment.disliked_by.count}}</div>
+                  </div>
+                </li>
+              </ul>
+
           </div>
+          <button type="button" data-toggle="popover" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id=delete_{{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
         </div>
       </div>
     {%endfor%}
@@ -201,31 +211,55 @@
         var picFileName = tmp[tmp.length - 1];
         var currCount = $("#comment-dislike-number_"+comment_pk).html();
         if (result == 1) {
+            console.log("result is 1");
            $("#comment-dislike-number_"+comment_pk).html(Number(currCount) + 1);
           $("#dislike-" + comment_pk).prop('src', "{%static 'img/icons/thumb_down_selected.png'%}");
         }
         else if (result == 0) {
+          console.log("result is 0");
           $("#comment-dislike-number_"+comment_pk).html(Number(currCount) - 1);
           $("#dislike-" + comment_pk).prop('src', "{%static 'img/icons/thumb_down_unselected.png'%}");
         }
         else {
+          console.log("result is -1");
           $("#dislike-" + comment_pk).tooltip({trigger:"click"});
         }
       }
     });
   });
 
-  $(".delete-comment-btn").click(function () {
+  $(document).ready(function(){
+      $('.delete-comment-btn').popover({
+          placement : 'top',
+          html : true,
+          title : 'User Info <a href="#" class="close" data-dismiss="alert">&times;</a>',
+          content : '<div class="media"><a href="#" class="pull-left"></a><div class="media-body"><h4 class="media-heading">John Carter</h4><p>Excellent Bootstrap popover! I really love it.</p>' +
+            '<a href="https://www.google.com" class="confirm-delete-comment-btn" data-dismiss="alert" data-href=sd' + $(this).attr("data-href") + '>confirm</a></div></div>'
+      });
+
+  });
+  $(document).on("click", ".popover .close" , function(){
+      $(this).parents(".popover").popover('hide');
+  });
+
+  $(document).on("click", ".popover .confirm-delete-comment-btn" , function(){
     var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
     $.ajax({
       type: "POST",
       url: $(this).attr("data-href"),
       data: postData,
       success: function (result) {
-        
+        var url = $(this)[0].url;
+        var comment_pk = url.match(/.*\/(\d+)\/.*/)[1];
+        var picSrc = $("#like-" + comment_pk).attr("src");
+        var tmp = picSrc.split('/');
+        var picFileName = tmp[tmp.length - 1];
+        var currCount = $("#comment-dislike-number_"+comment_pk).html();
+        if (result == 1) {}
       }
     });
   });
+
 
   // $('.like-comment').tooltip().click(function () {
   //     setTimeout(function () {
