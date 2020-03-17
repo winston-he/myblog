@@ -33,13 +33,12 @@ class PostListView(ListView):
 #
 class PostDetailView(DetailView):
     model = Post
-
-    def get_object(self, queryset=None):
-        post = super().get_object()
-        post.viewed_count += 1
-        post.save()
-        self.viewed_count = post.viewed_count
-        return post
+    # def get_object(self, queryset=None):
+    #     post = super().get_object()
+    #     post.viewed_count += 1
+    #     post.save()
+    #     self.viewed_count = post.viewed_count
+    #     return post
 
 
 
@@ -169,4 +168,14 @@ def remove_comment(request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         comment.delete()
         return HttpResponse(1)
+
+
+@login_required
+def add_view_count(request, pk):
+    if request.method == "POST":
+        print("ADD VIEW COUNT")
+        post = get_object_or_404(Post, pk=pk)
+        post.viewed_count += 1
+        post.save()
+        return HttpResponse(post.viewed_count)
 
