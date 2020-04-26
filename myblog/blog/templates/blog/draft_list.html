@@ -1,3 +1,29 @@
 {%extends "base.html"%}
-<!-- {%block content%}
-{%endblock%} -->
+{% load static %}
+{%block content%}
+<div class="container">
+    <ul class="list-group">
+        {%for post in post_list%}
+            <li class="list-group-item post-item">
+                <div class="preview-post-title">
+                    <h3><a href="{%url 'post_detail' pk=post.pk%}" id="post-title-link"><span>{{post.title}}</span></a></h3>
+                </div>
+                <div class="preview-post-date">
+                    <p>Created on: {{post.create_time|date:"N d, Y"}} by: {{post.author}}</p>
+                </div>
+                <div class="preview-post-content">
+                    <p>
+                      {%if post.content|length > 140%}
+                        {{post.content|slice:":140"}}...
+                      {%else%}
+                        {{post.content}}
+                      {%endif%}
+                    </p>
+                </div>
+            </li>
+        {%endfor%}
+    </ul>
+</div>
+ {%endblock%}
+ {%block right_navbar%}
+ {%endblock%}

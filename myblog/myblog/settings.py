@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'blog',
     'bootstrap4',
     'bootstrap_modal_forms',
-    'widget_tweaks'
+    'widget_tweaks',
+    'user'
+    # "debug-toolbar"
 ]
 
 MIDDLEWARE = [
@@ -77,8 +79,12 @@ WSGI_APPLICATION = 'myblog.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'myblog',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'USER': 'root',
+        'PASSWORD': '1234'
     }
 }
 
@@ -120,5 +126,6 @@ STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'post_list'

@@ -6,7 +6,7 @@
         {%for post in post_list%}
             <li class="list-group-item post-item">
                 <div class="preview-post-title">
-                    <h3><a href="{%url 'post_detail' pk=post.pk%}" id="post-title-link"><span>{{post.title}}</span></a></h3>
+                    <h4><a href="{%url 'post_detail' pk=post.pk%}" id="post-title-link"><span>{{post.title}}</span></a></h4>
                 </div>
                 <div class="preview-post-date">
                     <p>Created on: {{post.create_time|date:"N d, Y"}} by: {{post.author}}</p>
@@ -21,14 +21,10 @@
                     </p>
                 </div>
                 <div class="preview-visit-stats">
-                  <table>
-                    <tr>
-                      <td id="liked-count" class="stats"><img src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt=""> {{post.liked_by.count}}</td>
-                      <td id="marked-count" class="stats"><img src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">{{post.marked_by.count}}</td>
-                      <td id="viewed-count" class="stats"><img src="{%static 'img/icons/view.png'%}" width=20 height=20 alt=""> {{post.viewed_count}}</td>
-                      <td id="comment-count" class="stats"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt="">{{post.post_comments.count}}</td>
-                    </tr>
-                  </table>
+                      <div id="liked-count" class="stats"><img src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt=""> {{post.liked_by.count}}</div>
+                      <div id="marked-count" class="stats"><img src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">{{post.marked_by.count}}</div>
+                      <div id="viewed-count" class="stats"><img src="{%static 'img/icons/view.png'%}" width=20 height=20 alt=""> {{post.viewed_count}}</div>
+                      <div id="comment-count" class="stats"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt="">{{post.post_comments.count}}</div>
                 </div>
 
             </li>

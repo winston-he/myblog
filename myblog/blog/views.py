@@ -1,6 +1,6 @@
 from django.shortcuts import reverse, render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -18,8 +18,16 @@ class PostListView(ListView):
     model = Post
 
     def get_queryset(self):
-        # return Post.objects.filter(published_time__isnull=False).order_by('-published_time')
-        return Post.objects.order_by('-viewed_count')
+        print("get posts")
+        return Post.objects.filter(published_time__isnull=False).order_by('-published_time')
+
+
+class DraftListView(ListView):
+    model = Post
+
+    def get_queryset(self):
+        print("getting drafts")
+        return Post.objects.filter(published_time__isnull=True).order_by('-published_time')
 
 
 #
@@ -42,10 +50,9 @@ class PostDetailView(DetailView):
         return post
 
 
-
-
 class CreatePostView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
+
     @staticmethod
     def save(request):
         if request.method == 'POST':
@@ -81,6 +88,7 @@ class DeletePostView(LoginRequiredMixin, DeleteView):
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
+
     @staticmethod
     def save(request, pk):
         if request.method == 'POST':
@@ -106,7 +114,6 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 
 @login_required
 def like_post(request, pk):
-    # if request.method == 'POST':
     post = get_object_or_404(Post, pk=pk)
     if not request.user.liked_posts.filter(pk=post.pk):
         request.user.liked_posts.add(post)

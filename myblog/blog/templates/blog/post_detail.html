@@ -3,6 +3,7 @@
 {% block content %}
 <script src="{% static 'js/popper.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.js' %}"></script>
+<script src="{% static 'blog/js/default.js' %}"></script>
 <div class="container" id="blog-detail-comment-area">
     <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example blog-detail-area">
       <h5 class="card-title post-title">{{post.title}}</h5>
@@ -19,7 +20,7 @@
         <div class="mark-post-btn">
           <a  role="button">
             {%if user in post.marked_by.all%}
-              <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=30 height=30 alt="">
+              <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=20 height=20 alt="">
             {%else%}
               <img id="mark-post" src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">
             {%endif%}
@@ -48,12 +49,6 @@
     {%endif%}
   {%if user == post.author%}
       <a  href="{%url 'post_edit' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
-
-      <!-- <div class="modal fade" tabindex="-1" role="dialog" id="modal">
-          <div class="modal-dialog" role="document">
-              <div class="modal-content"></div>
-          </div>
-      </div> -->
       <button type="button" id="delete-post"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></button>
   {%endif%}
   {%if not post.published_time and user == post.author%}
@@ -78,20 +73,22 @@
           </h6>
           <p class="card-text"><p class="mb-1">{{comment.content}}</p>
           <div class="comment-actions">
-              <a role="button" >
+              <a role="button" class=comment-action-item>
                 {%if user in comment.liked_by.all%}
                   <img data-toggle="tooltip" title="I think you dislike it?"  data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_selected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
                 {%else%}
                   <img data-toggle="tooltip" title="I think you dislike it?" data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_unselected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
                 {%endif%}
-              </a><div id="comment-like-number_{{comment.pk}}">{{comment.liked_by.count}}</div>
-              <a role="button">
+              </a>
+              <div id="comment-like-number_{{comment.pk}}" class=comment-action-item>{{comment.liked_by.count}}</div>
+              <a role="button" class=comment-action-item>
               {%if user in comment.disliked_by.all%}
                 <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
               {%else%}
                 <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
               {%endif%}
-              </a><div id="comment-dislike-number_{{comment.pk}}">{{comment.disliked_by.count}}</div>
+              </a>
+              <div id="comment-dislike-number_{{comment.pk}}" class=comment-action-item>{{comment.disliked_by.count}}</div>
               <button type="button" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id="delete_{{comment_pk}}" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
           </div>
         </div>
@@ -115,7 +112,6 @@
     $('.scrollspy-example.blog-detail-area').height('400px');
     $('#view-entire-post-btn').hide();
   })
-
   $("#like-post").click(function () {
     var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
     $.ajax({
@@ -129,9 +125,12 @@
           $("#like-number").html(Number($("#like-number").html()) - 1);
           $('#like-post').prop('src', "{%static 'img/icons/grey_heart.png'%}");
         }
-        else {
+        else if(res == 1) {
           $("#like-number").html(Number($("#like-number").html()) + 1);
           $('#like-post').prop('src', "{%static 'img/icons/red_heart.png'%}");
+        }
+        else {
+          renderLoginPage();
         }
       }
     });
@@ -151,9 +150,12 @@
           $("#mark-number").html(Number($("#mark-number").html()) - 1);
           $('#mark-post').prop('src', "{%static 'img/icons/grey_star.png'%}");
         }
-        else {
+        else if(res == 1) {
           $("#mark-number").html(Number($("#mark-number").html()) + 1);
           $('#mark-post').prop('src', "{%static 'img/icons/star.png'%}");
+        }
+        else {
+          renderLoginPage();
         }
       }
     });
@@ -222,7 +224,7 @@
       url: $(this).attr("data-href"),
       data: postData,
       success: function (result) {
-        
+
       }
     });
   });

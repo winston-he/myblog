@@ -6,10 +6,6 @@ a span {
   color: #000000;
 }
 
-div {
-  display: block;
-}
-
 #major-page-content {
   float:left;
   width:100%;
@@ -20,7 +16,7 @@ div {
 
 #left-navbar-area {
   float:left;
-  width: 10%;
+  width: 20%;
   text-decoration:none;
   padding:0.2em 0.6em;
   border-right:1px solid white;
@@ -93,10 +89,22 @@ div {
   margin: auto;
 }
 
+.login-signup-btn-section {
+  margin: 0 auto;
+  display: flex;
+}
+
 #login-submit-btn {
-  /* margin-top: 50px; */
-  margin-top: 20px;
-  margin-left: 150px;
+  width: 100px;
+  /* margin: 0 auto; */
+  margin-right: 20px;
+  margin-left: 70px;
+  display: inline;
+}
+
+#signup-btn {
+  width: 100px;
+  display: inline;
   cursor: pointer;
 }
 
@@ -115,6 +123,11 @@ div {
 
 .preview-post-title {
   position: absolute;
+}
+
+.stats {
+  display: inline;
+  margin: 5px;
 }
 
 .preview-post-date {
@@ -194,7 +207,9 @@ div {
   margin-right: 5px;
 }
 
-
+.card-body {
+  padding: 10px;
+}
 
 .card-text.post-content {
   position: relative;
@@ -221,10 +236,12 @@ div {
 #post-comment {
   margin-top: 10px;
   border: none;
+  color: #ffffff;
 }
 
 #delete-post {
   border: none;
+  color: #ffffff;
 }
 
 #post-content {
@@ -236,6 +253,10 @@ div {
   transition-duration: 0.15s, 0.15s;
   transition-timing-function: ease-in-out, ease-in-out;
   transition-delay: 0s, 0s;
+}
+
+.comment-action-item {
+  display: inline;
 }
 
 .delete-comment-btn {
@@ -258,7 +279,7 @@ div {
 #view-entire-post-btn {
   width: 100%;
   border: none;
-  background-color: #F8F9FA;
+  /* background-color: #F8F9FA; */
 }
 
 .card.bg-light.mb-3.comment-item {
@@ -292,11 +313,4 @@ div {
 
 .comment-actions {
 
-}
-
-.stats {
-  /* width: 30px;
-  height: 30px; */
-  margin: 5px 5px 5px 5px;
-  padding: 5px 5px 5px 5px;
 }

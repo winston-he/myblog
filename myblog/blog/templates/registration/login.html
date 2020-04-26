@@ -55,8 +55,10 @@
           <a href=""><small>forgot password?</small></a>
         </div>
     </div>
-    <input type="submit" class='btn btn-primary' id='login-submit-btn' value="Login" />
-    <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+    <div class="login-signup-btn-section">
+      <input type="submit" class='btn btn-primary' id='login-submit-btn' value="Login" />
+      <a class='btn btn-outline-primary' id='signup-btn'  href="{% url 'new_user' %}">Signup</a>
+    </div>
     </form>
   </div>
 <!-- <div class="login-component"> -->

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <div class="new-user-form-area">
+      {% csrf_token %}
+      <form class="" method="post">
+        <div>name: {{form.name}}</div>
+        <div>password: {{form.password}}</div>
+        <div>confirm your password: {{form.password}}</div>
+        <div>email: {{form.email}}</div>
+        <div>gender: {{form.gender}}</div>
+        <input type="text" name="" value="">
+        <button type="submit" class="btn btn-primary" name="button">Confirm</button>
+        <a type="button" class="btn btn-outline-primary" name="button" href="{% url 'login' %}">Return</a>
+      </form>
+    </div>
+  </body>
+</html>
