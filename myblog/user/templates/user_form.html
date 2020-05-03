@@ -1,22 +1,53 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-  </head>
+{%extends 'base-user.html'%}
   <body>
+    {%block content%}
     <div class="new-user-form-area">
-      {% csrf_token %}
-      <form class="" method="post">
-        <div>name: {{form.name}}</div>
-        <div>password: {{form.password}}</div>
-        <div>confirm your password: {{form.password}}</div>
-        <div>email: {{form.email}}</div>
-        <div>gender: {{form.gender}}</div>
-        <input type="text" name="" value="">
-        <button type="submit" class="btn btn-primary" name="button">Confirm</button>
+      <form class="" method="post" action="{% url 'new_user' %}">
+        {% csrf_token %}
+        <div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">username</span>
+            </div>
+            <input name="username" type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+          </div>
+      </div>
+      <div>
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" >password</span>
+          </div>
+          <input name="password" type="text" class="form-control" placeholder="Length>=8" aria-describedby="basic-addon1">
+        </div>
+      </div>
+    <div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" >password again</span>
+        </div>
+        <input name="confirm_password" type="text" class="form-control" placeholder=""  aria-describedby="basic-addon1">
+      </div>
+  </div>
+  <div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" >email</span>
+      </div>
+      <input name="email" type="text" class="form-control" placeholder="@" aria-describedby="basic-addon1">
+    </div>
+</div>
+<div class="col-auto my-1">
+  <label class="mr-sm-2 sr-only">Preference</label>
+  <select name="gender" class="custom-select mr-sm-2" required>
+    <option selected>选择您的性别</option>
+    <option value="1">男</option>
+    <option value="2">女</option>
+    <option value="3">保密</option>
+  </select>
+</div>
+        <button type="submit" class="btn btn-primary" name="button">Sign up</button>
         <a type="button" class="btn btn-outline-primary" name="button" href="{% url 'login' %}">Return</a>
       </form>
     </div>
+    {%endblock%}
   </body>
-</html>

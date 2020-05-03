@@ -11,10 +11,25 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import djcelery
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'blog/templates/blog')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'winstonhwz@163.com'
+MAIL_HOST_PASSWORD = 'FAGMKMUDKYUBEYQP'
+EMAIL_FROM = 'myblog<winstonhwz@163.com>'
+
+djcelery.setup_loader()
+
+BROKER_URL = 'amqp://localhost:5672/'
+CELERY_IMPORTS = ('myblog.mail.views', )
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -40,7 +55,8 @@ INSTALLED_APPS = [
     'bootstrap4',
     'bootstrap_modal_forms',
     'widget_tweaks',
-    'user'
+    'user',
+    'djcelery'
     # "debug-toolbar"
 ]
 
@@ -117,7 +133,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/

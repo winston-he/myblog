@@ -10,5 +10,6 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^user/new$', views.CreateUserView.as_view(), name='new_user')
+    url(r'^user/new$', views.register, name='new_user'),
+    url(r'^user/activate/{}$', views.activate_user_account, name='activate_user'),
 ]

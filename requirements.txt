@@ -4,3 +4,7 @@ django-widget-tweaks==1.4.5
 django-bootstrap4
 django-debug-toolbar==2.2
 mysqlclient==1.4.6
+celery==4.4.2
+django-celery==3.3.1
+lxml==4.5.0
+itsdangerous==1.1.0
