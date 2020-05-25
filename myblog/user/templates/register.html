@@ -1,0 +1,13 @@
+{%extends 'base-user.html'%}
+  <body>
+    {%block content%}
+    <div class="new-user-form-area">
+      <form class="" method="post" action="{% url 'new_user' %}">
+          {% csrf_token %}
+          {{form.as_ul}}
+          <button type="submit" class="btn btn-primary" name="button">Sign up</button>
+      </form>
+      <a type="button" class="btn btn-outline-primary" name="button" href="{% url 'login' %}">Return</a>
+    </div>
+    {%endblock%}
+  </body>

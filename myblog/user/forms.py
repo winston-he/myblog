@@ -6,17 +6,26 @@
 @File: forms.py.py
 @Time: 2020/4/11 19:26
 '''
-from django import forms
+# from django import forms
 from django.contrib.auth.forms import PasswordResetForm
+from django.forms import ModelForm, Textarea, TextInput, PasswordInput, EmailInput, RadioSelect, CharField
+
 from .models import User
 
-
-class UserForm(forms.ModelForm):
+class UserForm(ModelForm):
     class Meta:
         model = User
-        fields = ('name', 'email', 'password', 'gender')
-        # widgets = {
-        #     'title': forms.TextInput(attrs={'class': 'textinputclass'}),
-        #     'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea postcontent', 'rows': 40, 'cols': 60}),
-        # }
+        fields = ['name', 'password', 'email', 'gender']
+        widgets = {
+            'name': TextInput(),
+            'password': PasswordInput(),
+            'email': EmailInput(),
+            'gender': RadioSelect()
+        }
+
+    def clean(self):
+        pass
+
+    password_confirm = CharField(required=True, max_length=32, min_length=6, error_messages="")
+
 

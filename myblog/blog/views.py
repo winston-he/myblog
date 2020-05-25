@@ -19,6 +19,8 @@ class PostListView(ListView):
 
     def get_queryset(self):
         print("get posts")
+
+        HttpResponse
         return Post.objects.filter(published_time__isnull=False).order_by('-published_time')
 
 
@@ -180,7 +182,6 @@ def remove_comment(request, pk):
 @login_required
 def add_view_count(request, pk):
     if request.method == "POST":
-        print("ADD VIEW COUNT")
         post = get_object_or_404(Post, pk=pk)
         post.viewed_count += 1
         post.save()
