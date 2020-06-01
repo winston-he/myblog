@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-import djcelery
+# import djcelery
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,7 +24,7 @@ EMAIL_HOST_USER = 'winstonhwz@163.com'
 MAIL_HOST_PASSWORD = 'FAGMKMUDKYUBEYQP'
 EMAIL_FROM = 'myblog<winstonhwz@163.com>'
 
-djcelery.setup_loader()
+# djcelery.setup_loader()
 
 BROKER_URL = 'amqp://localhost:5672/'
 CELERY_IMPORTS = ('myblog.mail.views', )
@@ -56,7 +56,9 @@ INSTALLED_APPS = [
     'bootstrap_modal_forms',
     'widget_tweaks',
     'user',
-    'djcelery'
+    'channels',
+    'chat'
+    # 'djcelery'
     # "debug-toolbar"
 ]
 
@@ -89,6 +91,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'myblog.wsgi.application'
+ASGI_APPLICATION = 'myblog.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -100,7 +103,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
         'USER': 'root',
-        'PASSWORD': '1234'
+        'PASSWORD': 'hwzhen123'
     }
 }
 
@@ -145,3 +148,13 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'post_list'
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

@@ -105,6 +105,6 @@ params = [1 - float(random.randint(1, 2)) / 100,
           ]
 
 if __name__ == '__main__':
-    val_pic_gen = ValidationPicGenerator((500, 100), 100, '/Users/winstonhe/PycharmProjects/myblog/myblog/fonts/FZHTJW.TTF', 5)
+    val_pic_gen = ValidationPicGenerator((500, 100), 100, '../fonts/FZHTJW.TTF', 5)
     res = val_pic_gen.upside_down_char(upside_down_num=2)
     print(res)

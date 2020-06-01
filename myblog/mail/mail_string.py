@@ -6,7 +6,7 @@
 @File: mail_string.py
 @Time: 2020/5/3 16:13
 '''
-import lxml
+
 
 def get_activate_msg(username, link):
     return '<!DOCTYPE html>' \

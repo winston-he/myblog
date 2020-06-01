@@ -61,8 +61,10 @@
     </div>
     </form>
   </div>
-<!-- <div class="login-component"> -->
-
-<!-- </div> -->
-
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("#id_username").prop("autocomplete", "off");
+    $("#id_password").prop("autocomplete", "off");
+  })
+</script>
 {%endblock%}
