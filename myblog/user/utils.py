@@ -9,9 +9,11 @@
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous.exc import BadSignature, SignatureExpired
 
+
 def generate_token(obj) -> str:
     s = Serializer('secret-key', expires_in=3600 * 24)
     return s.dumps(obj).decode("utf-8")
+
 
 def load_token(token: str):
     '''
@@ -27,4 +29,3 @@ def load_token(token: str):
     except BadSignature:
         return -2
     return obj
-

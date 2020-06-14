@@ -51,11 +51,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'user',
     'blog',
     'bootstrap4',
     'bootstrap_modal_forms',
     'widget_tweaks',
-    'user',
     'channels',
     'chat'
     # 'djcelery'
@@ -103,7 +103,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
         'USER': 'root',
-        'PASSWORD': 'hwzhen123'
+        'PASSWORD': '1234'
     }
 }
 

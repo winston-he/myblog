@@ -6,26 +6,19 @@
 @File: forms.py.py
 @Time: 2020/4/11 19:26
 '''
-# from django import forms
-from django.contrib.auth.forms import PasswordResetForm
-from django.forms import ModelForm, Textarea, TextInput, PasswordInput, EmailInput, RadioSelect, CharField
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.forms import IntegerField, RadioSelect
 
-from .models import User
+from .models import UserProfile
 
-class UserForm(ModelForm):
+
+class UserForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['name', 'password', 'email', 'gender']
+        fields = ['username', 'password1', 'password2', 'email', 'gender']
         widgets = {
-            'name': TextInput(),
-            'password': PasswordInput(),
-            'email': EmailInput(),
             'gender': RadioSelect()
         }
 
-    def clean(self):
-        pass
-
-    password_confirm = CharField(required=True, max_length=32, min_length=6, error_messages="")
-
-
+    gender = IntegerField(min_value=0, max_value=2)

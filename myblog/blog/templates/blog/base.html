@@ -13,6 +13,8 @@
 <body>
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/security.js' %}"></script>
+    <script src="{% static 'layer/layer.js' %}"></script>
     <!-- You can alternatively load the minified version -->
     <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
     <nav class="navbar navbar-expand-lg navbar-light bg-light" id="main-navbar">
@@ -70,16 +72,16 @@
               <a class="nav-link active" href="{%url 'post_list'%}">All Posts</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link left" href="#">My Comments</a>
+              <a class="nav-link left" href="{%url 'comment_list'%}">My Comments</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link left" href="{%url 'draft_list'%}">My Drafts</a>
+              <a class="nav-link left" href="{%url 'my_post_list'%}">Mine</a>
             </li>
 <!--            <li class="nav-item">-->
 <!--              <a class="nav-link left" href="#">Messages</a>-->
 <!--            </li>-->
             <li class="nav-item">
-              <a class="nav-link left" href="#">Marked Posts</a>
+              <a class="nav-link left" href="{%url 'marked_post_list'%}">Marked Posts</a>
             </li>
             <!-- <li class="nav-item">
               <a class="nav-link left" href="#">More</a>

@@ -1,0 +1,10 @@
+{%extends 'base.html'%}
+{%block content%}
+    <ul>
+        {% for comment in comment_list %}
+            <li>
+                {{comment}}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

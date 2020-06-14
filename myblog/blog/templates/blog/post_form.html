@@ -2,28 +2,42 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/my_styling.css' %}">
-<script src="{% static 'js/popper.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'trix/dist/trix.css' %}">
+<script src="{% static 'popper/popper.min.js' %}"></script>
 <script src="{% static 'js/jquery.js' %}"></script>
 <script src="{% static 'js/bootstrap.js' %}"></script>
+<script src="{% static 'trix/dist/trix.js' %}"></script>
 <div class="post-edit-area">
   <form method="POST">
       {%csrf_token%}
       <div class="form-group">
-      {%for field in form%}
-        {%if field.label == 'Title'%}
-          <label for="post-title">Title</label>
-          <input type="text" name="title" class="form-control" id="post-title" autocomplete="off" data-toggle="popover" title="Hint" data-content="Max text length is 100!" value="{%if field.value%}{{field.value}}{%else%}{%endif%}">
-          <small id="pot-title-text-limit" class="form-text text-muted">0/100</small>
-        {%else%}
-          <p>Content</p>
-          <textarea name="content" id="post-content" rows="25" cols="100" autocomplete="off" placeholder='Say something...' unresize=true>{%if field.value%}{{field.value}}{%endif%}</textarea>
-        {%endif%}
-      {%endfor%}
+        <label for="post-title">Title</label>
+        <input type="text" name="title" class="form-control" id="post-title" autocomplete="off" data-toggle="popover" title="Hint" data-content="Max text length is 100!" value="{%if form.title.value%}{{form.title.value}}{%else%}{%endif%}">
+        <small id="pot-title-text-limit" class="form-text text-muted">0/100</small>
+
+        <p>Content</p>
+        <input id="rich-editor" value="{%if form.content.value%}{{form.content.value}}{%else%}{%endif%}" type="hidden" name="content">
+        <trix-editor input="rich-editor"></trix-editor>
       </div>
       <button type="submit" class="btn btn-outline-primary" id="save-to-draft-btn">Save As Draft</button>
   </form>
+      {%if post.published_time == None %}
+        <button class="btn btn-outline-primary" id="post-btn">Post it!</button>
+      {%endif%}
 </div>
 <script type="text/javascript">
+  $("#post-btn").click(function() {
+    var url = "{%url 'post_publish' pk=0%}";
+    var redirect_url = "{%url 'post_detail' pk=0%}";
+    $.ajax({
+      {% comment %} type: "POST", {% endcomment %}
+      url: url.replace("0", '{{post.pk}}'),
+      success: function() {
+        window.location = redirect_url.replace("0", '{{post.pk}}');
+      }
+    })
+  })
+
   $('#post-title').keyup(function() {
     var currTextLength = $('#post-title').val().length;
     if (currTextLength > 100) {

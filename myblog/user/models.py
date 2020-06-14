@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Permission, User
 from django.db import models
 
 
@@ -9,8 +10,12 @@ class UserManager(models.Manager):
         return super(UserManager, self).get_queryset()
 
 
-class User(models.Model):
+class UserProfile(models.Model):
     '''用户表'''
+
+    class Meta:
+        ordering = ['user__date_joined']
+        verbose_name = '用户'
 
     gender_choices = (
         (0, '男'),
@@ -18,21 +23,17 @@ class User(models.Model):
         (2, '保密')
     )
 
-    name = models.CharField(max_length=128, unique=True)
-    password = models.CharField(max_length=256)
-    email = models.EmailField(unique=True)
     gender = models.IntegerField(choices=gender_choices, default=2)
-    is_activated = models.BooleanField(default=False)
-    create_time = models.DateTimeField(auto_now_add=True)
-
-    objects = UserManager()
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user')
 
     def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['create_time']
-        verbose_name = '用户'
+        return self.user.get_username() + ' ' + self.user.email
 
 
-
+#
+# class ChatGroup(Group):
+#     pass
+#
+#
+# class TopicPermission(Permission):
+#     pass

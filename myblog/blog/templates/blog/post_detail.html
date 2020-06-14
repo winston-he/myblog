@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<script src="{% static 'js/popper.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.js' %}"></script>
 <script src="{% static 'blog/js/default.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/my_styling.css' %}">
 <div class="container" id="blog-detail-comment-area">
     <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example blog-detail-area">
       <h5 class="card-title post-title">{{post.title}}</h5>
@@ -34,23 +34,18 @@
         Last edited at {{post.update_time}}
       </div>
 
-      <p class="card-text post-content">{{post.content}}</p>
+      <p class="card-text post-content">{{post.content|safe}}</p>
       <div id="view-entire-post-btn-area">
         <button type="button" name="button" id="view-entire-post-btn">Click to see the entire post</button>
       </div>
     </div>
-    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content"></div>
-        </div>
-    </div>
     {%if user.is_authenticated%}
       <button type="button" id="post-comment"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt=""></button>
     {%endif%}
-  {%if user == post.author%}
+  {%ifequal user post.author%}
       <a  href="{%url 'post_edit' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
       <button type="button" id="delete-post"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></button>
-  {%endif%}
+  {%endifequal%}
   {%if not post.published_time and user == post.author%}
       <a href="{%url 'post_publish' pk=post.pk%}" role="button"><img src="{%static 'img/icons/publish.png'%}" width=15 height=15 alt=""></a>
   {%endif%}
@@ -60,7 +55,7 @@
         <div class="card-header">
           <div class="d-flex w-100 justify-content-between">
             Posted by:
-                      {%if comment.author == user%}
+                      {%if comment.author.username == user.username%}
                           me
                       {%else%}
                           {{comment.author.username}}
@@ -82,11 +77,11 @@
               </a>
               <div id="comment-like-number_{{comment.pk}}" class=comment-action-item>{{comment.liked_by.count}}</div>
               <a role="button" class=comment-action-item>
-              {%if user in comment.disliked_by.all%}
-                <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
-              {%else%}
-                <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
-              {%endif%}
+                {%if user in comment.disliked_by.all%}
+                  <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
+                {%else%}
+                  <img data-toggle="tooltip" title="I think you like it?"  data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
+                {%endif%}
               </a>
               <div id="comment-dislike-number_{{comment.pk}}" class=comment-action-item>{{comment.disliked_by.count}}</div>
               <button type="button" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id="delete_{{comment_pk}}" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
@@ -95,19 +90,59 @@
       </div>
     {%endfor%}
   </div>
+
+{% csrf_token %}
 <script type="text/javascript">
-  $(function () {
-    $("#post-comment").modalForm({
-      formURL: "{% url 'comment_new' pk=post.pk %}",
+  csrf();
+  {% comment %} 弹出输入评论的窗口 {% endcomment %}
+  $("#post-comment").click(function() {
+    var url = "{%url 'comment_new' pk=0%}";
+    layer.prompt({
+      id: "comment-input-layer",
+      formType: 2,
+      maxlength: 140,
+      title: 'Share your idea with everyone',
+      area: ['400px', '350px'] 
+    }, function(value, index, elem){
+      $.ajax({
+        url: url.replace('0', '{{post.id}}'),
+        data: value,
+        type: 'POST',
+        success: function() {
+          location.reload();
+          layer.close(index); 
+        }
+      })
+      
     });
-  });
+  })
 
-  $(function () {
-    $("#delete-post").modalForm({
-      formURL: "{% url 'post_remove' pk=post.pk %}",
-    });
-  });
-
+  {% comment %} 弹出删除blog的窗口 {% endcomment %}
+  $("#delete-post").click(function() {
+    var url = "{%url 'post_remove' pk=0%}";
+    var btn = "<button class='btn btn-primary' id='confirm-delete-post-btn'>Confirm</button>";
+    layer.open({
+      value: '@',
+      resize: false,
+      title: 'Are you sure?',
+      content: "<p>This operation is irreversible</p>" + btn.replace("0", '{{post.id}}'),
+      btn: [],
+      area: ['300px', '180px'],
+      success: function() {
+        $('#confirm-delete-post-btn').click(function() {
+          console.log("ASAA");
+          $.ajax({
+            url: url.replace("0", '{{post.id}}'),
+            {% comment %} type: 'delete', {% endcomment %}
+            success: function() {
+              location.href = "{%url 'post_list'%}";
+            }
+          })
+        })
+      }
+    })
+  })
+  
   $('#view-entire-post-btn').click(function() {
     $('.scrollspy-example.blog-detail-area').height('400px');
     $('#view-entire-post-btn').hide();
@@ -142,7 +177,6 @@
       type: "POST",
       data: postData,
       url: "{%url 'mark_post' pk=post.pk%}",
-      // data: form.serialize(),
       success: function (res) {
         var tmp = $('#mark-post').prop('src').split('/');
         var picFileName = tmp[tmp.length - 1];
@@ -219,13 +253,13 @@
 
   $(".delete-comment-btn").click(function () {
     var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-    $.ajax({
-      type: "POST",
-      url: $(this).attr("data-href"),
-      data: postData,
-      success: function (result) {
-
-      }
+    layer.open({
+      title: 'Are you sure?',
+      content: "This operation is irreversible.",
+      area: ['300px', '160px'] 
+    }, function(value, index, elem){
+      
+      layer.close(index);
     });
   });
 

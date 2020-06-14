@@ -1,15 +1,19 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views.generic import CreateView
 
 from mail.mail_string import get_activate_msg
 from mail.views import send_email
 from .forms import UserForm
-from .models import User
+
+from .models import User, UserProfile
 from myblog.settings import EMAIL_FROM
 import os
 from .utils import generate_token, load_token
+from itsdangerous import SignatureExpired, BadSignature
 
 
 class UserRegisterView(CreateView):
@@ -19,39 +23,43 @@ class UserRegisterView(CreateView):
     def get_queryset(self):
         return User.objects.all()
 
-    def form_invalid(self, form):
-        pass
+    # def form_invalid(self, form):
+    #     print(form.errors.as_json())
+    #     return HttpResponse("表单验证失败")
 
     def form_valid(self, form):
-        pass
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password1']
+        email = form.cleaned_data['email']
+        gender = form.cleaned_data['gender']
+        # user = User(username=username, password=password, email=email, is_active=0)
+        user = User.objects.create_user(username, email, password)
+        user.save()
+        UserProfile(gender=gender, user=user).save()
+
+        host = self.request.get_host()
+
+        # TODO 暂时使用同步发送
+        send_email(subject="Myblog账号验证提醒", message='', from_email=EMAIL_FROM, recipient_list=[email, ],
+                   html_message=get_activate_msg(username, "{}/{}/{}".format(host, 'user/activate',
+                                                                             generate_token({"username": username}))))
+        print("邮件发送完毕")
+        return render(self.request, 'activate.html', context={
+            "username": username,
+            "email": email
+        })
 
 
-
-# def register(request):
-#     if request.method == 'POST':
-#         username = request.POST.get("username")
-#         password = request.POST.get("password")
-#         confirm_password = request.POST.get("confirm_password")
-#         email = request.POST.get("email")
-#         gender = int(request.POST.get("gender"))
-#         if password != confirm_password:
-#             return HttpResponse("两次输入的密码不一致")
-#         u = User.objects.filter(name=username).first()
-#         if u:
-#             return HttpResponse("系统中已存在此用户") if u.is_activated else HttpResponse("请查看邮箱中的激活邮件，并完成激活验证")
-#
-#         password = make_password(password)
-#         User(name=username, password=password, email=email, gender=gender).save()
-#         host = request.get_host()
-#         send_email.delay(subject="Myblog账号验证提醒", message='', from_email=EMAIL_FROM, recipient_list=[email, ],
-#                          html_message=get_activate_msg(username, "{}/{}/{}".format(host, 'user/activate', generate_token({"username": username}))), expires=1)
-#         return render(request, 'activate.html', context={
-#             "username": username,
-#             "email": email
-#         })
-#     return render(request, 'register.html')
-#
-#
-# def activate_user_account():
-#     pass
-
+def activate_user_account(request):
+    if request.method == 'GET':
+        token = request.args.get("token", None, str)
+        try:
+            res = load_token(token)
+        except SignatureExpired:
+            HttpResponse("已经超过24小时，链接失效")
+        except BadSignature:
+            HttpResponse("您使用的为非法链接，可能经过篡改")
+        else:
+            username = res['username']
+            User.objects.filter(name=username).update(activated=1)
+            HttpResponse("您的账号已激活")

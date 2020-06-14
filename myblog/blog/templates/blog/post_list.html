@@ -4,9 +4,13 @@
 <div class="container">
     <ul class="list-group">
         {%for post in post_list%}
-            <li class="list-group-item post-item">
+            {%if post.published_time%}
+                <li class="list-group-item post-item">
+            {%else%}
+                <li class="list-group-item draft-item">
+            {%endif%}
                 <div class="preview-post-title">
-                    <h4><a href="{%url 'post_detail' pk=post.pk%}" id="post-title-link"><span>{{post.title}}</span></a></h4>
+                    <h4><a href="{%url 'post_detail' pk=post.pk%}" id="post-title-link-{{post.pk}}" class="post-title-link"><span>{{post.title}}</span></a></h4>
                 </div>
                 <div class="preview-post-date">
                     <p>Created on: {{post.create_time|date:"N d, Y"}} by: {{post.author}}</p>
@@ -14,9 +18,9 @@
                 <div class="preview-post-content">
                     <p>
                       {%if post.content|length > 140%}
-                        {{post.content|slice:":140"}}...
+                        {{post.content|slice:":140"|safe}}...
                       {%else%}
-                        {{post.content}}
+                        {{post.content|safe}}
                       {%endif%}
                     </p>
                 </div>
@@ -26,11 +30,29 @@
                       <div id="viewed-count" class="stats"><img src="{%static 'img/icons/view.png'%}" width=20 height=20 alt=""> {{post.viewed_count}}</div>
                       <div id="comment-count" class="stats"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt="">{{post.post_comments.count}}</div>
                 </div>
-
             </li>
         {%endfor%}
     </ul>
 </div>
+{% csrf_token %}
+<script type="text/javascript">
+    csrf();
+    $(".post-title-link").on("click", function() {
+        var post_id = $(this).prop("id").split("-")[3];
+        var url = '{%url "view_count" pk=0%}';
+        console.log("HELLO");
+        $.ajax({
+            type: "post",
+            url: url.replace("0", post_id),
+            async: false,
+            dataType: "json",
+            success: function() {
+                console.log("success")
+            }
+        })
+
+    })
+</script>
  {%endblock%}
  {%block right_navbar%}
  {%endblock%}

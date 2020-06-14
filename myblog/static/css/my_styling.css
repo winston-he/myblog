@@ -117,8 +117,13 @@ a span {
   float: right;
 } */
 
-.list-group-item.post-item {
+.post-item {
   padding: 5px 5px 5px 20px;
+}
+
+.draft-item {
+  padding: 5px 5px 5px 20px;
+  background-color: red
 }
 
 .preview-post-title {
@@ -269,6 +274,7 @@ a span {
 .comment-actions {
   margin-top: 10px;
   width: 100px;
+  display: contents;
   /* position: absolute; */
 }
 
@@ -347,7 +353,7 @@ a span {
 #save-to-draft-btn {
   position: absolute;
   top: 60px;
-  right: 80px;
+  right: 100px;
 }
 
 #post-btn {
