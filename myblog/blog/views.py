@@ -1,23 +1,17 @@
-import json
-
-from django.shortcuts import reverse, render, get_object_or_404, redirect
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-
-from user.models import User, UserProfile
-from .models import Post, Comment
-from .forms import PostForm, CommentForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+
+from .forms import CommentForm, PostForm
+from .models import Post, Comment
 
 
 # Create your views here.
 # class AboutView(TemplateView):
 #     template_name = 'about.html'
-
-
 
 
 class PostListView(ListView):
@@ -55,44 +49,30 @@ class PostDetailView(DetailView):
     model = Post
 
 
-def _save_post(request, publish=False):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            if publish:
-                post.published_time = timezone.now()
-            post.author = request.user
-            post.save()
-    else:
-        form = PostForm()
-
-def _update_post(request, pk, publish=False):
-    pass
-
-@login_required
-def create_draft(request):
-    _save_post(request)
+class CreateDraftView(CreateView, LoginRequiredMixin):
+    template_name = "post_form.html"
+    form_class = PostForm
 
 
-@login_required
-def create_post(request):
-    _save_post(request, True)
+class UpdateDraftView(UpdateView, LoginRequiredMixin):
+    template_name = "post_form.html"
+    form_class = PostForm
 
 
-@login_required
-def update_draft(request, pk):
-    _update_post(request)
+class CreatePostView(CreateView):
+    form_class = PostForm
 
-@login_required
-def update_post(request, pk):
-    _update_post(request, pk)
+    def form_valid(self, form):
+        form.instance.published_time = timezone.now()
+        return super().form_valid(form)
 
 
-@login_required
-def delete_post(request, pk):
-    Post.objects.filter(pk=pk, author=request.user).delete()
-    return HttpResponse(content=json.dumps({'result': 1}))
+class UpdatePostView(UpdateView):
+    form_class = PostForm
+
+    def form_valid(self, form):
+        form.instance.published_time = timezone.now()
+        return super().form_valid(form)
 
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
@@ -118,6 +98,7 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
 #     # template_name = 'blog/post_detail.html'
 
 
+# 点赞博客
 @login_required
 def like_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -131,6 +112,7 @@ def like_post(request, pk):
     return HttpResponse(result)
 
 
+# 收藏博客
 @login_required
 def mark_post(request, pk):
     # if request.method == 'POST':
@@ -146,6 +128,7 @@ def mark_post(request, pk):
     return HttpResponse(result)
 
 
+# 点赞评论
 @login_required
 def like_comment(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
@@ -163,6 +146,7 @@ def like_comment(request, pk):
     return HttpResponse(result)
 
 
+# 点灭评论
 @login_required
 def dislike_comment(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
@@ -180,6 +164,7 @@ def dislike_comment(request, pk):
     return HttpResponse(result)
 
 
+# 移除评论
 @login_required
 def remove_comment(request, pk):
     if request.method == "POST":
