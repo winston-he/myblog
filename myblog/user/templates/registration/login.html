@@ -34,9 +34,6 @@
 </div>
 <div class="jumbotron" id="login-component">
     <h2 id="login-text">Welcome!</h2>
-    {% if form.errors %}
-        <p>{{form.errors.as_data}}</p>
-    {% endif %}
     <form method="POST" action="{% url 'login' %}">
     {% csrf_token %}
     <div class="input-group mb-3 username">
@@ -52,7 +49,7 @@
           {% render_field form.password class="form-control" %}
         </div>
         <div class="reset-password-link">
-          <a href=""><small>forgot password?</small></a>
+          <a href="{%url 'password_reset'%}"><small>forgot password?</small></a>
         </div>
     </div>
     <div class="login-signup-btn-section">
@@ -66,5 +63,12 @@
     $("#id_username").prop("autocomplete", "off");
     $("#id_password").prop("autocomplete", "off");
   })
+
+  {% if form.errors %}
+    layer.tips("Invalid username or password.", ".username", {
+      tips: 2,
+      time: 2000
+    })
+  {% endif %}
 </script>
 {%endblock%}

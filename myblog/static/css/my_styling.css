@@ -1,3 +1,7 @@
+body {
+    background-color: 	#F5F5F5!important;
+}
+
 a {
   text-decoration: none !important;
 }
@@ -14,13 +18,37 @@ a span {
   list-style-type:none;
 }
 
+.btn.btn-success {
+    background-color: #ffbd69;
+    border-color: #ffbd69
+}
+.btn.btn-success:hover {
+    background-color: #fbc682;
+    border-color: #ffbd69;
+}
+
+#main-navbar {
+    background-color: #FFFFFF!important
+}
+
+#main-navbar a {
+    color: 	#808080
+}
+
 #left-navbar-area {
   float:left;
-  width: 20%;
+  width: 10%;
   text-decoration:none;
   padding:0.2em 0.6em;
   border-right:1px solid white;
   display: inline;
+  margin: 20px 10px 20px 40px;
+  background-color: #FFFFFF
+}
+
+#left-navbar-area a {
+    color: #808080;
+    font-size: 16px
 }
 
 .nav-link.active {
@@ -29,6 +57,10 @@ a span {
 
 .nav-link.left {
   padding: 15px 15px 0 0;
+}
+
+.blog-list-container {
+    margin: 20px
 }
 
 #center-content-area {
@@ -60,15 +92,30 @@ a span {
   width: 380px;
   top: 150px;
   margin: auto;
-  position: relative;
+  position: absolute;
+  right: 400px;
+  top: 200px;
   background-color: #fff;
   box-shadow: 0 1.75rem 1.75rem -1.75rem rgba(0,0,0,0.15),
   0 1.75rem 1.75rem 1.75rem rgba(0,0,0,0.15);
-  /* -4px 0px 5px #808083,
-  4px 0px 5px #808083,
-  0px 4px 5px #808083;  */
   padding: 10px;
 }
+
+#register-component {
+  height: 550px;
+  width: 400px;
+  margin: 20px auto;
+  background-color: #fff;
+  box-shadow: 0 1.75rem 1.75rem -1.75rem rgba(0,0,0,0.15),
+  0 1.75rem 1.75rem 1.75rem rgba(0,0,0,0.15);
+  padding: 40px 20px;
+}
+
+#confirm-signup-btn {
+    margin: 30px auto 0px auto;
+    display: block
+}
+
 
 .input-group.mb-3.username {
   width: 80%;
@@ -248,12 +295,12 @@ a span {
 #post-comment {
   margin-top: 10px;
   border: none;
-  color: #ffffff;
+  background-color: white;
 }
 
 #delete-post {
   border: none;
-  color: #ffffff;
+  background-color: white;
 }
 
 #post-content {

@@ -1,3 +1,4 @@
+<script src="{% static 'layer/layer.js' %}"></script>
 <form method="POST" action="">
   {% csrf_token %}
   <div class="modal-header">
@@ -13,3 +14,11 @@
     <button type="submit" class="btn btn-outline-primary">Yes, I'm sure.</button>
   </div>
 </form>
+
+
+<script text="text/javascript">
+  $("form").submit(function() {
+    console.log('CLOSING');
+    layer.closeAll();
+  })
+</script>

@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from .forms import CommentForm, PostForm
 from .models import Post, Comment
@@ -16,6 +17,7 @@ from .models import Post, Comment
 
 class PostListView(ListView):
     model = Post
+    paginate_by = 2
 
     def get_queryset(self):
         return Post.objects.filter(published_time__isnull=False).order_by('-published_time')
@@ -40,13 +42,18 @@ class MarkedPostListView(LoginRequiredMixin, ListView):
 class CommentListView(LoginRequiredMixin, ListView):
     model = Comment
     template_name = 'comment_list.html'
-
+    paginate_by = 5
     def get_queryset(self):
         return Comment.objects.filter(author=self.request.user).order_by('-create_time')
 
 
 class PostDetailView(DetailView):
     model = Post
+
+    @staticmethod
+    def post_comment_list(request):
+        page = request.args.get('page')
+
 
 
 class CreateDraftView(CreateView, LoginRequiredMixin):
@@ -61,18 +68,57 @@ class UpdateDraftView(UpdateView, LoginRequiredMixin):
 
 class CreatePostView(CreateView):
     form_class = PostForm
+    template_name = "post_form.html"
 
     def form_valid(self, form):
         form.instance.published_time = timezone.now()
         return super().form_valid(form)
+
+    # 新建并保存，但不发布
+    @staticmethod
+    def save(request):
+        form = PostForm(request.POST)
+        if form.is_valid() and request.is_ajax():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return JsonResponse(data={"pk": post.pk})
+        else:
+            print(form.cleaned_data)
+            print(form.errors.as_data())
+        return render(request, 'post_form.html')
 
 
 class UpdatePostView(UpdateView):
     form_class = PostForm
+    template_name = "post_form.html"
+
+    def get_queryset(self):
+        return Post.objects.filter(**self.kwargs)
 
     def form_valid(self, form):
         form.instance.published_time = timezone.now()
         return super().form_valid(form)
+
+    # 更新并保存，但不发布
+    def save(self, pk):
+        form = PostForm(self.request.POST)
+        if form.is_valid():
+            post = get_object_or_404(Post, pk=pk)
+            post.title = form.cleaned_data['title']
+            post.content = form.cleaned_data['content']
+            post.save()
+
+    def publish(self, pk):
+        post = get_object_or_404(Post, pk=pk)
+        post.published_time = timezone.now()
+        post.save()
+        return redirect('post_detail', pk=pk)
+
+
+class DeletePostView(DeleteView):
+    model = Post
+    success_url = reverse_lazy('post_list')
 
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
@@ -167,10 +213,10 @@ def dislike_comment(request, pk):
 # 移除评论
 @login_required
 def remove_comment(request, pk):
-    if request.method == "POST":
+    if request.method == "POST" and request.is_ajax():
         comment = get_object_or_404(Comment, pk=pk)
         comment.delete()
-        return redirect('post_detail', pk=comment.post.pk)
+        return JsonResponse(data={'result': 0})
 
 
 # 博客阅读次数+1

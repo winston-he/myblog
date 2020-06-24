@@ -1,15 +1,31 @@
+<!DOCTYPE html>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'layer/layer.js' %}"></script>
 <form method="POST" action="">
   {% csrf_token %}
   <div class="modal-header">
     <h3 class="modal-title">Delete Post</h3>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    {% comment %} <button type="button" class="close" data-dismiss="modal" aria-label="Close"> {% endcomment %}
+      {% comment %} <span aria-hidden="true">&times;</span> {% endcomment %}
+    {% comment %} </button> {% endcomment %}
   </div>
   <div class="modal-body">
-        <p id="hint-text">Are you sure you want to delete this post?</p>
+        <p id="hint-text">This operation is irreversible.</p>
   </div>
   <div class="modal-footer">
-    <button type="submit" class="btn btn-outline-primary">Yes, I'm sure.</button>
+    <button type="submit" class="btn btn-outline-primary" id="post-confirm-delete-btn">Yes, I'm sure.</button>
   </div>
 </form>
+<script type="text/javascript">
+  $("form").submit(function() {
+    console.log('CLOSING');
+    //当你在iframe页面关闭自身时
+    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引    parent.layer.close(index); //再执行关闭   
+
+    parent.layer.close(index);
+    // 父页面重定向到post列表
+    window.parent.location.href = "{%url 'post_list'%}";
+  }) 
+</script>

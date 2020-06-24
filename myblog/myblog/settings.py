@@ -20,10 +20,12 @@ GENERAL_TEMPLATES_DIR = os.path.join(BASE_DIR, 'general_templates')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
+# EMAIL_HOST_PASSWORD = 'hwzhen700587'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'winstonhwz@163.com'
-MAIL_HOST_PASSWORD = 'FAGMKMUDKYUBEYQP'
+EMAIL_HOST_PASSWORD = 'FAGMKMUDKYUBEYQP'
 EMAIL_FROM = 'myblog<winstonhwz@163.com>'
+DEFAULT_FROM_EMAIL = 'winstonhwz@163.com'
 
 # djcelery.setup_loader()
 
@@ -73,7 +75,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-AUTHENTICATION_BACKENDS = ['path.to.auth.module.EmailBackend']
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+# AUTHENTICATION_BACKENDS = ['path.to.auth.module.EmailBackend']
 
 ROOT_URLCONF = 'myblog.urls'
 
@@ -103,10 +106,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'myblog',
-        'HOST': 'localhost',
+        'HOST': '123.57.201.57',
         'PORT': '3306',
-        'USER': 'root',
-        'PASSWORD': '1234'
+        'USER': 'winston',
+        'PASSWORD': 'wins1603'
     }
 }
 

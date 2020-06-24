@@ -1,5 +1,5 @@
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -38,16 +38,24 @@ class UserRegisterView(CreateView):
         UserProfile(gender=gender, user=user).save()
 
         host = self.request.get_host()
+        send_email.delay(subject="Myblog账号激活验证提醒",
+                         message='',
+                         from_email=EMAIL_FROM,
+                         recipient_list=[email, ],
+                         html_message=get_activate_msg(username, "{}/{}/{}".format(host, 'user/activate',
+                                                                             generate_token({"username": username})))
 
-        # TODO 暂时使用同步发送
-        send_email(subject="Myblog账号验证提醒", message='', from_email=EMAIL_FROM, recipient_list=[email, ],
-                   html_message=get_activate_msg(username, "{}/{}/{}".format(host, 'user/activate',
-                                                                             generate_token({"username": username}))))
+                         )
         print("邮件发送完毕")
         return render(self.request, 'activate.html', context={
             "username": username,
             "email": email
         })
+
+def reset_password_done(request):
+    if request.method == 'GET':
+        return render(request, 'reset_password_done.html')
+
 
 
 def activate_user_account(request):
@@ -63,3 +71,4 @@ def activate_user_account(request):
             username = res['username']
             User.objects.filter(name=username).update(activated=1)
             HttpResponse("您的账号已激活")
+

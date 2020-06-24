@@ -13,11 +13,19 @@ urlpatterns = [
     url(r'^drafts/$', views.MyPostListView.as_view(), name='my_post_list'),
     url(r'^post/marked/$', views.MarkedPostListView.as_view(), name='marked_post_list'),
     url(r'^post/(?P<pk>\d+)/detail/$', views.PostDetailView.as_view(), name='post_detail'),
-    url(r'^post/new/$', views.CreatePostView.save_post, name='post_new'),
+
+    url(r'^post/new/$', views.CreatePostView.as_view(), name='post_new'),
+    url(r'^post/(?P<pk>\d+)/publish/$', views.UpdatePostView.publish, name='post_publish'),
     url(r'^post/(?P<pk>\d+)/edit/$', views.UpdatePostView.as_view(), name='post_edit'),
-    url(r'^post/(?P<pk>\d+)/publish/$', views.CreatePostView.publish_post, name='post_publish'),
-    url(r'^post/(?P<pk>\d+)/delete/$', views.delete_post, name='post_remove'),
+
+    url(r'^draft/new/$', views.CreatePostView.save, name='draft_new'),
+    url(r'^draft/(?P<pk>\d+)/edit/$', views.UpdatePostView.save, name='draft_update'),
+
+    url(r'^post/(?P<pk>\d+)/delete/$', views.DeletePostView.as_view(), name='post_remove'),
     url(r'^post/(?P<pk>\d+)/comment/$', views.CreateCommentView.save, name='comment_new'),
+
+    url(r'^post/(?P<pk>\d+)/comment-list/$', views.PostDetailView.post_comment_list, name='post_comment_list'),
+
     url(r'^comment/(?P<pk>\d+)/delete/$', views.remove_comment, name='comment_remove'),
     url(r'^comment/$', views.CommentListView.as_view(), name='comment_list'),
     url(r'^post/(?P<pk>\d+)/like/$', views.like_post, name='like_post'),
