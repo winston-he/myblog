@@ -68,7 +68,7 @@ GEM
     hashie (3.5.6)
     http_parser.rb (0.6.0)
     i18n (0.7.0)
-    json (2.0.2)
+    json (2.3.1)
     jwt (1.5.6)
     minitest (5.9.1)
     multi_json (1.12.1)
