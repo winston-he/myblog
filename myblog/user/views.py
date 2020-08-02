@@ -32,7 +32,7 @@ class UserRegisterView(CreateView):
         password = form.cleaned_data['password1']
         email = form.cleaned_data['email']
         gender = form.cleaned_data['gender']
-        # user = User(username=username, password=password, email=email, is_active=0)
+        # registration = User(username=username, password=password, email=email, is_active=0)
         user = User.objects.create_user(username, email, password)
         user.save()
         UserProfile(gender=gender, user=user).save()
@@ -42,7 +42,7 @@ class UserRegisterView(CreateView):
                          message='',
                          from_email=EMAIL_FROM,
                          recipient_list=[email, ],
-                         html_message=get_activate_msg(username, "{}/{}/{}".format(host, 'user/activate',
+                         html_message=get_activate_msg(username, "{}/{}/{}".format(host, 'registration/activate',
                                                                              generate_token({"username": username})))
 
                          )

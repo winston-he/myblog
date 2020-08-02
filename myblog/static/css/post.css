@@ -1,0 +1,22 @@
+.left-side-bar-container {
+    background: #ffffff;
+    float: left;
+    margin-left: 200px;
+    margin-right: 20px;
+    width: 10%
+}
+
+.blog-list-container {
+    background: #ffffff;
+    float: left;
+    width: 50%
+}
+
+.left-sidebar-item {
+    margin: 10px;
+    text-align: center
+}
+
+body {
+    background: #F5F5F5;
+}

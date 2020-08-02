@@ -1,0 +1,103 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="post-edit-area">
+    {%if not post.published_time%}
+        {%if post.author%}
+            <button class="layui-btn layui-btn-primary" data-href='{%url "draft_update" pk=123%}' id="save-to-draft-btn">存为草稿</a>
+        {%else%}
+            <button class="layui-btn layui-btn-primary" data-href="{%url 'draft_new'%}" id="save-to-draft-btn">存为草稿</a>
+        {%endif%}
+    {%endif%}
+  <form method="POST">
+      <button type="submit" class="layui-btn layui-btn-normal" id="post-btn">发布</button>
+      {%csrf_token%}
+      <div class="form-group">
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" lay-filter="title", class="layui-input" id="post-title" autocomplete="off"  title="Hint" data-content="Max text length is 100!" value="{%if form.title.value%}{{form.title.value}}{%else%}{%endif%}">
+                <small id="post-title-text-limit" class="form-text text-muted">0/100</small>
+            </div>
+        </div>
+        
+        <div id="test-editormd">
+            <textarea style="display:none;" name="content">### Hello Editor.md !</textarea>
+        </div>
+      </div>
+  </form>
+</div>
+
+
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<link rel="stylesheet" href="{%static 'editor/css/editormd.css'%}" />
+<script src="{%static 'editor/editormd.min.js'%}"></script>
+<script>
+    var testEditor;
+    $(function () {
+        $.get("{% static 'editor/examples/test.md' %}", function (md) {
+            testEditor = editormd("test-editormd", {
+                width: "100%",
+                height: 730,
+                path: '{% static 'editor/lib/' %}',
+                markdown: md,
+                codeFold: true,
+                saveHTMLToTextarea: true,
+                searchReplace: true,
+                htmlDecode: "style,script,iframe|on*",
+                emoji: true,
+                taskList: true,
+                tocm: true,       
+                tex: true,                   
+                flowChart: true,             
+                sequenceDiagram: true,       
+                imageUpload: true,
+                imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                onload: function () {
+                    console.log('onload', this);
+                },
+                editorTheme: "pastel-on-dark",
+                theme: "dark",
+                previewTheme: "dark"
+            });
+        });
+    });
+</script>
+
+{%csrf_token%}
+<script type="text/javascript">
+  csrf();
+  $("#save-to-draft-btn").click(function() {
+    var url = $(this).data("href");
+    if (url.indexOf('123') != -1) {
+      $(this).data("href").replace('123', '{{post.pk}}')
+    }
+    $.ajax({
+      type: "POST",
+      dataType: "json",
+      url: url,
+      data: 
+        {
+          "title": $("#post-title").val(), 
+        "content": $("#rich-editor").val()},
+      success: function(data) {
+        location.href = "{%url 'post_detail' pk=123%}".replace('123', data.pk)
+      }
+    }) 
+  })
+    $("#post-title").on("input", function() {
+        if ($(this).val().length > 100) {
+            $(this).prop("disabled", "true");
+        } 
+        else {
+            if ($(this).prop("disabled"))
+                $(this).prop("disabled", "false");
+            $("#post-title-text-limit").html($(this).val().length + "/100");
+        } 
+    });
+
+</script>
+
+{% endblock %}

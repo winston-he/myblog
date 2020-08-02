@@ -7,7 +7,7 @@
 # @Desc:
 import random
 
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont
 
 
 def getBGColor():

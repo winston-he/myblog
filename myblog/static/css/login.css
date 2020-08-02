@@ -1,0 +1,20 @@
+.login-box {
+    width: 400px;
+    height: auto;
+    margin: 200px auto;
+    background: #ffffff
+}
+
+.layui-form-item {
+    margin: 20px 20px 20px 0;
+}
+
+#login-confirm-btn {
+    margin: 30px auto;
+    display: block
+}
+
+#signup-confirm-btn {
+    margin: 30px auto;
+    display: block
+}

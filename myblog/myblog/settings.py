@@ -15,7 +15,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TEMPLATE_DIR = os.path.join(BASE_DIR, 'blog/templates/blog')
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'myblog', 'templates')
 GENERAL_TEMPLATES_DIR = os.path.join(BASE_DIR, 'general_templates')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -56,13 +56,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',
     'blog',
-    'bootstrap4',
-    'bootstrap_modal_forms',
     'widget_tweaks',
     'channels',
-    'chat'
-    # 'djcelery'
-    # "debug-toolbar"
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -109,7 +105,7 @@ DATABASES = {
         'HOST': '123.57.201.57',
         'PORT': '3306',
         'USER': 'winston',
-        'PASSWORD': 'wins1603'
+        'PASSWORD': 'Hwzhen123.'
     }
 }
 
@@ -148,7 +144,8 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'upload')
+
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 
 LOGIN_URL = 'login'

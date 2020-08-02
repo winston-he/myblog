@@ -1,0 +1,51 @@
+{%extends 'base-user.html'%}
+{%load static%}
+  <body style="color: red">
+    {%block content%}
+    <style media="screen">
+      input {
+        width: 80%;
+        height: 40px;
+      }
+
+      input#id_gender {
+        width: 100px
+      }
+      .register-header-text {
+        margin-top: 100px
+      }
+    </style>
+    <div class="mb-4 mb-md-8 container-md register-header-text">
+      <div class="text-mono text-center text-gray-light text-normal mb-3">Join Us Now!</div>
+      <h1 class="d-none d-md-block mt-0 mb-3 text-center h00-mktg lh-condensed-ultra ">Create your account</h1>
+    </div>
+    <div class="jumbotron" id="register-component">
+      <div class="new-user-form-area">
+        {%if form.errors%}
+          <p>{{form.errors}}</p>
+        {%endif%}
+        <form class="" method="post" action="{% url 'new_user' %}">
+            {% csrf_token %}
+            <label autocapitalize="off" autofocus="autofocus" required="required" for="username">Username<span style="color: red">*</span></label>
+            <p>{{form.username}}</p>
+            <label autocapitalize="off" autofocus="autofocus" required="required" for="email">Email<span style="color: red">*</span></label>
+            <p>{{form.email}}  <img class="email-help-msg" src="{%static 'img/icons/question_mark.png'%}" style="width: 20px; height: 20px"></img></p>
+            <label autocapitalize="off" autofocus="autofocus" required="required" for="password">Password<span style="color: red">*</span></label>
+            <p>{{form.password1}}</p>
+            <label autocapitalize="off" autofocus="autofocus" required="required" for="password_confirm">Confirm password<span style="color: red">*</span></label>
+            <p>{{form.password2}}</p>
+            <button type="submit" class="layui-btn layui-btn-primary" name="button" id="confirm-signup-btn">Sign up</button>
+        </form>
+        {% comment %} <a type="button" class="btn btn-outline-primary" name="button" href="{% url 'login' %}">Return</a> {% endcomment %}
+      </div>
+    </div>
+    <script type="text/javascript">
+      $(".email-help-msg").mouseover(function() {
+        layer.tips('We will send you an activate email to finish registration.', $(this), {
+          tips: [2, '#111d5e'],
+          time: 3000
+        });
+      })
+    </script>
+    {%endblock%}
+  </body>

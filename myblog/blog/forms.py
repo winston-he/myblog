@@ -27,3 +27,7 @@ class CommentForm(forms.ModelForm, PopRequestMixin):
             'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea', 'rows': 4, 'cols': 80}),
         }
 
+
+class UploadFileForm(forms.Form):
+    title = forms.CharField(max_length=50)
+    file = forms.FileField()

@@ -24,7 +24,7 @@ class UserProfile(models.Model):
     )
 
     gender = models.IntegerField(choices=gender_choices, default=2)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='registration')
 
     def __str__(self):
         return self.user.get_username() + ' ' + self.user.email

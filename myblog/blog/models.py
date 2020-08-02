@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 
-# from user.models import UserProfile
+# from registration.models import UserProfile
 
 
 class Post(models.Model):
@@ -42,3 +42,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.content
+
+
+class Appendix(models.Model):
+    create_time = models.DateTimeField(default=timezone.now)
+    # upload_to 相对于MEDIA_ROOT，媒体根目录，图片
+    file = models.ImageField(upload_to='appendix/%Y/%m')
