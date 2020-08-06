@@ -22,7 +22,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'winstonhwz@163.com'
-EMAIL_HOST_PASSWORD = 'FAGMKMUDKYUBEYQP'
 EMAIL_FROM = 'myblog<winstonhwz@163.com>'
 DEFAULT_FROM_EMAIL = 'winstonhwz@163.com'
 
@@ -104,7 +103,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
         'USER': 'root',
-        'PASSWORD': 'hwzhen123'
+        'PASSWORD': 'XXXXXX'
     }
 }
 
