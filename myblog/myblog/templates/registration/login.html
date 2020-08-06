@@ -12,7 +12,12 @@
                 <li>注册</li>
             </ul>
             <div class="layui-tab-content">
-                <div class="layui-tab-item layui-show">
+                
+                {%if action_type != 'register' %}
+                    <div class="layui-tab-item layui-show">
+                {%else%}
+                    <div class="layui-tab-item">
+                {%endif%}
                     <form action="{%url 'login'%}" method="POST">
                         {%csrf_token%}
                         <div class="layui-form-item">
@@ -21,7 +26,7 @@
                                 <input type="text" name="username" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
                             </div>
                         </div>
-                        <div class="layui-form-item">
+                            <div class="layui-tab-item layui-show">
                             <label class="layui-form-label">密码</label>
                             <div class="layui-input-block">
                                     <input type="password" name="password" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
@@ -35,32 +40,41 @@
                         <button type="submit" class="layui-btn layui-btn-normal" id="login-confirm-btn">登录</button>
                     </form>
                 </div>
-                <div class="layui-tab-item">
-                    <form class="" method="post" action="{% url 'new_user' %}">
+                    {%if action_type == 'register'%}
+                        <div class="layui-tab-item layui-show">
+                    {%else%}
+                        <div class="layui-tab-item">
+                    {%endif%}
+                    <form class="" method="POST" action="{% url 'new_user' %}">
                         {%csrf_token%}
                         <div class="layui-form-item">
                             <label class="layui-form-label">用户名</label>
                             <div class="layui-input-block">
                                 <input type="text" name="username" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
                             </div>
+                            
+                            <small style="color: #ff0000">{{errors.username}}</small>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">邮箱</label>
                             <div class="layui-input-block">
                                 <input type="text" name="email" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
                             </div>
+                            <small style="color: #ff0000">{{errors.email}}</small>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">密码</label>
                             <div class="layui-input-block">
                                     <input type="password" name="password1" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
                             </div>
+                            <small style="color: #ff0000">{{errors.password1}}</small>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">确认密码</label>
                             <div class="layui-input-block">
                                     <input type="password" name="password2" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
                             </div>
+                            <small style="color: #ff0000">{{errors.password2}}</small>
                         </div>
                         <button type="submit" class="layui-btn layui-btn-normal" id="signup-confirm-btn">注册</button>
                     </form>

@@ -1,10 +1,8 @@
-import code
-import os
+from math import ceil
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core import serializers
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, request
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -12,6 +10,7 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from blog.marsh import BlogPostPreviewSchema
 from .forms import CommentForm, PostForm
 from .models import Post, Comment, Appendix
 
@@ -19,35 +18,69 @@ from .models import Post, Comment, Appendix
 # class AboutView(TemplateView):
 #     template_name = 'about.html'
 COMMENT_PER_PAGE = 5
-BLOG_PER_PAGE = 1
+BLOG_PER_PAGE = 5
 
 
 class PostListView(ListView):
     model = Post
-    paginate_by = 2
 
-    def get_queryset(self, page=1):
+    def get_queryset(self, page=1, all=True, published=False):
+
+        all = True if self.request.GET.get("all") is not None and self.request.GET.get("all") == 'true' else False
+
+        # 如果查询我的文章但是当前用户未登陆
+        if not all and not self.request.user:
+            return redirect(reverse("login"))
+
+        self.template_name = 'blog/post_list.html' if all else 'blog/my_post_list.html'
         start = (page - 1) * BLOG_PER_PAGE
         end = start + BLOG_PER_PAGE
-        return Post.objects.filter(published_time__isnull=False).order_by('-published_time')[start: end]
+        conditions = {
+            "published_time__isnull": not published,
+        }
+        if not all:
+            conditions['author'] = self.request.user
+        res = Post.objects.filter(**conditions).order_by('-published_time')[start: end]
+        return res
 
-    # def get_posts_by_page(self, page):
-    #
-    #     return Post.objects.filter(published_tim'{%url "view_count" pk=0%}';e__isnull=False).order_by('-published_time')[start: end]
+
+    @staticmethod
+    def get_posts_by_page(request, page):
+        published = True if request.GET.get("all") == 'true' else False
+        all = True if request.GET.get("all") is not None and request.GET.get("all") == 'true' else False
+
+        conditions = {
+            "published_time__isnull": not published,
+        }
+        if not all:
+            conditions['author'] = request.user
+        # TODO why page is a String??
+        all_set = Post.objects.filter(**conditions).order_by('-published_time')
+        pages = ceil(all_set.count() / BLOG_PER_PAGE)
+
+        raw_set = all_set[(int(page))*BLOG_PER_PAGE: (int(page))*BLOG_PER_PAGE+BLOG_PER_PAGE]
+        for record in raw_set:
+            record.authorname = record.author.username
+            record.liked_count = record.liked_by.count()
+            record.marked_count = record.marked_by.count()
+            record.comment_count = record.post_comments.count()
+
+        schema = BlogPostPreviewSchema()
+        res = schema.dump(raw_set, many=True)
+        return JsonResponse(data={"data": res, "pages": pages}, safe=False)
 
 
-class MyPostListView(LoginRequiredMixin, ListView):
-    model = Post
 
-    def get_queryset(self):
-        return Post.objects.filter(author=self.request.user).order_by('-published_time')
+# class MyPostListView(LoginRequiredMixin, ListView):
+#     model = Post
+#
+#     def get_queryset(self):
+#         return Post.objects.filter(author=self.request.user).order_by('-published_time')
 
 
 class MarkedPostListView(LoginRequiredMixin, ListView):
     model = Post
-
     template_name = 'post_list.html'
-
     def get_queryset(self):
         return Post.objects.filter(marked_by=self.request.user).order_by('-published_time')
 
@@ -97,6 +130,13 @@ class PostDetailView(DetailView):
 class CreateDraftView(LoginRequiredMixin, CreateView):
     template_name = "blog/post_form.html"
     form_class = PostForm
+
+    # def form_valid(self, form):
+    #     super().form_valid(form)
+    #     self.object
+
+    def get_success_url(self):
+        return reverse('post_detail', {"pk": self.object.pk})
 
 
 class UpdateDraftView(LoginRequiredMixin, UpdateView):
@@ -163,18 +203,43 @@ class DeletePostView(DeleteView):
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
+    model = Comment
 
-    @staticmethod
-    def save(request, pk):
-        if request.method == 'POST':
-            post = get_object_or_404(Post, pk=pk)
-            print(request.body)
-            comment = Comment(content=request.body.decode('utf-8'), author=request.user, post=post)
-            comment.save()
-            return redirect('post_detail', pk=post.pk)
-        else:
-            form = CommentForm()
-        return render(request, 'blog/comment_form.html', {'form': form})
+    template_name = 'blog/comment_form.html'
+    fields = ["content",]
+
+    def render_to_response(self, context, **response_kwargs):
+        context['pk'] = self.kwargs['pk']
+        return super().render_to_response(context, **response_kwargs)
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post = get_object_or_404(Post, pk=int(self.kwargs['pk']))
+
+        # 执行成功后不重定向，而是返回JsonResponse
+        form.save()
+
+
+
+    def form_invalid(self, form):
+        print("HEHHE")
+
+
+
+
+    # @staticmethod
+    # def save(request, pk):
+    #     if request.method == 'POST':
+    #         post = get_object_or_404(Post, pk=pk)
+    #         comment = Comment(content=request.body.decode('utf-8'), author=request.user, post=post)
+    #         comment.save()
+    #         return redirect('post_detail', pk=post.pk)
+    #     else:
+    #         form = CommentForm()
+    #     return render(request, 'blog/comment_form.html', {'form': form, 'pk': pk})
+
+    # def form_valid(self, form):
+    #     pass
 
 
 # class DeleteCommentView(LoginRequiredMixin, DeleteView):
@@ -188,14 +253,13 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
 @login_required
 def like_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    # u = UserProfile.objects.filter(pk=request.registration.id).first()
     if not request.user.liked_posts.filter(pk=post.pk):
         request.user.liked_posts.add(post)
         result = 1
     else:
         result = -1
         request.user.liked_posts.remove(post)
-    return HttpResponse(result)
+    return JsonResponse({"result": result})
 
 
 # 收藏博客
@@ -211,7 +275,7 @@ def mark_post(request, pk):
         result = -1
         request.user.marked_posts.remove(post)
     # return redirect('post_detail', pk=post.pk)
-    return HttpResponse(result)
+    return JsonResponse({"result": result})
 
 
 # 点赞评论

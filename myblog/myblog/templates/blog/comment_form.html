@@ -1,61 +1,40 @@
 {% load static %}
 {% load widget_tweaks %}
-<link rel="stylesheet" href="{% static 'css/my_styling.css' %}">
-<script src="{% static 'js/popper.min.js' %}"></script>
 <script src="{% static 'js/jquery.js' %}"></script>
-<script src="{% static 'js/bootstrap.js' %}"></script>
-<form method="POST" action="">
+<script src="{% static 'layui/layui.js' %}"></script>
+<link rel="stylesheet" href="{% static 'layui/css/layui.css' %}">
   {% csrf_token %}
-  <div class="modal-header">
-    <h3 class="modal-title">new comment</h3>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
     <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
       {% for error in form.non_field_errors %}
         {{ error }}
       {% endfor %}
     </div>
-
-    <!-- {% for field in form %} -->
       <div class="form-group">
         <p id="text-limit-hint">0/140</p>
-        <!-- <input type="textarea" cols=5 name="content" id="comment-content" class="form-control" placeholder="@" aria-label="comment" aria-describedby="basic-addon1"> -->
-        <textarea name="content" id="comment-content" rows="5" cols="60" placeholder="@" data-toggle="popover" title="Hint" data-content="Max text length is 140!"></textarea>
+        <textarea name="content" id="comment-content" rows="5" cols="60" placeholder="@" title="Hint" class="layui-textarea"></textarea>
         <div class="{% if field.errors %} invalid{% endif %}">
           {% for error in field.errors %}
             <p class="help-block">{{ error }}</p>
           {% endfor %}
         </div>
-      </div>
-    <!-- {% endfor %} -->
-  </div>
-
-  <div class="modal-footer">
-    <button type="submit" class="btn btn-outline-primary" id="save-comment">submit</button>
-  </div>
-</form>
+    </div>
+    <button class="layui-btn layui-btn-normal" id="save-comment">提交</button>
 <script type="text/javascript">
+  $(".comment-form").prop("action", "{%url 'comment_new' pk=123%}".replace('123', {{pk}}));
+
+  $("#save-comment").click(function() {
+    
+  })
+
   $('#comment-content').keyup(function() {
     var currTextLength = $('#comment-content').val().length;
     if (currTextLength > 140) {
         $('#save-comment').prop('disabled', true);
-        $('#comment-content').popover("show");
+        layer.msg('字数必须少于140！');
     }
     else {
       $('#save-comment').prop('disabled', false);
-      $('#comment-content').popover("hide");
     }
     $('#text-limit-hint').text(currTextLength + "/140");
   })
-  $('body').on('click', function (e) {
-    $('[data-toggle=popover]').each(function () {
-        // hide any open popovers when the anywhere else in the body is clicked
-        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-            $(this).popover('hide');
-        }
-    });
-});
 </script>

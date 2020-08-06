@@ -1,54 +1,63 @@
 {% extends 'base/base.html' %}
 {% load static %}
+
+{%block ref%}
+<link rel="stylesheet" href="{% static 'css/post.css' %}">
+{%endblock%}
+
 {% block content %}
-<script src="{% static 'js/bootstrap.js' %}"></script>
+<script src="{% static 'editor/editormd.js' %}"></script>
+<script src="{% static 'editor/lib/marked.min.js' %}"></script>
+<script src="{% static 'editor/lib/prettify.min.js' %}"></script>
 <script src="{% static 'blog/js/default.js' %}"></script>
-<link rel="stylesheet" href="{% static 'css/my_styling.css' %}">
 <div class="container" id="blog-detail-comment-area">
-    <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example blog-detail-area">
-      <h5 class="card-title post-title">{{post.title}}</h5>
+    <div class="blog-detail-area">
+      <h1 class="post-title">{{post.title}}</h5>
       <div class="post-stats">
-        <div class="like-post-btn">
+        <div class="post-stats-item like-post-btn">
             <a role="button" id="like-post-link">
               {%if user in post.liked_by.all%}
                 <img id="like-post" src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt="">
               {%else%}
                 <img id="like-post" src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">
               {%endif%}
-            </a><div id="like-number">{{post.liked_by.count}}</div>
+            </a>
+            <div class="like-post-count">{{post.liked_by.count}}</div>
         </div>
-        <div class="mark-post-btn">
-          <a  role="button">
+        <div class="post-stats-item mark-post-btn">
+          <a role="button" id="mark-post-link">
             {%if user in post.marked_by.all%}
               <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=20 height=20 alt="">
             {%else%}
               <img id="mark-post" src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">
             {%endif%}
-          </a><div id="mark-number">{{post.marked_by.count}}</div>
+          </a>
+          <div class="mark-post-count">{{post.marked_by.count}}</div>
+        </div>
+        <div class="post-stats-item">
+          <img id="view-post" src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  <div class="view-post-count">{{post.viewed_count}}</div>
         </div>
       </div>
-      <div class="view-post-count">
-        <img id="view-post" src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  {{post.viewed_count}}
-      </div>
       <div class="last-edit-time">
-        Last edited at {{post.update_time}}
+        最后编辑时间 {{post.update_time}}
       </div>
-
-      <p class="card-text post-content">{{post.content|safe}}</p>
-      <div id="view-entire-post-btn-area">
-        <button type="button" name="button" id="view-entire-post-btn">Click to see the entire post</button>
+      <div id="post-content">
+        <!-- Server-side output Markdown text -->
+        <textarea style="display:none;">{{post.content|safe}}</textarea>             
       </div>
     </div>
-    {%if user.is_authenticated%}
-      <button type="button" id="post-comment"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt=""></button>
-    {%endif%}
-  {%ifequal user post.author%}
-      <a  href="{%url 'post_edit' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
-      <button type="button" id="delete-post"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></button>
-  {%endifequal%}
-  {%if not post.published_time and user == post.author%}
-      <a href="{%url 'post_publish' pk=post.pk%}" role="button"><img src="{%static 'img/icons/publish.png'%}" width=15 height=15 alt=""></a>
-  {%endif%}
+    <div class="post-operation-btn-group">
+      {%if user.is_authenticated%}
+      <button type="button" id="post-comment-btn"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt=""></button>
+      {%endif%}
+      {%ifequal user post.author%}
+        <a  href="{%url 'post_edit' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
+        <button type="button" id="delete-post-btn"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></button>
+      {%endifequal%}
+      {%if not post.published_time and user == post.author%}
+        <a href="{%url 'post_publish' pk=post.pk%}" role="button" id="post-publish-btn"><img src="{%static 'img/icons/publish.png'%}" width=15 height=15 alt=""></a>
+      {%endif%}
+    </div>
     <div class="comment-section">
       {% for comment in post.post_comments.all|slice:'5' %}
         <div class="card bg-light mb-3 comment-item" id="comment-item_{{comment.pk}}">
@@ -62,13 +71,12 @@
                         {%endif%}
             </div>
           </div>
-          <div class="card-body">
-            <h6 class="card-title comment-title">
+            <h6 class=comment-title">
               <small>{{comment.create_time | date:"N d, Y P"}}</small>
             </h6>
-            <p class="card-text comment-text"><p class="mb-1">{{comment.content}}</p>
+            <p class="comment-text"><p class="mb-1">{{comment.content}}</p>
             <div class="comment-actions">
-                <a role="button" class=comment-action-item>
+                <a role="button" class="comment-action-item">
                   {%if user in comment.liked_by.all%}
                     <img data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_selected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
                   {%else%}
@@ -86,7 +94,6 @@
                 <div id="comment-dislike-number_{{comment.pk}}" class=comment-action-item>{{comment.disliked_by.count}}</div>
                 <button type="button" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id="delete_{{comment_pk}}" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
             </div>
-          </div>
         </div>
       {%endfor%}
     </div>
@@ -96,346 +103,109 @@
 
 {% csrf_token %}
 <script type="text/javascript">
-  csrf();
-  function CommentPager(totalCommentNum, commentPerPage) {
-    this.commentPage = 1;
-    this.commentItemNum = 5;
-    this.totalCommentNum = totalCommentNum;
-    this.commentPerPage = commentPerPage;
-    this.commentPageItemEffect = function(pageNum) {
+    $(function() {
       
-    };
-    this.initPageList = function() {
-      if (this.totalCommentNum / this.commentPerPage < this.commentItemNum)
-      var commentItem = this.totalCommentNum / this.commentPerPage < this.commentItemNum?Math.ceil(this.totalCommentNum / this.commentPerPage):this.commentItemNum;
-      console.log(commentItem);
-      $(".comment-pagination").append('<li class="previous">' +
-      '<button class="comment-page-link" id="comment-previous-page-btn" aria-label="Previous">' +
-      '<span aria-hidden="true">&laquo;</span></li>');
-      for(var i=1; i<=commentItem; i++) {
-        $(".comment-pagination").append('<li><button class="comment-page-item" data-page=' + i + '>' + i + '</button></li>')
-      }
-      $(".comment-pagination").append('<li class="next">' +
-      '<button class="comment-page-link" id="comment-next-page-btn" aria-label="Next">' +
-      '<span aria-hidden="true">&raquo;</span></li>');
-      this.bindPageEvent();
-    };
-    this.updatePageList = function() {
-
-    };
-
-    // 切换页面时调用
-    this.getCommentList = function(page) {
-      // 给当前页选中效果
-      var commentPageItem = $(".comment-page-item");
-      for(var i=0; i<commentPageItem.length; i++) {
-        if (commentPageItem[i].getAttribute('data-page') == page) {
-          $(".comment-page-item").css("background-color", "#ffffff");
-          commentPageItem[i].style.backgroundColor = "#c3c3c3";
-          break;
-        }
-      }
-      let that = this;
-      // 获取评论区内容
-      $.ajax({
-        url: "{%url 'post_comment_list' pk=123 %}".replace('123', '{{post.pk}}') + "?page=" + page,
-        type: "GET",
-        success: function(data) {     
-          $(".comment-section").html("");
-          if (data.last_page) {
-            $("#comment-previous-page-btn").prop("disabled", false);
-            $("#comment-next-page-btn").prop("disabled", true);
-          }
-          else {
-            $("#comment-next-page-btn").prop("disabled", false);
-          }
-
-          if (page == 1) {
-            $("#comment-previous-page-btn").prop("disabled", true);
-            $("#comment-next-page-btn").prop("disabled", false);
-          }
-          // 填充评论区
-          var str = '';
-          var commentList = data.comment_list;
-          for (var i=0; i < commentList.length; i++) {
-            var newComment = commentList[i];
-            str+='<div class="card bg-light mb-3 comment-item" id="comment-item_' + newComment.id +'">';
-            str+='<div class="card-header comment-header">';
-            str+='<div class="d-flex w-100 justify-content-between">';
-            str+='Posted by:';
-            str+=newComment.author;
-            str+='</div>';
-            str+='</div>';
-            str+='<div class="card-body">';
-            str+='<h6 class="card-title comment-title">';
-            str+='<small>' + newComment.created_time + '</small>';
-            str+='</h6>';
-            str+='<p class="card-text comment-text"><p class="mb-1">' + newComment.content + '</p>';
-            str+='<div class="comment-actions">';
-            str+='<a role="button" class=comment-action-item>';
-            if (newComment.liked)
-              str+='<img data-href="{% url "like_comment" pk=123 %}" src="{%static "img/icons/thumb_up_selected.png"%}" class="like-comment" id="like-'.replace("123", newComment.id) + newComment.id + '" width=20 height=20>';
-            else
-              str+='<img data-href="{% url "like_comment" pk=123 %}" src="{%static "img/icons/thumb_up_unselected.png"%}" class="like-comment" id="like-'.replace("123", newComment.id) + newComment.id +  '" width=20 height=20>';
-            str+='</a>';
-            str+='<div id="comment-like-number_' + newComment.id + '" class=comment-action-item>' + newComment.likes_count + '</div>';
-            str+='';
-            str+='<a role="button" class=comment-action-item>';
-            if (newComment.disliked)
-              str+='<img data-href="{% url "dislike_comment" pk=123 %}" src="{%static "img/icons/thumb_down_selected.png"%}" class="dislike-comment" id="dislike-'.replace("123", newComment.id) + newComment.id + '" width=20 height=20>';
-            else
-              str+='<img data-href="{% url "dislike_comment" pk=123 %}" src="{%static "img/icons/thumb_down_unselected.png"%}" class="dislike-comment" id="dislike-'.replace("123", newComment.id) + newComment.id + '" width=20 height=20>';
-            str+='</a>';
-            str+='<div id="comment-dislike-number_' +  newComment.id + '" class=comment-action-item>' + newComment.dislikes_count + '</div>';
-            str+='<button type="button" data-href="{%url "comment_remove" pk=123%}" class="delete-comment-btn" id="delete_'.replace("123", newComment.id) + newComment.id + '" id=' + newComment.id + '><img src="{%static "img/icons/trash_bin.png"%}" width=20 height=20></button>';
-            str+='</div>';
-            str+='</div>';
-            str+='</div>';
-          }
-          $(".comment-section").html(str);
-          // 再次绑定一次评论的事件
-          console.log(that);
-          that.bindCommentOperationEvent();
-        }
-      }) 
-    };
-    this.bindCommentOperationEvent = function() {
-      console.log("I'm called again");
-      $(".like-comment").click(function () {
-        console.log("HAHA");
-        var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-        $.ajax({
-          type: "POST",
-          url: $(this).attr("data-href"),
-          data: postData,
-          success: function (result) {
-            console.log("Hey SUCCESS");
-            var url = $(this)[0].url;
-            var comment_pk = url.match(/.*\/(\d+)\/.*/)[1];
-            var picSrc = $("#like-" + comment_pk).attr("src");
-            var tmp = picSrc.split('/');
-            var picFileName = tmp[tmp.length - 1];
-            var currCount = $("#comment-like-number_"+comment_pk).html();
-            if (result == 1) {
-              $("#comment-like-number_"+comment_pk).html(Number(currCount) + 1);
-              $("#like-" + comment_pk).prop('src', "{%static 'img/icons/thumb_up_selected.png'%}");
-            }
-            else if (result == 0) {
-              $("#comment-like-number_"+comment_pk).html(Number(currCount) - 1);
-              $("#like-" + comment_pk).prop('src', "{%static 'img/icons/thumb_up_unselected.png'%}");
-            }
-            else {
-            }
-          }
+	    var testView = editormd.markdownToHTML("post-content", {
+            // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
+            htmlDecode : true,  // Enable / disable HTML tag encode.
+            htmlDecode : "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
         });
-      });
-
-      $(".dislike-comment").click(function () {
-        var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-        $.ajax({
-          type: "POST",
-          url: $(this).attr("data-href"),
-          data: postData,
-          success: function (result) {
-            var url = $(this)[0].url;
-            var comment_pk = url.match(/.*\/(\d+)\/.*/)[1];
-            var picSrc = $("#like-" + comment_pk).attr("src");
-            var tmp = picSrc.split('/');
-            var picFileName = tmp[tmp.length - 1];
-            var currCount = $("#comment-dislike-number_"+comment_pk).html();
-            if (result == 1) {
-              $("#comment-dislike-number_"+comment_pk).html(Number(currCount) + 1);
-              $("#dislike-" + comment_pk).prop('src', "{%static 'img/icons/thumb_down_selected.png'%}");
-            }
-            else if (result == 0) {
-              $("#comment-dislike-number_"+comment_pk).html(Number(currCount) - 1);
-              $("#dislike-" + comment_pk).prop('src', "{%static 'img/icons/thumb_down_unselected.png'%}");
-            }
-            else {
-            }
-          }
-        });
-      });
-
-      $(".delete-comment-btn").click(function () {
-        var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-        var url = $(this).data("href");
-        var commentId = url.split('/')[2];
-        layer.open({
-          title: 'Are you sure?',
-          content: "This operation is irreversible..",
-          area: ['300px', '160px'],
-          yes: function(index, layero){
-            console.log("trying to delete comment");
-            $.ajax({
-              type: "post",
-              url: url,
-              data: {pk: commentId},
-              success: function(data) {
-                $("#comment-item_" + commentId).remove();
-              }
-            })
-            layer.close(index);
-          }
-        });
-      });
-    };
-
-    this.bindPageEvent = function() {
-      let that = this;
-      $(".comment-page-item").click(function() {
-        var pageToGo = $(this).data("page");
-        that.getCommentList(pageToGo);
-      })
-    };
-  }
-
-  var totalCommentNum, commentPerPage, pager;
-  $.ajax({
-    method: "GET",
-    url: "{%url 'comment_count' pk=123%}".replace("123", '{{post.pk}}'),
-    async: false,
-    success: function(data) {
-      console.log(data);
-      totalCommentNum = data.total_comment_count;
-      commentPerPage = data.comment_per_page;
-      
-    }
-  })
-  var pager = new CommentPager(totalCommentNum, commentPerPage); 
-  pager.initPageList();
-  pager.bindCommentOperationEvent();
-  $("#comment-previous-page-btn").click(function() {
-    if (pager.commentPage == 1) {
-      $(this).prop("disabled", true);
-    }
-    else
-      pager.commentPage--;
-    $("#comment-next-page-btn").prop("disabled", false);
-    // 更新分页组件中的页数
-    if (pager.commentPage % pager.commentItemNum == 0) {
-      var commentPageItem = $(".comment-page-item");
-      var currPage = pager.commentPage - pager.commentItemNum;
-      for (var i=0; i<commentPageItem.length; i++) {
-        commentPageItem[i].find(".page-link").html(currPage++);
-      }
-    }
-    pager.getCommentList(pager.commentPage);
-  })
-
-  $("#comment-next-page-btn").click(function() {
-    pager.commentPage++;
-    // 更新分页组件中的页数
-    if (pager.commentPage-1 % pager.commentItemNum == 0) {
-      var commentPageItem = $(".comment-page-item");
-      console.log(commentPageItem);
-      var currPage = pager.commentPage;
-      for (var i=0; i<commentPageItem.length; i++) {
-        var link = commentPageItem[i].find(".page-link")
-        console.log(link);
-        link.html(currPage++);
-      }
-    }
-    pager.getCommentList(pager.commentPage);
-  })
-  
-  {% comment %} 弹出输入评论的窗口 {% endcomment %}
-  $("#post-comment").click(function() {
-    var url = "{%url 'comment_new' pk=0%}";
-    layer.prompt({
-      id: "comment-input-layer",
-      formType: 2,
-      maxlength: 140,
-      title: 'Share your idea with everyone',
-      area: ['400px', '350px'] 
-    }, function(value, index, elem){
-      $.ajax({
-        url: url.replace('0', '{{post.id}}'),
-        data: value,
-        type: 'POST',
-        success: function() {
-          location.reload();
-          layer.close(index); 
-        }
-      })
-      
     });
-  })
 
-  {% comment %} 弹出删除blog的窗口 {% endcomment %}
-  $("#delete-post").click(function() {
-    var url = "{%url 'post_remove' pk=123%}".replace('123', '{{post.pk}}');
-    console.log(url);
-    var btn = "<button class='btn btn-primary' id='confirm-delete-post-btn'>Confirm</button>";
-    var index = layer.open({
-      resize: false,
-      title: 'Are you sure?',
-      type: 2,
-      content: url,
-      btn: null,
-      area: ['400px', '290px'],
-      success: function() {
-        $('#post-confirm-delete-btn').click(function() {
-            layer.close(index);
-            console.log("YES");
-            location.href = "{%url 'post_list' page=1%}";
+    function EventListener() {
+      this.init = function() {
+        this.likePost();
+        this.markPost();
+        this.makeComment();
+      }
+
+      this.likePost = function() {
+        $("#like-post-link").click(function() {
+          $.ajax(
+            {
+              type: "GET",
+              url: '{%url "like_post" pk=123%}'.replace("123", '{{post.pk}}'),
+              success: function(res) {
+                if (res.result==1) {
+                  $("#like-post").prop("src", '{%static "img/icons/red_heart.png"%}');
+                  var likePostCount = Number($(".like-post-count").text());
+                  $(".like-post-count").text(likePostCount+1);
+                }
+                else {
+                  $("#like-post").prop("src", '{%static "img/icons/grey_heart.png"%}');
+                  var likePostCount = Number($(".like-post-count").text());
+                  $(".like-post-count").text(likePostCount-1);
+                }
+              }
+            }
+          )
+        })
+      };
+      this.markPost = function() {
+        $("#mark-post-link").click(function() {
+          $.ajax(
+            {
+              type: "GET",
+              url: '{%url "mark_post" pk=123%}'.replace("123", '{{post.pk}}'),
+              success: function(res) {
+                if (res.result==1) {
+                  $("#mark-post").prop("src", '{%static "img/icons/star.png"%}');
+                  var markPostCount = Number($(".mark-post-count").text());
+                  $(".mark-post-count").text(markPostCount+1);
+                }
+                else {
+                  $("#mark-post").prop("src", '{%static "img/icons/grey_star.png"%}');
+                  var markPostCount = Number($(".mark-post-count").text());
+                  $(".mark-post-count").text(markPostCount-1);
+                }
+              }
+            }
+          )
+        })
+      };
+      this.makeComment = function() {
+        $("#post-comment-btn").click(function() {
+          $.get('{%url "comment_new" pk=123%}'.replace("123", '{{post.pk}}'), {}, function(str) {
+            layer.prompt(
+              {
+                title: "发表您的见解",
+                fixed: false,
+                resize: false,
+                content: str,
+                btn: null,
+                success: function() {
+                  $("#save-comment").click(function() {
+                    layer.close();
+                  })
+                }
+              },
+              function(value, index, elem) {
+                alert(value);
+              }
+            )
+          })
+
+
+        })
+      };
+      this.editPost = function() {
+        $("#like-post-link").click(function() {
+          
+        })
+      };
+      this.deletePost = function() {
+        $("#like-post-link").click(function() {
+          
+        })
+      };
+      this.publishPost = function() {
+        $("#like-post-link").click(function() {
+          
         })
       }
-    })
-  })
-  
-  $('#view-entire-post-btn').click(function() {
-    $('.scrollspy-example.blog-detail-area').height('400px');
-    $('#view-entire-post-btn').hide();
-  })
-  $("#like-post").click(function () {
-    var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-    $.ajax({
-      type: "POST",
-      data: postData,
-      url: "{%url 'like_post' pk=post.pk%}",
-      success: function (res) {
-        var tmp = $('#like-post').prop('src').split('/');
-        var picFileName = tmp[tmp.length - 1];
-        if (res == -1) {
-          $("#like-number").html(Number($("#like-number").html()) - 1);
-          $('#like-post').prop('src', "{%static 'img/icons/grey_heart.png'%}");
-        }
-        else if(res == 1) {
-          $("#like-number").html(Number($("#like-number").html()) + 1);
-          $('#like-post').prop('src', "{%static 'img/icons/red_heart.png'%}");
-        }
-        else {
-          renderLoginPage();
-        }
-      }
-    });
-  });
+    }
 
-  $("#mark-post").click(function () {
-    var postData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-    $.ajax({
-      type: "POST",
-      data: postData,
-      url: "{%url 'mark_post' pk=post.pk%}",
-      success: function (res) {
-        var tmp = $('#mark-post').prop('src').split('/');
-        var picFileName = tmp[tmp.length - 1];
-        if (res == -1) {
-          $("#mark-number").html(Number($("#mark-number").html()) - 1);
-          $('#mark-post').prop('src', "{%static 'img/icons/grey_star.png'%}");
-        }
-        else if(res == 1) {
-          $("#mark-number").html(Number($("#mark-number").html()) + 1);
-          $('#mark-post').prop('src', "{%static 'img/icons/star.png'%}");
-        }
-        else {
-          renderLoginPage();
-        }
-      }
-    });
-  });
-
-
+    var listener = new EventListener();
+    listener.init();
 </script>
 {% endblock %}

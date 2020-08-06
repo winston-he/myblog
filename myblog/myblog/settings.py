@@ -20,7 +20,6 @@ GENERAL_TEMPLATES_DIR = os.path.join(BASE_DIR, 'general_templates')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
-# EMAIL_HOST_PASSWORD = 'hwzhen700587'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'winstonhwz@163.com'
 EMAIL_HOST_PASSWORD = 'FAGMKMUDKYUBEYQP'
@@ -57,8 +56,8 @@ INSTALLED_APPS = [
     'user',
     'blog',
     'widget_tweaks',
-    'channels',
-    'chat',
+    # 'channels',
+    # 'chat',
 ]
 
 MIDDLEWARE = [
@@ -102,10 +101,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'myblog',
-        'HOST': '123.57.201.57',
+        'HOST': 'localhost',
         'PORT': '3306',
-        'USER': 'winston',
-        'PASSWORD': 'Hwzhen123.'
+        'USER': 'root',
+        'PASSWORD': 'hwzhen123'
     }
 }
 
