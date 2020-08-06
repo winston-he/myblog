@@ -39,3 +39,5 @@ urlpatterns = [
     url(r'^comment/(?P<pk>\d+)/dislike/$', views.dislike_comment, name='dislike_comment'),
     url(r'^post/(?P<pk>\d+)/view/$', views.add_view_count, name='view_count')
 ]
+
+
