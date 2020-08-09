@@ -90,6 +90,32 @@ body {
     padding: 10px;
 }
 
+#delete-post-btn {
+    background: #F5F5F5
+}
+
+#post-comment-btn {
+    background: #F5F5F5
+}
+
 .last-edit-time {
     padding-left: 20px;
+}
+
+.comment-item {
+    background: #ffffff;
+    margin-bottom: 8px;
+}
+
+.comment-action-item {
+    display: inline
+}
+
+.comment-section {
+    margin-top: 10px;
+}
+
+.delete-comment-btn {
+    background: #ffffff;
+    border: none;
 }

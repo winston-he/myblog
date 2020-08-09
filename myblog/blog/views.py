@@ -15,8 +15,7 @@ from .forms import CommentForm, PostForm
 from .models import Post, Comment, Appendix
 
 # Create your views here.
-# class AboutView(TemplateView):
-#     template_name = 'about.html'
+
 COMMENT_PER_PAGE = 5
 BLOG_PER_PAGE = 5
 
@@ -70,28 +69,11 @@ class PostListView(ListView):
         return JsonResponse(data={"data": res, "pages": pages}, safe=False)
 
 
-
-# class MyPostListView(LoginRequiredMixin, ListView):
-#     model = Post
-#
-#     def get_queryset(self):
-#         return Post.objects.filter(author=self.request.user).order_by('-published_time')
-
-
 class MarkedPostListView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'post_list.html'
     def get_queryset(self):
         return Post.objects.filter(marked_by=self.request.user).order_by('-published_time')
-
-
-class CommentListView(LoginRequiredMixin, ListView):
-    model = Comment
-    template_name = 'comment_list.html'
-    paginate_by = 5
-
-    def get_queryset(self):
-        return Comment.objects.filter(author=self.request.user).order_by('-create_time')
 
 
 class PostDetailView(DetailView):
@@ -101,30 +83,6 @@ class PostDetailView(DetailView):
     def get_total_comment_count(request, pk):
         res = Comment.objects.filter(post=pk).count()
         return JsonResponse({"total_comment_count": res, "comment_per_page": COMMENT_PER_PAGE})
-
-    @staticmethod
-    def post_comment_list(request, pk):
-        page = request.GET.get('page')
-        page = int(page)
-        # 分页
-        comments = Comment.objects.filter(post=pk).order_by("-likes_count")[
-                   page * COMMENT_PER_PAGE:page * COMMENT_PER_PAGE + COMMENT_PER_PAGE]
-        # code.interact(local=locals())
-        last_page = len(comments) < COMMENT_PER_PAGE
-        res = []
-        for comment in comments:
-            res.append({
-                "id": comment.id,
-                "author": comment.author.username,
-                "post": pk,
-                "content": comment.content,
-                "likes_count": comment.likes_count,
-                "dislikes_count": comment.dislikes_count,
-                "created_time": comment.create_time.strftime("%b %d, %Y %I:%M %p"),
-                "liked": request.user in comment.liked_by.all(),
-                "disliked": request.user in comment.disliked_by.all()
-            })
-        return JsonResponse({"comment_list": res, "last_page": last_page}, safe=False)
 
 
 class CreateDraftView(LoginRequiredMixin, CreateView):
@@ -201,6 +159,33 @@ class DeletePostView(DeleteView):
     success_url = reverse_lazy('post_list')
 
 
+class CommentListView(LoginRequiredMixin, ListView):
+    model = Comment
+    template_name = 'blog/comment_list.html'
+    paginate_by = 5
+
+    def get(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            query_set = self.get_queryset()
+            res = []
+            for record in query_set:
+                res.append({
+                    "create_time": record.strftime("%b %d, %Y %I:%M %p"),
+                    "content": record.content,
+                    "likes_count": record.liked_by.count(),
+                    "dislikes_count": record.disliked_by.count()
+                })
+            return JsonResponse({"data": res, "result": 1})
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        limit = self.paginate_by
+        page = self.request.GET.get('page', None)
+        page = 1 if page is None else int(page)
+        return Comment.objects.filter(author=self.request.user).order_by('-create_time')[page*limit: (page+1)*limit]
+
+
 class CreateCommentView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
     model = Comment
@@ -215,31 +200,12 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.post = get_object_or_404(Post, pk=int(self.kwargs['pk']))
-
         # 执行成功后不重定向，而是返回JsonResponse
         form.save()
-
-
+        return JsonResponse({"result": 1})
 
     def form_invalid(self, form):
-        print("HEHHE")
-
-
-
-
-    # @staticmethod
-    # def save(request, pk):
-    #     if request.method == 'POST':
-    #         post = get_object_or_404(Post, pk=pk)
-    #         comment = Comment(content=request.body.decode('utf-8'), author=request.user, post=post)
-    #         comment.save()
-    #         return redirect('post_detail', pk=post.pk)
-    #     else:
-    #         form = CommentForm()
-    #     return render(request, 'blog/comment_form.html', {'form': form, 'pk': pk})
-
-    # def form_valid(self, form):
-    #     pass
+        return JsonResponse({"result": -1})
 
 
 # class DeleteCommentView(LoginRequiredMixin, DeleteView):

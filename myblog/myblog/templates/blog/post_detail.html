@@ -60,7 +60,7 @@
     </div>
     <div class="comment-section">
       {% for comment in post.post_comments.all|slice:'5' %}
-        <div class="card bg-light mb-3 comment-item" id="comment-item_{{comment.pk}}">
+        <div class="comment-item" id="comment-item_{{comment.pk}}">
           <div class="card-header comment-header">
             <div class="d-flex w-100 justify-content-between">
               Posted by:
@@ -76,23 +76,30 @@
             </h6>
             <p class="comment-text"><p class="mb-1">{{comment.content}}</p>
             <div class="comment-actions">
-                <a role="button" class="comment-action-item">
-                  {%if user in comment.liked_by.all%}
-                    <img data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_selected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
-                  {%else%}
-                    <img data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_unselected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
-                  {%endif%}
-                </a>
-                <div id="comment-like-number_{{comment.pk}}" class=comment-action-item>{{comment.liked_by.count}}</div>
-                <a role="button" class=comment-action-item>
-                  {%if user in comment.disliked_by.all%}
-                    <img data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
-                  {%else%}
-                    <img data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
-                  {%endif%}
-                </a>
-                <div id="comment-dislike-number_{{comment.pk}}" class=comment-action-item>{{comment.disliked_by.count}}</div>
-                <button type="button" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id="delete_{{comment_pk}}" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
+                <div class="comment-action-item like-comment">
+                  <a role="button">
+                    {%if user in comment.liked_by.all%}
+                      <img data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_selected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
+                    {%else%}
+                      <img data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_unselected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
+                    {%endif%}
+                  </a>
+                  <div id="comment-like-number_{{comment.pk}}" class=comment-action-item>{{comment.liked_by.count}}</div>
+                </div>
+                
+                <div class="comment-action-item dislike-comment">
+                  <a role="button">
+                    {%if user in comment.disliked_by.all%}
+                      <img data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
+                    {%else%}
+                      <img data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
+                    {%endif%}
+                  </a>
+                  <div id="comment-dislike-number_{{comment.pk}}" class=comment-action-item>{{comment.disliked_by.count}}</div>
+                </div>
+                <div class="comment-action-item remove-comment">
+                  <button type="button" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id="delete_{{comment_pk}}" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
+                </div>
             </div>
         </div>
       {%endfor%}
@@ -104,7 +111,6 @@
 {% csrf_token %}
 <script type="text/javascript">
     $(function() {
-      
 	    var testView = editormd.markdownToHTML("post-content", {
             // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
             htmlDecode : true,  // Enable / disable HTML tag encode.
@@ -117,6 +123,7 @@
         this.likePost();
         this.markPost();
         this.makeComment();
+        this.getCommentList();
       }
 
       this.likePost = function() {
@@ -201,6 +208,18 @@
       this.publishPost = function() {
         $("#like-post-link").click(function() {
           
+        })
+      }
+      this.getCommentList = function() {
+        $.get({
+          url: '{%url "comment_list" pk=123%}'.replace('123', '{{post.pk}}'),
+          success: function(data) {
+            text = "";
+            var comments = data.data; 
+            for (var i=0; i <comment.length; i++) {
+
+            }
+          }
         })
       }
     }

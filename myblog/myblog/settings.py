@@ -18,6 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'myblog', 'templates')
 GENERAL_TEMPLATES_DIR = os.path.join(BASE_DIR, 'general_templates')
 
+EMAIL_HOST_PASSWORD = 'FAGMKMUDKYUBEYQP'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
@@ -100,10 +101,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'myblog',
-        'HOST': 'localhost',
+        'HOST': '123.57.201.57',
         'PORT': '3306',
-        'USER': 'root',
-        'PASSWORD': 'XXXXXX'
+        'USER': 'winston',
+        'PASSWORD': 'Hwzhen123.'
     }
 }
 

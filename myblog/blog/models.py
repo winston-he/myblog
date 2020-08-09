@@ -33,8 +33,8 @@ class Comment(models.Model):
     author = models.ForeignKey(User, related_name='user_comments', on_delete=models.CASCADE)
     post = models.ForeignKey(Post, related_name='post_comments', on_delete=models.CASCADE)
     content = models.CharField(max_length=140, null=False, help_text="Please fill it in!")
-    likes_count = models.PositiveIntegerField(default=0)
-    dislikes_count = models.PositiveIntegerField(default=0)
+    # likes_count = models.PositiveIntegerField(default=0)
+    # dislikes_count = models.PositiveIntegerField(default=0)
     create_time = models.DateTimeField(default=timezone.now)
 
     liked_by = models.ManyToManyField(to=User, related_name='liked_comments')
