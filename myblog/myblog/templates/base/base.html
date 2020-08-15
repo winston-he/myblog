@@ -23,6 +23,12 @@
       <li class="layui-nav-item layui-this"><a href="">社区</a></li>
       <li class="layui-nav-item"><a href="">问答</a></li>
       <li class="layui-nav-item"><a href="">商城</a></li>
+      <li class="layui-nav-item right">
+        <a href={%if user.is_authenticated%}"{%url 'my_zone' pk=user.pk%}"{%else%}"{%url 'login'%}"{%endif%}>个人中心<span class="layui-badge-dot"></span></a>
+      </li>
+      <li class="layui-nav-item right">
+        <a href="{%url 'login'%}"><img src="//t.cn/RCzsdCq" class="layui-nav-img">{%if user.is_authenticated%}{{user.username}}{%else%}登录或注册{%endif%}</a>
+      </li> 
     </ul>
     {% block content %}
     {% endblock content %}

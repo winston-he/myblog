@@ -1,0 +1,71 @@
+body {
+    background: #F5F5F5;
+}
+
+.main-container {
+    flex: 1;
+    width: 1200px;
+    margin: 8px auto 0;
+}
+
+.basic-personal-info {
+    width: 250px;
+    background: #ffffff;
+    float: left;
+    padding: 10px;
+}
+
+.basic-personal-info-item {
+    margin: 10px 10px 10px 10px;
+}
+
+
+img.profile-picture {
+    margin: 0 auto;
+    display: block;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.detailed-personal-info {
+    /* background: #ffffff; */
+    width: 600px;
+    float: left;
+    margin-left: 20px;
+}
+
+.layui-card.visit-count {
+    width: 40%;
+    display: inline-block;
+}
+
+.personal-info {
+    background: #ffffff;
+    padding: 10px
+}
+
+
+.personal-info-item {
+    margin: 10px 10px 20px 10px;
+}
+
+.settings {
+    background: #ffffff;
+    float: left;
+    padding: 20px;
+    margin-left: 20px
+}
+
+.layui-input-block.access-setting {
+    margin-left: 0;
+}
+
+.layui-form-checkbox[lay-skin=primary] {
+    display: block;
+    margin: 10px
+}
+
+#edit-basic-info-btn {
+    float: left;
+}

@@ -15,6 +15,9 @@ from . import views
 urlpatterns = [
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
+
+    url(r'^my_zone/(?P<pk>\w+)/$', views.MyZoneView.as_view(), name='my_zone'),
+
     url(r'^registration/new/$', views.user_register, name='new_user'),
     url(r'^registration/activate/(?P<token>\w+)/$', views.activate_user_account, name='activate_user'),
     url(r'^registration/password/reset/$', PasswordResetView.as_view(), name='password_reset'),

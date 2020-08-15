@@ -23,13 +23,16 @@ BLOG_PER_PAGE = 5
 class PostListView(ListView):
     model = Post
 
+    def get(self, request, *args, **kwargs):
+        if self.get_queryset() == 'nonauthenticated':
+            return redirect(reverse("login"))
+        return super().get(request, *args, **kwargs)
     def get_queryset(self, page=1, all=True, published=False):
 
         all = True if self.request.GET.get("all") is not None and self.request.GET.get("all") == 'true' else False
-
         # 如果查询我的文章但是当前用户未登陆
-        if not all and not self.request.user:
-            return redirect(reverse("login"))
+        if not all and not self.request.user.is_authenticated:
+            return "nonauthenticated"
 
         self.template_name = 'blog/post_list.html' if all else 'blog/my_post_list.html'
         start = (page - 1) * BLOG_PER_PAGE
@@ -106,9 +109,9 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     form_class = PostForm
     template_name = "blog/post_form.html"
 
-
     def form_valid(self, form):
         form.instance.published_time = timezone.now()
+        form.instance.author = self.request.user
         return super().form_valid(form)
 
     # 新建并保存，但不发布
@@ -170,7 +173,7 @@ class CommentListView(LoginRequiredMixin, ListView):
             res = []
             for record in query_set:
                 res.append({
-                    "create_time": record.strftime("%b %d, %Y %I:%M %p"),
+                    "create_time": record.create_time.strftime("%b %d, %Y %I:%M %p"),
                     "content": record.content,
                     "likes_count": record.liked_by.count(),
                     "dislikes_count": record.disliked_by.count()

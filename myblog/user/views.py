@@ -1,9 +1,10 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView
 from mail.mail_string import get_activate_msg
 from mail.views import send_email
 from .forms import UserRegisterForm
@@ -13,6 +14,13 @@ from myblog.settings import EMAIL_FROM
 import os
 from .utils import generate_token, load_token
 from itsdangerous import SignatureExpired, BadSignature
+
+
+class MyZoneView(LoginRequiredMixin, DetailView):
+    template_name = 'profile/my_zone.html'
+
+    model = User
+
 
 
 def user_register(request):

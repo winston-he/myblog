@@ -1,0 +1,113 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{%block ref%}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{%endblock%}
+
+{%block content%}
+
+<div class="main-container">
+    <div class="basic-personal-info">
+        <div class="profile-image">
+            <img class="profile-picture" src="{%static 'upload/profile/harden.jpg'%}" 
+            style="width: 200px;
+            height: 200px;
+            margin: 0 auto;  
+            display: block;
+            border-radius: 50%;">
+        </div>
+        <div class="basic-personal-info-item nickname"><h1>{{user.username}}</h1></div>
+        <div class="basic-personal-info-item username"><h3>{{user.username}}</h3></div>
+        <div class="basic-personal-info-item email"><h3><embed src="{%static 'img/icons/email.svg'%}" type="" width="20" height="20">{{user.email}}</h3></div>
+        <div class="basic-personal-info-item location"><h3><embed src="{%static 'img/icons/location.svg'%}" type="" width="20" height="20">{{user.user.location}}</h3></div>
+        <div class="basic-personal-info-item joined-time"><h3>加入时间 {{user.date_joined}}</h3></div>
+        <div class="basic-personal-info-item introduction"><h3>{%if user.user.introduction%}{{user.user.introduction}}{%else%}个人介绍是空白的~{%endif%}</h3></div>
+    </div>
+    <div class="detailed-personal-info">
+        <div class="overall-visit-count">
+            <fieldset class="layui-elem-field layui-field-title visit-record">
+                <legend>访问记录</legend>
+            </fieldset>
+            <div class="layui-card visit-count">
+                    <div class="layui-card-header">个人博客总数</div>
+                    <div class="layui-card-body">
+                        总共发表 <br><span style="font-size: 30px">47</span>篇
+                    </div>
+                </div>
+            <div>
+            <div class="layui-card visit-count">
+                    <div class="layui-card-header">点赞</div>
+                    <div class="layui-card-body">
+                        共收获点赞 <br><span style="font-size: 30px">10496</span>次
+                    </div>
+                </div>
+            <div>
+            <div class="layui-card visit-count">
+                    <div class="layui-card-header">收藏</div>
+                    <div class="layui-card-body">
+                        一共被收藏 <br><span style="font-size: 30px">4742</span>次
+                    </div>
+            </div>
+            <div>
+            <div class="layui-card visit-count">
+                <div class="layui-card-header">总访问数</div>
+                <div class="layui-card-body">
+                    历史总计博客阅读 <br><span style="font-size: 30px">20479</span>次
+                </div>
+            </div>
+            <div class="layui-card visit-count">
+                <div class="layui-card-header">周访问数</div>
+                <div class="layui-card-body">
+                    本周博客阅读 <br><span style="font-size: 30px">246</span>次
+                </div>
+            </div>
+        </div>
+        <fieldset class="layui-elem-field layui-field-title basic-info">
+            <legend>个人基本信息</legend>
+        </fieldset>
+        <div class="personal-info">
+            <button id="edit-basic-info-btn" type="button" class="layui-btn layui-btn-primary">编辑</button>
+            <div class="personal-info-item">用户ID: {{user.pk}}</div>
+            <div class="personal-info-item">用户名: {{user.username}}</div>
+            <div class="personal-info-item">昵称: {{user.user.nickname}}</div>
+            <div class="personal-info-item">性别: {{user.user.gender}}</div>
+        </div>
+        <fieldset class="layui-elem-field layui-field-title education-info">
+                <legend>教育背景</legend>
+        </fieldset>
+        <button id="edit-education-info-btn" type="button" class="layui-btn layui-btn-primary">编辑</button>
+        <fieldset class="layui-elem-field layui-field-title employment-info">
+                <legend>工作经历</legend>
+        </fieldset>
+        <button id="edit-employment-info-btn" type="button" class="layui-btn layui-btn-primary">编辑</button>
+    </div>
+    <div class="settings">
+        <h2>设置</h2>
+        <h3>别人可以看到我的</h3>
+        <div class="layui-form">
+            <div class="layui-input-block access-setting">
+                <form class="layui-form" action="">
+                    <input class="setting-checkbox" type="checkbox" name="" title="访问记录" lay-skin="primary">
+                    <input class="setting-checkbox" type="checkbox" name="" title="教育背景" lay-skin="primary">
+                    <input class="setting-checkbox" type="checkbox" name="" title="工作经历" lay-skin="primary">
+                    <button type="submit" class="layui-btn layui-btn-normal" id="update-setting-btn" lay-filter="update-setting" disabled>更新</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form;
+        
+        //监听提交
+        form.on('submit(update-setting)', function(data){
+        layer.msg(JSON.stringify(data.field));
+        return false;
+        });
+    });
+</script>
+{%endblock%}
