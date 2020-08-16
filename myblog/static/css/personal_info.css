@@ -1,0 +1,12 @@
+body {
+    background: #F5F5F5;
+}
+
+.main-container {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.layui-input-block {
+    margin: 10px
+}

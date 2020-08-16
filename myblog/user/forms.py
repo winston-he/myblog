@@ -3,13 +3,13 @@
 '''
 @Author: winston he
 @Email: winston.wz.he@gmail.com
-@File: forms.py.py
+@File: forms.py
 @Time: 2020/4/11 19:26
 '''
 from django.contrib.auth.models import User
 from django.forms import IntegerField, RadioSelect, CharField, EmailField
 from django import forms
-
+from .models import ACADEMY_LIMITS, EMPLOYMENT_LIMITS
 from .models import UserProfile
 
 
@@ -29,7 +29,39 @@ class UserRegisterForm(forms.Form):
             del self.cleaned_data['password1']
             del self.cleaned_data['password2']
 
+class PersonalInfoForm(forms.ModelForm):
+    nickname = forms.CharField(required=True, max_length=64)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for i in range(1, ACADEMY_LIMITS+1):
+            edu_school = 'edu_school_' + str(i)
+            edu_major = 'edu_major_' + str(i)
+            start_date = 'edu_start_date_' + str(i)
+            end_date = 'edu_end_date_' + str(i)
+            try:
+                self.fields[edu_school] = forms.CharField(max_length=50, required=True)
+                self.fields[edu_major] = forms.CharField(max_length=50, required=True)
+                self.fields[start_date] = forms.CharField(max_length=50, required=True)
+                self.fields[end_date] = forms.CharField(max_length=50)
+            except KeyError:
+                break
 
+        for i in range(1, EMPLOYMENT_LIMITS+1):
+            company = 'company_' + str(i)
+            title = 'edu_major_' + str(i)
+            start_date = 'emp_start_date_' + str(i)
+            end_date = 'emp_end_date_' + str(i)
+            try:
+                self.fields[company] = forms.CharField(max_length=50, required=True)
+                self.fields[title] = forms.CharField(max_length=50, required=True)
+                self.fields[start_date] = forms.CharField(max_length=50, required=True)
+                self.fields[end_date] = forms.CharField(max_length=50)
+            except KeyError:
+                break
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
 
 

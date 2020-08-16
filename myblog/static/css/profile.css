@@ -66,6 +66,7 @@ img.profile-picture {
     margin: 10px
 }
 
-#edit-basic-info-btn {
-    float: left;
+#edit-personal-info-btn {
+    width: 100%;
+    
 }

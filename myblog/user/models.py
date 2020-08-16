@@ -1,5 +1,10 @@
 from django.contrib.auth.models import Permission, User
+from django.core.exceptions import ValidationError
 from django.db import models
+
+
+ACADEMY_LIMITS = 6
+EMPLOYMENT_LIMITS = 10
 
 
 class UserManager(models.Manager):
@@ -39,24 +44,42 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.get_username() + ' ' + self.user.email
 
+def education_limit(value):
+    if UserEducation.objects.filter(user=value) > ACADEMY_LIMITS:
+        raise ValidationError("最多只能添加{}个教育经历".format(ACADEMY_LIMITS))
 
 class UserEducation(models.Model):
+    degree_choices = (
+        ((0, '小学'), (1, '初中'), (2, '高中'),
+         (3, '职高'),
+         (4, '大专'),
+         (5, '本科'),
+         (6, '硕士研究生'),
+         (7, '博士研究生'),
+         (8, '博士导师'))
+    )
+
     edu_school = models.CharField(max_length=50, null=True)
     edu_major = models.CharField(max_length=50, null=True)
+    edu_degree = models.CharField(max_length=10, null=True, choices=degree_choices)
     start_date = models.DateTimeField(null=False)
     end_date = models.DateTimeField(null=False)
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='education')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='education', validators=(education_limit, ))
 
     def __str__(self):
         return "Academy: {}, Major: {}".format(self.edu_school, self.edu_major)
+
+
+def employment_limit(value):
+    if UserEducation.objects.filter(user=value) > ACADEMY_LIMITS:
+        raise ValidationError("最多只能添加{}个工作经历".format(EMPLOYMENT_LIMITS))
 
 class UserEmploymentInfo(models.Model):
     company = models.CharField(max_length=100, null=False)
     title = models.CharField(max_length=100, null=False)
     start_date = models.DateTimeField(null=False)
     end_date = models.DateTimeField(null=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employment')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employment', validators=(employment_limit, ))
 
     def __str__(self):
         return "Company: {}, Title: {}".format(self.company, self.title)

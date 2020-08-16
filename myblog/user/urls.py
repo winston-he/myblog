@@ -16,7 +16,8 @@ urlpatterns = [
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
 
-    url(r'^my_zone/(?P<pk>\w+)/$', views.MyZoneView.as_view(), name='my_zone'),
+    url(r'^my_zone/(?P<pk>\w+)/$', views.PersonalInfoDetailView.as_view(), name='my_zone'),
+    url(r'^my_zone/(?P<pk>\w+)/edit/$', views.UpdatePersonalInfoView.as_view(), name='update_personal_info'),
 
     url(r'^registration/new/$', views.user_register, name='new_user'),
     url(r'^registration/activate/(?P<token>\w+)/$', views.activate_user_account, name='activate_user'),

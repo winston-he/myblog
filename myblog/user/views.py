@@ -4,10 +4,10 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, UpdateView
 from mail.mail_string import get_activate_msg
 from mail.views import send_email
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, PersonalInfoForm
 
 from .models import User, UserProfile
 from myblog.settings import EMAIL_FROM
@@ -16,15 +16,21 @@ from .utils import generate_token, load_token
 from itsdangerous import SignatureExpired, BadSignature
 
 
-class MyZoneView(LoginRequiredMixin, DetailView):
-    template_name = 'profile/my_zone.html'
+class UpdatePersonalInfoView(LoginRequiredMixin, UpdateView):
+    template_name = "profile/personal_info_form.html"
+    model = User
+    form_class = PersonalInfoForm
 
+    def form_valid(self, form):
+        form.cleaned_data
+
+        return super().form_valid(form)
+
+class PersonalInfoDetailView(LoginRequiredMixin, DetailView):
+    template_name = 'profile/my_zone.html'
     model = User
 
-
-
 def user_register(request):
-
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
