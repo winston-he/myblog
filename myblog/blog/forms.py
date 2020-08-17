@@ -6,7 +6,7 @@
 # @Email: winston.wz.he@gmail.com
 from django import forms
 from .models import Post, Comment
-from bootstrap_modal_forms.mixins import PopRequestMixin
+
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -20,7 +20,7 @@ class PostForm(forms.ModelForm):
 
 
 
-class CommentForm(forms.ModelForm, PopRequestMixin):
+class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ('content', )

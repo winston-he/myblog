@@ -21,22 +21,6 @@
     <button class="layui-btn layui-btn-normal" id="save-comment">提交</button>
 <script type="text/javascript">
   var csrf = $('input[name="csrfmiddlewaretoken"]').val();
-  $(".comment-form").prop("action", "{%url 'comment_new' pk=123%}".replace('123', {{pk}}));
-
-  $("#save-comment").click(function() {
-    $.post({
-      url: '{%url "comment_new" 123%}'.replace('123', '{{pk}}'),
-      data: {
-        "content": $("#comment-content").val(),
-        "csrfmiddlewaretoken": csrf
-      },
-      success: function(data) {
-        console.log("this is insane" + data);
-        layer.closeAll();
-      }
-    })
-  })
-
   $('#comment-content').keyup(function() {
     var currTextLength = $('#comment-content').val().length;
     if (currTextLength > 140) {

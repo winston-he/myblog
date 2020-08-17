@@ -168,9 +168,11 @@ class CommentListView(LoginRequiredMixin, ListView):
     paginate_by = 5
 
     def get(self, request, *args, **kwargs):
+        # 直接返回json格式的数据
         if self.request.is_ajax():
             query_set = self.get_queryset()
             res = []
+            total_comment = Comment.objects.filter(post=int(kwargs['pk'])).count()
             for record in query_set:
                 res.append({
                     "create_time": record.create_time.strftime("%b %d, %Y %I:%M %p"),
@@ -178,7 +180,7 @@ class CommentListView(LoginRequiredMixin, ListView):
                     "likes_count": record.liked_by.count(),
                     "dislikes_count": record.disliked_by.count()
                 })
-            return JsonResponse({"data": res, "result": 1})
+            return JsonResponse({"data": res, "result": 1, "total_comment": total_comment, "limit": self.paginate_by})
         else:
             return super().get(request, *args, **kwargs)
 
@@ -205,7 +207,14 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
         form.instance.post = get_object_or_404(Post, pk=int(self.kwargs['pk']))
         # 执行成功后不重定向，而是返回JsonResponse
         form.save()
-        return JsonResponse({"result": 1})
+        return JsonResponse({"result": 1, "data": {
+            "pk": form.instance.pk,
+            "create_time": form.instance.create_time.strftime("%b %d, %Y %I:%M %p"),
+            "content": form.instance.content,
+            "likes_count": form.instance.liked_by.count(),
+            "dislikes_count": form.instance.disliked_by.count(),
+            "author": self.request.user.username
+        }})
 
     def form_invalid(self, form):
         return JsonResponse({"result": -1})

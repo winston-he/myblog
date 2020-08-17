@@ -10,6 +10,9 @@
 <script src="{% static 'editor/lib/marked.min.js' %}"></script>
 <script src="{% static 'editor/lib/prettify.min.js' %}"></script>
 <script src="{% static 'blog/js/default.js' %}"></script>
+
+<script src="{% static 'layui/lay/modules/laypage.js' %}"></script>
+
 <div class="container" id="blog-detail-comment-area">
     <div class="blog-detail-area">
       <h1 class="post-title">{{post.title}}</h5>
@@ -58,54 +61,9 @@
         <a href="{%url 'post_publish' pk=post.pk%}" role="button" id="post-publish-btn"><img src="{%static 'img/icons/publish.png'%}" width=15 height=15 alt=""></a>
       {%endif%}
     </div>
+    <div class="comment-list"></div>
     <div class="comment-section">
-      {% for comment in post.post_comments.all|slice:'5' %}
-        <div class="comment-item" id="comment-item_{{comment.pk}}">
-          <div class="card-header comment-header">
-            <div class="d-flex w-100 justify-content-between">
-              Posted by:
-                        {%if comment.author.username == user.username%}
-                            me
-                        {%else%}
-                            {{comment.author.username}}
-                        {%endif%}
-            </div>
-          </div>
-            <h6 class=comment-title">
-              <small>{{comment.create_time | date:"N d, Y P"}}</small>
-            </h6>
-            <p class="comment-text"><p class="mb-1">{{comment.content}}</p>
-            <div class="comment-actions">
-                <div class="comment-action-item like-comment">
-                  <a role="button">
-                    {%if user in comment.liked_by.all%}
-                      <img data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_selected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
-                    {%else%}
-                      <img data-href="{% url 'like_comment' comment.pk %}" src="{%static 'img/icons/thumb_up_unselected.png'%}" class="like-comment" id="like-{{comment.pk}}" width=20 height=20>
-                    {%endif%}
-                  </a>
-                  <div id="comment-like-number_{{comment.pk}}" class=comment-action-item>{{comment.liked_by.count}}</div>
-                </div>
-                
-                <div class="comment-action-item dislike-comment">
-                  <a role="button">
-                    {%if user in comment.disliked_by.all%}
-                      <img data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_selected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
-                    {%else%}
-                      <img data-href="{% url 'dislike_comment' comment.pk %}" src="{%static 'img/icons/thumb_down_unselected.png'%}" class="dislike-comment" id="dislike-{{comment.pk}}" width=20 height=20>
-                    {%endif%}
-                  </a>
-                  <div id="comment-dislike-number_{{comment.pk}}" class=comment-action-item>{{comment.disliked_by.count}}</div>
-                </div>
-                <div class="comment-action-item remove-comment">
-                  <button type="button" data-href="{%url 'comment_remove' pk=comment.pk%}" class="delete-comment-btn" id="delete_{{comment_pk}}" id={{comment.pk}}><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20></button>
-                </div>
-            </div>
-        </div>
-      {%endfor%}
     </div>
-      <ul class="comment-pagination">
-      </ul>
   </div>
 
 {% csrf_token %}
@@ -118,12 +76,47 @@
         });
     });
 
+    function generateCommentItem(data) {
+        var text = "";
+        text += "<div class=\"comment-item\" id=\"comment-item_PK_PLACEHOLDER\">".replace("PK_PLACEHOLDER", data.pk);
+        text += "  <div class=\"card-header comment-header\">";
+        text += "    <div class=\"d-flex w-100 justify-content-between\">";
+        text += "      Posted by: me";
+        text += "    </div>";
+        text += "  </div>";
+        text += "    <h6 class=comment-title\">";
+        text += "      <small>" + data.create_time + "</small>";
+        text += "    </h6>";
+        text += "    <p class=\"comment-text\"><p class=\"mb-1\">" + data.content +"</p>";
+        text += "    <div class=\"comment-actions\">";
+        text += "        <div class=\"comment-action-item like-comment\">";
+        text += "          <a role=\"button\">";
+        text += "              <img data-href=\"{% url 'like_comment' pk=123 %}\" src=\"{%static 'img/icons/thumb_up_unselected.png'%}\" class=\"like-comment\" id=\"like-".replace("123", data.pk) + data.pk + "\" width=20 height=20>";
+        text += "          </a>";
+        text += "          <div id=\"comment-like-number_" + data.pk + "\" class=comment-action-item>" + data.likes_count + "</div>";
+        text += "        </div>";
+        text += "        ";
+        text += "        <div class=\"comment-action-item dislike-comment\">";
+        text += "          <a role=\"button\">";
+        text += "              <img data-href=\"{% url 'dislike_comment' pk=123 %}\" src=\"{%static 'img/icons/thumb_down_unselected.png'%}\" class=\"dislike-comment\" id=\"dislike-123\" width=20 height=20>".replace("123", data.pk);
+        text += "          </a>";
+        text += "          <div id=\"comment-dislike-number_" + data.pk + "\" class=comment-action-item>"  + data.dislikes_count + "</div>";
+        text += "        </div>";
+        text += "        <div class=\"comment-action-item remove-comment\">";
+        text += "          <button type=\"button\" data-href=\"{%url 'comment_remove' pk=123%}\" class=\"delete-comment-btn\" id=\"delete_123\" id=PK_><img src=\"{%static 'img/icons/trash_bin.png'%}\" width=20 height=20></button>".replace("123", data.pk);
+        text += "        </div>";
+        text += "    </div>";
+        text += "</div>";
+        return text;
+      }
+
+    var csrf = $('input[name="csrfmiddlewaretoken"]').val();
     function EventListener() {
       this.init = function() {
         this.likePost();
         this.markPost();
         this.makeComment();
-        this.getCommentList();
+        {% comment %} this.getCommentList(); {% endcomment %}
       }
 
       this.likePost = function() {
@@ -171,6 +164,7 @@
         })
       };
       this.makeComment = function() {
+        //
         $("#post-comment-btn").click(function() {
           $.get('{%url "comment_new" pk=123%}'.replace("123", '{{post.pk}}'), {}, function(str) {
             layer.prompt(
@@ -182,7 +176,19 @@
                 btn: null,
                 success: function() {
                   $("#save-comment").click(function() {
-                    layer.close();
+                    $.post({
+                      url: '{%url "comment_new" 123%}'.replace('123', '{{post.pk}}'),
+                      data: {
+                        "content": $("#comment-content").val(),
+                        "csrfmiddlewaretoken": csrf,
+                      },
+                      success: function(res) {
+                        var data = res.data;
+                        var text = generateCommentItem(data);
+                        $(".comment-list").append(text);
+                        layer.closeAll();
+                      }
+                    })
                   })
                 }
               },
@@ -216,7 +222,7 @@
           success: function(data) {
             text = "";
             var comments = data.data; 
-            for (var i=0; i <comment.length; i++) {
+            for (var i=0; i <comments.length; i++) {
 
             }
           }
@@ -224,6 +230,43 @@
       }
     }
 
+    var commentCount, commentLimit, firstCommentPageData;
+    $.get({
+      url: '{%url "comment_list" pk=123%}'.replace("123", '{{post.pk}}'),
+      success: function(res) {
+        commentCount = res.total_comment;
+        commentLimit = res.limit;
+        firstCommentPageData = res.data;
+        var laypage = layui.laypage;
+
+        var text = "";
+        for (var i=0; i<firstCommentPageData.length; i++) {
+          text += generateCommentItem(firstCommentPageData[i]);
+        }
+        //执行一个laypage实例
+        laypage.render({
+          elem: document.getElementsByClassName('comment-section')[0] //注意，这里的 test1 是 ID，不用加 # 号
+          , count: commentCount //数据总数，从服务端得到
+          , limit: commentLimit
+          {% comment %} , first: "<h1>Hello World</h1>" {% endcomment %}
+          , jump: function(obj, first) {
+              console.log("commentCount is:" + commentCount);
+              console.log("commentLimit is:" + commentLimit);
+              $.get({
+                url: '{%url "comment_list" pk=123%}'.replace("123", '{{post.pk}}') + '?page=' + obj.curr,
+                success: function(res) {
+                  var text = "";
+                  var data = res.data;
+                  for (var i=0; i<data.length; i++) {
+                    text += generateCommentItem(data[i]);
+                  }
+                  $(".comment-list").html(text);
+                }
+              })
+          }
+        });
+      }
+    })
     var listener = new EventListener();
     listener.init();
 </script>

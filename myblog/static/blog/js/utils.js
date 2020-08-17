@@ -24,3 +24,36 @@ function getBlogPostPreviewItem(blogPostItem) {
         text += "</li>";
     return text
 }
+
+function getPostCommentItem(data) {
+    var text = "";
+    text += "<div class=\"comment-item\" id=\"comment-item_PK_PLACEHOLDER\">".replace("PK_PLACEHOLDER", data.pk);
+    text += "  <div class=\"card-header comment-header\">";
+    text += "    <div class=\"d-flex w-100 justify-content-between\">";
+    text += "      Posted by: me";
+    text += "    </div>";
+    text += "  </div>";
+    text += "    <h6 class=comment-title\">";
+    text += "      <small>{{comment.create_time | date:\"N d, Y P\"}}</small>";
+    text += "    </h6>";
+    text += "    <p class=\"comment-text\"><p class=\"mb-1\">" + data.content +"</p>";
+    text += "    <div class=\"comment-actions\">";
+    text += "        <div class=\"comment-action-item like-comment\">";
+    text += "          <a role=\"button\">";
+    text += "              <img data-href=\"{% url 'like_comment' pk=123 %}\" src=\"{%static 'img/icons/thumb_up_unselected.png'%}\" class=\"like-comment\" id=\"like-".replace("123", data.pk) + data.pk + "\" width=20 height=20>";
+    text += "          </a>";
+    text += "          <div id=\"comment-like-number_" + data.pk + "\" class=comment-action-item>" + data.likes_count + "</div>";
+    text += "        </div>";
+    text += "        ";
+    text += "        <div class=\"comment-action-item dislike-comment\">";
+    text += "          <a role=\"button\">";
+    text += "              <img data-href=\"{% url 'dislike_comment' 123 %}\" src=\"{%static 'img/icons/thumb_down_unselected.png'%}\" class=\"dislike-comment\" id=\"dislike-123\" width=20 height=20>".replace("123", data.pk);
+    text += "          </a>";
+    text += "          <div id=\"comment-dislike-number_" + data.pk + "\" class=comment-action-item>"  + data.dislikes_count + "</div>";
+    text += "        </div>";
+    text += "        <div class=\"comment-action-item remove-comment\">";
+    text += "          <button type=\"button\" data-href=\"{%url 'comment_remove' pk=123%}\" class=\"delete-comment-btn\" id=\"delete_123\" id=PK_><img src=\"{%static 'img/icons/trash_bin.png'%}\" width=20 height=20></button>".replace("123", data.pk);
+    text += "        </div>";
+    text += "    </div>";
+    text += "</div>";
+}
