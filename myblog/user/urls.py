@@ -7,14 +7,14 @@
 @Time: 2020/4/11 22:11
 '''
 from django.conf.urls import url
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
+from django.contrib.auth.views import LoginView, PasswordResetView
 
 from . import views
 
 
 urlpatterns = [
     url(r'^login/$', LoginView.as_view(), name='login'),
-    url(r'^logout/$', LogoutView.as_view(), name='logout'),
+    url(r'^logout/$', views.MyLogoutView.as_view(), name='logout'),
 
     url(r'^my_zone/(?P<pk>\w+)/$', views.PersonalInfoDetailView.as_view(), name='my_zone'),
     url(r'^my_zone/(?P<pk>\w+)/edit/$', views.UpdatePersonalInfoView.as_view(), name='update_personal_info'),

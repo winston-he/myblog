@@ -9,9 +9,33 @@ from .models import Post, Comment
 
 
 class PostForm(forms.ModelForm):
+    publish = forms.CharField(required=False)
+    draft = forms.CharField(required=False)
+
+    def clean(self):
+        """
+        使用publish 和 draft两个字段判断是发布还是存为草稿，在这里作处理
+        :return:
+        """
+        if 'publish' not in self.cleaned_data or 'draft' not in self.cleaned_data:
+            raise forms.ValidationError("Critical error occurs")
+        publish = self.cleaned_data['publish']
+        draft = self.cleaned_data['draft']
+
+        if publish != '' and draft == '':
+            self.cleaned_data['is_publish'] = True
+        elif publish == '' and draft != '':
+            self.cleaned_data['is_publish'] = False
+        else:
+            raise forms.ValidationError("Critical error occurs")
+
+        del self.cleaned_data['publish']
+        del self.cleaned_data['draft']
+        return super().clean()
+
     class Meta:
         model = Post
-        fields = ('title', 'content')
+        fields = ('title', 'content', 'publish', 'draft')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'textinputclass'}),
             'content': forms.Textarea(

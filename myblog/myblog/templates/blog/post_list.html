@@ -8,7 +8,7 @@
 {%block content%}
     <div class="left-side-bar-container">
         <ul class="left-side-bar">
-                <li class="left-sidebar-item all-blog"><a href="{%url 'post_list' page=1%}?all=true" class="side-bar-btn">所有博客</a></li>
+                <li class="left-sidebar-item all-blog"><a href="{%url 'post_list' page=1%}?all=true&published=true" class="side-bar-btn">所有博客</a></li>
                 <li class="left-sidebar-item write-blog"><a href="{%url 'post_new'%}" class="side-bar-btn">写文章</a></li>
                 <li class="left-sidebar-item my-comment"><a href="" class="side-bar-btn">我的评论</a></li>
                 <li class="left-sidebar-item my-marked"><a href="{%url 'marked_post_list'%}" class="side-bar-btn">我收藏的</a></li>
@@ -23,8 +23,10 @@
                 {%else%}
                     <li class="list-group-item draft-item">
                 {%endif%}
+                    {%block blog-item-extension%}
+                    {%endblock blog-item-extension%}
                     <div class="preview-post-title">
-                        <h4><a href="{%url 'post_detail' pk=post.pk%}" class="post-title-link"><span style="font-size: 30px;">{{post.title}}</span></a></h4>
+                        <h4><a href="{%url 'post_detail' pk=post.pk%}" class="post-title-link" id=preview-post-{{post.pk}}><span style="font-size: 30px;">{{post.title}}</span></a></h4>
                     </div>
                     <div class="preview-post-date">
                         <p>Created on: {{post.create_time|date:"N d, Y"}} by: {{post.author}}</p>
@@ -53,27 +55,33 @@
     {% csrf_token %}
     <script type="text/javascript">
         csrf();
-        $(".post-title-link").on("click", function() {
-            var post_id = $(this).prop("id").split("-")[3];
-            var url = '{%url "view_count" pk=0%}';
-            console.log("HELLO");
-            $.ajax({
-                type: "post",
-                url: url.replace("0", post_id),
-                async: false,
-                dataType: "json",
-                success: function() {
-                    console.log("success")
-                }
+        // 增加阅读次数
+        function incrViewCount() {
+            $(".post-title-link").on("click", function() {
+                console.log("*&^^&*&");
+                var post_id = $(this).prop("id").split("-")[2];
+                console.log("POST ID IS:" + post_id);
+                var url = '{%url "view_count" pk=0%}';
+                $.ajax({
+                    type: "post",
+                    url: url.replace("0", post_id),
+                    async: false,
+                    dataType: "json",
+                    success: function(res) {
+                        console.log("success");
+                    }
+                })
             })
+        }
 
-        })
+        incrViewCount();
+
+        {%block js_section%}
         function getBlogPostPreviewItem(blogPostItem) {
             var r = blogPostItem;
-            var text = '<li class="list-group-item post-item"></li>'
-            var text = r.published_time?'<li class="list-group-item post-item"></li>':'<li class="list-group-item draft-item"></li>';
+            var text = r.published_time?'<li class="list-group-item post-item">':'<li class="list-group-item draft-item">';
             text += "<div class=\"preview-post-title\">";
-                text += "    <h4><a href=POST_DETAIL_URL_PLACEHOLDER class=\"post-title-link\">".replace("POST_DETAIL_URL_PLACEHOLDER", "{%url 'post_detail' pk=123%}".replace("123", r.id));
+                text += "    <h4><a href=POST_DETAIL_URL_PLACEHOLDER class=\"post-title-link\" id=preview-post-123>".replace("POST_DETAIL_URL_PLACEHOLDER", "{%url 'post_detail' pk=123%}").replace("123", r.id);
                 text += "<span style=\"font-size: 30px;\">POST_TITLE_PLACEHOLDER</span></a></h4>".replace("POST_TITLE_PLACEHOLDER", r.title);
                 text += "</div>";
                 text += "<div class=\"preview-post-date\">";
@@ -94,9 +102,8 @@
                 text += "</li>";
             return text
         }
-        {%block js_section%}
+        
         layui.use('flow', function() {
-            console.log("I'm all page");
             var $ = layui.jquery; //不用额外加载jQuery，flow模块本身是有依赖jQuery的，直接用即可。
             var flow = layui.flow;
             flow.load({
@@ -107,7 +114,7 @@
                 var url = '{%url "posts_by_page" page=1%}?all=true'.replace('1', page);
                 console.log("triggered");
                 
-                $.get(url, function(res){
+                $.get(url, function(res) {
                     console.log(res);
                     //假设你的列表返回在data集合中
                     layui.each(res.data, function(index, item){
@@ -116,14 +123,15 @@
                     }); 
                     //执行下一页渲染，第二参数为：满足“加载更多”的条件，即后面仍有分页
                     //pages为Ajax返回的总页数，只有当前页小于总页数的情况下，才会继续出现加载更多
-                    next(lis.join(''), page < res.pages);    
+                    next(lis.join(''), page < res.pages);   
+                    incrViewCount(); 
                 });
                 }
             });
         });
-        {%endblock%}
+        {%endblock js_section%}
     </script>
-{%endblock%}
+{%endblock content%}
 
 {%block right_navbar%}
 {%endblock%}

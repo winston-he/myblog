@@ -101,10 +101,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'myblog',
-        'HOST': '123.57.201.57',
+        'HOST': 'localhost',
         'PORT': '3306',
-        'USER': 'winston',
-        'PASSWORD': 'Hwzhen123.'
+        'USER': 'root',
+        'PASSWORD': 'hwzhen123'
     }
 }
 
@@ -149,7 +149,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = 'post_list'
+LOGOUT_REDIRECT_URL = LOGIN_URL
 
 
 CHANNEL_LAYERS = {

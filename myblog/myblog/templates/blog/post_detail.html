@@ -12,7 +12,6 @@
 <script src="{% static 'blog/js/default.js' %}"></script>
 
 <script src="{% static 'layui/lay/modules/laypage.js' %}"></script>
-
 <div class="container" id="blog-detail-comment-area">
     <div class="blog-detail-area">
       <h1 class="post-title">{{post.title}}</h5>
@@ -54,12 +53,9 @@
       <button type="button" id="post-comment-btn"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt=""></button>
       {%endif%}
       {%ifequal user post.author%}
-        <a  href="{%url 'post_edit' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
+        <a  href="{%url 'post_update' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
         <button type="button" id="delete-post-btn"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></button>
       {%endifequal%}
-      {%if not post.published_time and user == post.author%}
-        <a href="{%url 'post_publish' pk=post.pk%}" role="button" id="post-publish-btn"><img src="{%static 'img/icons/publish.png'%}" width=15 height=15 alt=""></a>
-      {%endif%}
     </div>
     <div class="comment-list"></div>
     <div class="comment-section">
@@ -81,7 +77,7 @@
         text += "<div class=\"comment-item\" id=\"comment-item_PK_PLACEHOLDER\">".replace("PK_PLACEHOLDER", data.pk);
         text += "  <div class=\"card-header comment-header\">";
         text += "    <div class=\"d-flex w-100 justify-content-between\">";
-        text += "      Posted by: me";
+        text += "      发布者: 我";
         text += "    </div>";
         text += "  </div>";
         text += "    <h6 class=comment-title\">";
@@ -90,20 +86,20 @@
         text += "    <p class=\"comment-text\"><p class=\"mb-1\">" + data.content +"</p>";
         text += "    <div class=\"comment-actions\">";
         text += "        <div class=\"comment-action-item like-comment\">";
-        text += "          <a role=\"button\">";
-        text += "              <img data-href=\"{% url 'like_comment' pk=123 %}\" src=\"{%static 'img/icons/thumb_up_unselected.png'%}\" class=\"like-comment\" id=\"like-".replace("123", data.pk) + data.pk + "\" width=20 height=20>";
+        text += "          <a role=\"button\" class=like-comment-btn data-href=\"{% url 'like_comment' pk=123 %}\">".replace("123", data.pk);
+        text += "              <img src=\"{%static 'img/icons/thumb_up_unselected.png'%}\" class=\"like-comment\" width=20 height=20>".replace("123", data.pk).replace("thumb_up_unselected.png", data.is_liked?"thumb_up_selected.png":"thumb_up_unselected.png");
         text += "          </a>";
         text += "          <div id=\"comment-like-number_" + data.pk + "\" class=comment-action-item>" + data.likes_count + "</div>";
         text += "        </div>";
         text += "        ";
         text += "        <div class=\"comment-action-item dislike-comment\">";
-        text += "          <a role=\"button\">";
-        text += "              <img data-href=\"{% url 'dislike_comment' pk=123 %}\" src=\"{%static 'img/icons/thumb_down_unselected.png'%}\" class=\"dislike-comment\" id=\"dislike-123\" width=20 height=20>".replace("123", data.pk);
+        text += "          <a role=\"button\" class=dislike-comment-btn data-href=\"{% url 'dislike_comment' pk=123 %}\">".replace("123", data.pk);
+        text += "              <img src=\"{%static 'img/icons/thumb_down_unselected.png'%}\" class=\"dislike-comment\" id=\"dislike-123\" width=20 height=20>".replace("123", data.pk).replace("thumb_down_unselected.png", data.is_disliked?"thumb_up_selected.png":"thumb_down_unselected.png");
         text += "          </a>";
         text += "          <div id=\"comment-dislike-number_" + data.pk + "\" class=comment-action-item>"  + data.dislikes_count + "</div>";
         text += "        </div>";
         text += "        <div class=\"comment-action-item remove-comment\">";
-        text += "          <button type=\"button\" data-href=\"{%url 'comment_remove' pk=123%}\" class=\"delete-comment-btn\" id=\"delete_123\" id=PK_><img src=\"{%static 'img/icons/trash_bin.png'%}\" width=20 height=20></button>".replace("123", data.pk);
+        text += "          <button type=\"button\" data-href=\"{%url 'comment_remove' pk=123%}\" class=\"delete-comment-btn\"><img src=\"{%static 'img/icons/trash_bin.png'%}\" width=20 height=20></button>".replace("123", data.pk);
         text += "        </div>";
         text += "    </div>";
         text += "</div>";
@@ -116,6 +112,9 @@
         this.likePost();
         this.markPost();
         this.makeComment();
+        this.deletePost();
+        {% comment %} this.likeComment();
+        this.dislikeComment(); {% endcomment %}
         {% comment %} this.getCommentList(); {% endcomment %}
       }
 
@@ -165,6 +164,7 @@
       };
       this.makeComment = function() {
         //
+        let that = this;
         $("#post-comment-btn").click(function() {
           $.get('{%url "comment_new" pk=123%}'.replace("123", '{{post.pk}}'), {}, function(str) {
             layer.prompt(
@@ -186,6 +186,8 @@
                         var data = res.data;
                         var text = generateCommentItem(data);
                         $(".comment-list").append(text);
+                        that.likeComment();
+                        that.dislikeComment();
                         layer.closeAll();
                       }
                     })
@@ -207,15 +209,98 @@
         })
       };
       this.deletePost = function() {
-        $("#like-post-link").click(function() {
-          
+        $("#delete-post-btn").click(function() {
+          console.log(csrf);
+            layer.open({
+                title: "提示",
+                content: "确定要删除吗？此操作不可撤销",
+                btn: ["删除", "取消"],
+                yes: function() {
+                    $.ajax({
+                        url: "{%url 'post_remove' pk=123%}".replace("123", '{{post.pk}}'),
+                        method: "delete",
+                        headers: {
+                            'X-CSRFToken': csrf
+                        },
+                        success: function(res) {
+                            if (res.result != 1) {
+                                layer.msg(res.msg, {
+                                    time: 2000
+                                });
+                            }
+                            else {
+                                window.location.href = document.referrer;
+                                layer.msg(res.msg, {
+                                    time: 2000
+                                }); 
+
+                            }
+                        }
+                    })
+                }
+            })
         })
       };
-      this.publishPost = function() {
-        $("#like-post-link").click(function() {
-          
+      this.likeComment = function() {
+        console.log("Like comment!");
+        $(".like-comment-btn").click(function() {
+          var url = $(this).data("href");
+          var clickedBtn = $(this);
+          $.get({
+            url: url,
+            success: function(res) {
+              console.log(res);
+              // 如果已经点灭，提示不能操作
+              if (res.result == -1) {
+                  layer.msg("您已经点过灭了！:)", {
+                    time: 2000
+                  })
+              }
+              // 如果已经点赞，取消点赞
+              else if (res.result == 1) {
+                var prevLikes = $("#comment-like-number_" + res.pk).text();
+                $("#comment-like-number_" + res.pk).text(Number(prevLikes)-1);
+                clickedBtn.find("img").prop("src", '{%static "img/icons/thumb_up_unselected.png"%}');
+              }
+              // 如果没有点赞，返回0，加入点赞
+              else {
+                var prevLikes = $("#comment-like-number_" + res.pk).text();
+                $("#comment-like-number_" + res.pk).text(Number(prevLikes)+1);
+                clickedBtn.find("img").prop("src", '{%static "img/icons/thumb_up_selected.png"%}');
+              }
+            }
+          })
         })
-      }
+      }; 
+      this.dislikeComment = function() {
+        $(".dislike-comment-btn").click(function() {
+          var url = $(this).data("href");
+          var clickedBtn = $(this);
+          $.get({
+            url: url,
+            success: function(res) {
+              if (res.result == -1) {
+                  layer.msg("您已经点过赞了！:)", {
+                    time: 2000
+                  })
+              }
+              else if (res.result == 1) {
+                var prevDislikes = $("#comment-dislike-number_" + res.pk).text();
+                $("#comment-dislike-number_" + res.pk).text(Number(prevDislikes)-1);
+                clickedBtn.find("img").prop("src", '{%static "img/icons/thumb_down_unselected.png"%}');
+              }
+              else {
+                var prevDislikes = $("#comment-dislike-number_" + res.pk).text();
+                $("#comment-dislike-number_" + res.pk).text(Number(prevDislikes)+1);
+                clickedBtn.find("img").prop("src", '{%static "img/icons/thumb_down_selected.png"%}');
+              }
+            }
+          })
+        })
+      };
+      this.deleteComment = function() {
+
+      };
       this.getCommentList = function() {
         $.get({
           url: '{%url "comment_list" pk=123%}'.replace('123', '{{post.pk}}'),
@@ -231,6 +316,8 @@
     }
 
     var commentCount, commentLimit, firstCommentPageData;
+    var listener = new EventListener();
+    listener.init();
     $.get({
       url: '{%url "comment_list" pk=123%}'.replace("123", '{{post.pk}}'),
       success: function(res) {
@@ -248,10 +335,7 @@
           elem: document.getElementsByClassName('comment-section')[0] //注意，这里的 test1 是 ID，不用加 # 号
           , count: commentCount //数据总数，从服务端得到
           , limit: commentLimit
-          {% comment %} , first: "<h1>Hello World</h1>" {% endcomment %}
           , jump: function(obj, first) {
-              console.log("commentCount is:" + commentCount);
-              console.log("commentLimit is:" + commentLimit);
               $.get({
                 url: '{%url "comment_list" pk=123%}'.replace("123", '{{post.pk}}') + '?page=' + obj.curr,
                 success: function(res) {
@@ -261,13 +345,14 @@
                     text += generateCommentItem(data[i]);
                   }
                   $(".comment-list").html(text);
+                  listener.likeComment();
+                  listener.dislikeComment();
                 }
               })
           }
         });
       }
     })
-    var listener = new EventListener();
-    listener.init();
+
 </script>
 {% endblock %}

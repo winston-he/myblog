@@ -1,20 +1,22 @@
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LogoutView
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.views.generic import CreateView, DetailView, UpdateView
-from mail.mail_string import get_activate_msg
-from mail.views import send_email
-from .forms import UserRegisterForm, PersonalInfoForm
-
-from .models import User, UserProfile
-from myblog.settings import EMAIL_FROM
-import os
-from .utils import generate_token, load_token
+from django.shortcuts import render
+from django.views.generic import DetailView, UpdateView
 from itsdangerous import SignatureExpired, BadSignature
 
+from mail.mail_string import get_activate_msg
+from mail.views import send_email
+from myblog.settings import EMAIL_FROM
+from .forms import UserRegisterForm, PersonalInfoForm
+from .models import User, UserProfile
+from .utils import generate_token, load_token
+
+
+class MyLogoutView(LogoutView):
+    # def re
+    pass
 
 class UpdatePersonalInfoView(LoginRequiredMixin, UpdateView):
     template_name = "profile/personal_info_form.html"
@@ -22,13 +24,13 @@ class UpdatePersonalInfoView(LoginRequiredMixin, UpdateView):
     form_class = PersonalInfoForm
 
     def form_valid(self, form):
-        form.cleaned_data
-
         return super().form_valid(form)
+
 
 class PersonalInfoDetailView(LoginRequiredMixin, DetailView):
     template_name = 'profile/my_zone.html'
     model = User
+
 
 def user_register(request):
     if request.method == "POST":
@@ -42,8 +44,11 @@ def user_register(request):
                              message='',
                              from_email=EMAIL_FROM,
                              recipient_list=[form.cleaned_data['email'], ],
-                             html_message=get_activate_msg(form.cleaned_data['username'], "{}/{}/{}".format(host, 'registration/activate',
-                                                                                       generate_token({"username": form.cleaned_data['username']}))),
+                             html_message=get_activate_msg(form.cleaned_data['username'],
+                                                           "{}/{}/{}".format(host, 'registration/activate',
+                                                                             generate_token({"username":
+                                                                                                 form.cleaned_data[
+                                                                                                     'username']}))),
                              expires=2)
             print("邮件发送完毕")
             # return redirect(reverse('activate_user'))
@@ -60,11 +65,9 @@ def user_register(request):
             return render(request, 'registration/login.html', context={"action_type": "register", "errors": errors})
 
 
-
 def reset_password_done(request):
     if request.method == 'GET':
         return render(request, 'reset_password_done.html')
-
 
 
 def activate_user_account(request):
@@ -80,4 +83,3 @@ def activate_user_account(request):
             username = res['username']
             User.objects.filter(name=username).update(activated=1)
             HttpResponse("您的账号已激活")
-

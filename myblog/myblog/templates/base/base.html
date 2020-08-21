@@ -19,15 +19,24 @@
     <script src="{% static 'js/security.js' %}"></script>
     <ul class="layui-nav" lay-filter="">
       <li class="layui-nav-item"><a href="{%url 'home'%}">MyBlog</a></li>
-      <li class="layui-nav-item"><a href="{%url 'post_list' page=1%}?all=true">博客</a></li>
+      <li class="layui-nav-item"><a href="{%url 'post_list' page=1%}?all=true&published=true">博客</a></li>
       <li class="layui-nav-item layui-this"><a href="">社区</a></li>
       <li class="layui-nav-item"><a href="">问答</a></li>
       <li class="layui-nav-item"><a href="">商城</a></li>
       <li class="layui-nav-item right">
         <a href={%if user.is_authenticated%}"{%url 'my_zone' pk=user.pk%}"{%else%}"{%url 'login'%}"{%endif%}>个人中心<span class="layui-badge-dot"></span></a>
       </li>
-      <li class="layui-nav-item right">
-        <a href={%if not user.is_authenticated%}"{%url 'login'%}"{%else%}""{%endif%}><img src="{%static 'upload/profile/harden.jpg'%}" class="layui-nav-img">{%if user.is_authenticated%}{{user.username}}{%else%}登录或注册{%endif%}</a>
+      <li class="layui-nav-item">
+        {%if user.is_authenticated%}
+          <a href="{%url 'logout'%}"><img src="{%static 'upload/profile/harden.jpg'%}" class="layui-nav-img">{{user.username}}</a>
+          <dl class="layui-nav-child">
+            <dd><a href="{%url 'logout'%}">退出登录</a></dd>
+            <dd><a href="{%url 'logout'%}">退出登录</a></dd>
+            <dd><a href="{%url 'logout'%}">退出登录</a></dd>
+          </dl>
+        {%else%}
+          <a href="{%url 'login'%}"><img src="{%static 'img/profile.harden.jpg'%}" class="layui-nav-img">登录或注册</a>
+        {%endif%}
       </li> 
     </ul>
     {% block content %}

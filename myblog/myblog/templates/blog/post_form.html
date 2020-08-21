@@ -2,19 +2,22 @@
 {% load static %}
 {% block content %}
 {%block ref%}
-<link rel="stylesheet" href="{% static 'css/post.css' %}">
+  <link rel="stylesheet" href="{% static 'css/post.css' %}">
 {%endblock%}
-
 <div class="post-edit-area">
-  {%if not post.published_time%}
-    {%if post.author%}
-        <button class="layui-btn layui-btn-primary" data-href='{%url "draft_update" pk=123%}' id="save-to-draft-btn">存为草稿</a>
-    {%else%}
-        <button class="layui-btn layui-btn-primary" data-href="{%url 'draft_new'%}" id="save-to-draft-btn">存为草稿</a>
-    {%endif%}
-  {%endif%}
   <form method="POST">
-    <button type="submit" class="layui-btn layui-btn-normal" id="post-btn">发布</button>
+    {%if not post.published_time%}
+      {%if post.author%}
+          <input type="submit" name="draft" class="layui-btn layui-btn-primary" data-href='{%url "post_update" pk=123%}' id="save-to-draft-btn" value="存为草稿"/>
+      {%else%}
+          <input type="submit" name="draft" class="layui-btn layui-btn-primary" data-href="{%url 'post_new'%}" id="save-to-draft-btn" value="存为草稿"/>
+      {%endif%}
+    {%endif%}
+    {%if post.author%}
+      <input type="submit" name="publish" class="layui-btn layui-btn-normal" data-href='{%url "post_update" pk=123%}' id="post-btn" value="发布" />
+    {%else%}
+      <input type="submit" name="publish" class="layui-btn layui-btn-normal" data-href='{%url "post_new"%}' id="post-btn" value="发布" />
+    {%endif%}
       {%csrf_token%}
       <div class="form-group">
         <div class="layui-form-item edit-post-item">
@@ -31,14 +34,11 @@
   </form>
 </div>
 
-
-
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <link rel="stylesheet" href="{%static 'editor/css/editormd.css'%}" />
 <script src="{%static 'editor/editormd.min.js'%}"></script>
 <script>
     var testEditor;
-
     testEditor = editormd("test-editormd", {
         width: "100%",
         height: 1000,
@@ -71,29 +71,48 @@
         this.init = function() {
           this.saveToDraft();
           this.textInputLimit();
+          this.postToBlog();
         }
-
         // 保存到草稿按钮
         this.saveToDraft = function() {
           $("#save-to-draft-btn").click(function() {
-          var url = $(this).data("href");
-          if (url.indexOf('123') != -1) {
-            $(this).data("href").replace('123', '{{post.pk}}')
-          }
+          var clickedBtn = $(this);
           $.ajax({
             type: "POST",
             dataType: "json",
-            url: url,
+            url: clickedBtn.data("href").replace('123', '{{post.pk}}') + "?submit_type=draft",
             data: 
               {
                 "title": $("#post-title").val(), 
                 "content": $("#editor-textarea").val()},
             success: function(data) {
-              location.href = "{%url 'post_detail' pk=123%}".replace('123', data.pk);
+              console.log(data);
+              window.location = '{%url "post_detail" pk=123%}'.replace("123", data.pk);
             }
           }) 
         })
       };
+
+      // 发布按钮
+      this.postToBlog = function() {
+        $("#post-btn").click(function() {
+          console.log(url);
+          var clickedBtn = $(this);
+          $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: clickedBtn.data("abc").replace('123', '{{post.pk}}') + "?submit_type=publish",
+            data: 
+              {
+                "title": $("#post-title").val(), 
+                "content": $("#editor-textarea").val()},
+            success: function(data) {
+              console.log("OK");
+              window.location = '{%url "post_detail" pk=123%}'.replace("123", data.pk);
+            }
+          }) 
+        })
+      }
       // 限制字数
       this.textInputLimit = function() {
         $("#post-title").on("input", function() {
@@ -112,10 +131,6 @@
 
   var listener = new EventListener();
   listener.init();
-
-
-
-
 </script>
 
 {% endblock %}

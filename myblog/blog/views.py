@@ -2,7 +2,7 @@ from math import ceil
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, JsonResponse, request
+from django.http import HttpResponse, JsonResponse, request, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -27,19 +27,26 @@ class PostListView(ListView):
         if self.get_queryset() == 'nonauthenticated':
             return redirect(reverse("login"))
         return super().get(request, *args, **kwargs)
-    def get_queryset(self, page=1, all=True, published=False):
+    def get_queryset(self, page=1):
 
         all = True if self.request.GET.get("all") is not None and self.request.GET.get("all") == 'true' else False
+        published = True if self.request.GET.get("published") is not None and self.request.GET.get("published") == 'true' else False
         # 如果查询我的文章但是当前用户未登陆
         if not all and not self.request.user.is_authenticated:
             return "nonauthenticated"
 
+        if all and not published:
+            published = True
+
         self.template_name = 'blog/post_list.html' if all else 'blog/my_post_list.html'
         start = (page - 1) * BLOG_PER_PAGE
         end = start + BLOG_PER_PAGE
-        conditions = {
-            "published_time__isnull": not published,
-        }
+        if all:
+            conditions = {
+                "published_time__isnull": not published,
+            }
+        else:
+            conditions = {}
         if not all:
             conditions['author'] = self.request.user
         res = Post.objects.filter(**conditions).order_by('-published_time')[start: end]
@@ -110,59 +117,72 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     template_name = "blog/post_form.html"
 
     def form_valid(self, form):
-        form.instance.published_time = timezone.now()
+
+        if form.cleaned_data['is_publish']:
+            form.instance.published_time = timezone.now()
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        form.instance.update_time = timezone.now()
+        form.save()
+        return JsonResponse({"result": 1, "msg": "OK", "pk": form.instance.pk})
 
-    # 新建并保存，但不发布
-    @staticmethod
-    @login_required
-    def save(request):
-        form = PostForm(request.POST)
-        if form.is_valid() and request.is_ajax():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return JsonResponse(data={"pk": post.pk})
-        else:
-            print(form.cleaned_data)
-            print(form.errors.as_data())
-        return render(request, 'blog/post_form.html')
-
+    def form_invalid(self, form):
+        print("hahah")
+        return JsonResponse({"1": "1"})
 
 class UpdatePostView(LoginRequiredMixin, UpdateView):
     form_class = PostForm
     template_name = "blog/post_form.html"
 
+
+
     def get_queryset(self):
         return Post.objects.filter(**self.kwargs)
 
     def form_valid(self, form):
-        form.instance.published_time = timezone.now()
-        return super().form_valid(form)
 
-    # 更新并保存，但不发布
-    def save(self, pk):
-        form = PostForm(self.request.POST)
-        if form.is_valid():
-            post = get_object_or_404(Post, pk=pk)
-            post.title = form.cleaned_data['title']
-            post.content = form.cleaned_data['content']
-            post.save()
+        if form.cleaned_data['is_publish']:
+            form.instance.published_time = timezone.now()
 
-    def publish(self, pk):
-        post = get_object_or_404(Post, pk=pk)
-        post.published_time = timezone.now()
-        post.save()
-        return redirect('post_detail', pk=pk)
+        form.instance.update_time = timezone.now()
+        if self.request.is_ajax():
+            form.save()
+            return JsonResponse({"result": 1, "msg": "OK", "pk": form.instance.pk})
+        else:
+            return super().form_valid(form)
+
+    def get_success_url(self):
+        print("Hello World")
+        return reverse('post_detail', kwargs=self.kwargs)
 
 
-class DeletePostView(DeleteView):
-    model = Post
-    success_url = reverse_lazy('post_list')
 
 
-class CommentListView(LoginRequiredMixin, ListView):
+class DeletePostView(LoginRequiredMixin, DeleteView):
+    # model = Post
+    success_url = reverse_lazy('post_list', **{"all": "false"})
+
+    def get_queryset(self):
+        return
+
+    def get_object(self, queryset=None):
+        return
+
+
+    def delete(self, request, *args, **kwargs):
+        # 不重定向，而是返回ajax response
+        if request.is_ajax():
+            post_pk = int(kwargs['pk'])
+            post = Post.objects.filter(pk=post_pk).first()
+            if post is None or post.author != self.request.user:
+                return JsonResponse({"result": -1, "msg": "删除失败！"})
+            else:
+                post.delete()
+                return JsonResponse({"result": 1, "msg": "删除成功"})
+        else:
+            super().delete(request, *args, **kwargs)
+
+
+class CommentListView(ListView):
     model = Comment
     template_name = 'blog/comment_list.html'
     paginate_by = 5
@@ -175,10 +195,13 @@ class CommentListView(LoginRequiredMixin, ListView):
             total_comment = Comment.objects.filter(post=int(kwargs['pk'])).count()
             for record in query_set:
                 res.append({
+                    "pk": record.pk,
                     "create_time": record.create_time.strftime("%b %d, %Y %I:%M %p"),
                     "content": record.content,
                     "likes_count": record.liked_by.count(),
-                    "dislikes_count": record.disliked_by.count()
+                    "dislikes_count": record.disliked_by.count(),
+                    "is_liked": self.request.user in record.liked_by.all(),
+                    "is_disliked": self.request.user in record.disliked_by.all()
                 })
             return JsonResponse({"data": res, "result": 1, "total_comment": total_comment, "limit": self.paginate_by})
         else:
@@ -188,7 +211,7 @@ class CommentListView(LoginRequiredMixin, ListView):
         limit = self.paginate_by
         page = self.request.GET.get('page', None)
         page = 1 if page is None else int(page)
-        return Comment.objects.filter(author=self.request.user).order_by('-create_time')[page*limit: (page+1)*limit]
+        return Comment.objects.filter(post=int(self.kwargs['pk'])).order_by('-create_time')[(page-1)*limit: (page)*limit]
 
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
@@ -220,11 +243,14 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
         return JsonResponse({"result": -1})
 
 
-# class DeleteCommentView(LoginRequiredMixin, DeleteView):
-#     login_url = '/login/'
-#     success_url = reverse_lazy('post_detail')
-#     model = Comment
-#     # template_name = 'blog/post_detail.html'
+class DeleteCommentView(LoginRequiredMixin, DeleteView):
+    login_url = '/login/'
+    model = Comment
+
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
 
 
 # 点赞博客
@@ -259,37 +285,41 @@ def mark_post(request, pk):
 # 点赞评论
 @login_required
 def like_comment(request, pk):
+    """
+    :param request:
+    :param pk:
+    :return:
+    如果已经点灭，返回-1，提示不能操作
+    如果已经点赞，返回1，取消点赞
+    如果没有点赞，返回0，加入点赞
+    """
     comment = get_object_or_404(Comment, pk=pk)
-    # u = UserProfile.objects.filter(pk=request.registration.id).first()
     if request.user.disliked_comments.filter(pk=pk):
-        return HttpResponse(-1)
-    if not request.user.liked_comments.filter(pk=pk):
+        result = -1
+    elif not request.user.liked_comments.filter(pk=pk):
         request.user.liked_comments.add(comment)
         request.user.disliked_comments.remove(comment)
-        result = 1
+        result = 0
     else:
         request.user.liked_comments.remove(comment)
-        result = 0
-    # return redirect('post_detail', pk=comment.post.pk)
-    return HttpResponse(result)
+        result = 1
+    return JsonResponse({"result": result, "pk": pk})
 
 
 # 点灭评论
 @login_required
 def dislike_comment(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
-    # u = UserProfile.objects.filter(pk=request.registration.id).first()
     if request.user.liked_comments.filter(pk=pk):
-        return HttpResponse(-1)
-    if not request.user.disliked_comments.filter(pk=pk):
+        result = -1
+    elif not request.user.disliked_comments.filter(pk=pk):
         request.user.liked_comments.remove(comment)
         request.user.disliked_comments.add(comment)
-        result = 1
+        result = 0
     else:
         request.user.disliked_comments.remove(comment)
-        result = 0
-    # return redirect('post_detail', pk=comment.post.pk){}
-    return HttpResponse(result)
+        result = 1
+    return JsonResponse({"result": result, "pk": pk})
 
 
 # 移除评论
@@ -303,12 +333,14 @@ def remove_comment(request, pk):
 
 # 博客阅读次数+1
 @login_required
-def add_view_count(request, pk):
+def increase_view_count(request, pk):
     if request.method == "POST":
         post = get_object_or_404(Post, pk=pk)
-        post.viewed_count += 1
-        post.save()
-        return HttpResponse(post.viewed_count)
+        # 只对已发布的文章更新此数字
+        if post.published_time:
+            post.viewed_count += 1
+            post.save()
+        return JsonResponse(post.viewed_count, safe=False)
 
 
 @csrf_exempt
