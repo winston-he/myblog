@@ -6,13 +6,14 @@
 # @Email: winston.wz.he@gmail.com
 # @Desc:
 from marshmallow import Schema, fields
+from rest_framework.serializers import Serializer
 
 
 class BlogPostPreviewSchema(Schema):
     id = fields.Integer()
     author = fields.String()
-    published_time = fields.DateTime(format="%Y/%m/%d $H:%M:%S")
-    create_time = fields.DateTime(format="%Y/%m/%d $H:%M:%S")
+    published_time = fields.DateTime(format="%Y/%m/%d %H:%M:%S")
+    create_time = fields.DateTime(format="%Y/%m/%d %H:%M:%S")
     title = fields.String()
     content = fields.Field()
     liked_count = fields.Integer()
@@ -22,4 +23,3 @@ class BlogPostPreviewSchema(Schema):
 
 class BlogCommentDetailSchema(Schema):
     pass
-

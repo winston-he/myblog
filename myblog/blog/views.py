@@ -2,6 +2,7 @@ from math import ceil
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse, request, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -26,10 +27,18 @@ class PostListView(ListView):
     def get(self, request, *args, **kwargs):
         if self.get_queryset() == 'nonauthenticated':
             return redirect(reverse("login"))
-        return super().get(request, *args, **kwargs)
-    def get_queryset(self, page=1):
+        if self.request.is_ajax():
+            schema = BlogPostPreviewSchema(many=True)
+            schema.fields.pop("content")
+            res = schema.dump(self.get_queryset())
 
+            return JsonResponse({"result": "OK", "data": res})
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self, page=1):
         all = True if self.request.GET.get("all") is not None and self.request.GET.get("all") == 'true' else False
+        author_id = self.request.GET.get("author_id")
         published = True if self.request.GET.get("published") is not None and self.request.GET.get("published") == 'true' else False
         # 如果查询我的文章但是当前用户未登陆
         if not all and not self.request.user.is_authenticated:
@@ -48,9 +57,17 @@ class PostListView(ListView):
         else:
             conditions = {}
         if not all:
-            conditions['author'] = self.request.user
-        res = Post.objects.filter(**conditions).order_by('-published_time')[start: end]
-        return res
+            if author_id is None:
+                conditions['author'] = self.request.user
+            else:
+                conditions['author'] = get_object_or_404(User, pk=int(author_id))
+                post_list_type = self.request.GET.get("type")
+                if post_list_type == "popular":
+                    return Post.objects.filter(**conditions).order_by('-viewed_count')[:5]
+                else:
+                    return Post.objects.filter(**conditions).order_by('-published_time')[:5]
+        return Post.objects.filter(**conditions).order_by('-published_time')[start: end]
+
 
 
     @staticmethod
@@ -196,6 +213,7 @@ class CommentListView(ListView):
             for record in query_set:
                 res.append({
                     "pk": record.pk,
+                    "author": record.author.username,
                     "create_time": record.create_time.strftime("%b %d, %Y %I:%M %p"),
                     "content": record.content,
                     "likes_count": record.liked_by.count(),

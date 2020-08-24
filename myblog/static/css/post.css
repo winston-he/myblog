@@ -61,9 +61,9 @@ body {
 }
 
 #blog-detail-comment-area {
-    width: 70%;
-    margin: 10px auto;
-    height: 400px;
+    width: 55%;
+    float: left;
+    margin-left: 100px
 }
 
 .post-stats-item {
@@ -72,6 +72,8 @@ body {
 }
 
 .post-stats {
+}
+
     float: right;
 }
 
@@ -82,17 +84,22 @@ body {
 
 .blog-detail-area {
     background: #ffffff;
-    height: 400px;
-    margin: 10px;
+    margin: -35px;
+    box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 #post-content {
     margin: 10px;
+    padding: 30px 100px;
 }
 
 .post-title {
     /* margin: 10px; */
     padding: 10px;
+}
+
+.post-operation-btn {
+    margin-left: 20px
 }
 
 .delete-preview-post-btn {
@@ -102,21 +109,29 @@ body {
 }
 
 #delete-post-btn {
-    background: #f5f5f5;
+    background: transparent;
+    border: none
 }
 
 #post-comment-btn {
-    background: #f5f5f5;
+    background: transparent;
+    border: none;
+    margin-top: 65px
 }
 
 .last-edit-time {
     padding-left: 20px;
 }
 
+.comment-list {
+    margin-top: 10px
+}
+
 .comment-item {
     background: #ffffff;
     margin-bottom: 8px;
-    padding: 8px;
+    padding: 10px 20px;
+    box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
 }
 
 .comment-action-item {
@@ -130,4 +145,71 @@ body {
 .delete-comment-btn {
     background: #ffffff;
     border: none;
+}
+
+
+.post-header-section {
+    height: 350px;
+    background: #d9d9d9;
+    align-items: center;
+    display: flex;
+    -webkit-box-align: center;
+    justify-content: center;
+}
+
+.post-header-info {
+    text-align: center!important;
+}
+
+.post-left-section {
+    margin-top: 10px;
+    margin-left: 5%;
+    float: left
+}
+
+.author-profile-info {
+    width: auto;
+    height: auto;
+    background: #ffffff;
+    text-align: center!important;
+    padding: 20px 40px;
+    box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.author-post-list {
+    margin-top: 50px;
+    background: #ffffff;
+    padding: 10px 20px;
+    box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+
+}
+
+#lateset-post-list {
+    margin-top: 30px;
+}
+
+.author-post-list h2 {
+        border-bottom: 1px #d3d3d3 solid;
+}
+
+.author-post-list ul {
+    margin-top: 8px
+}
+
+.author-post-list li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+.author-btns {
+}
+
+#toc-container {
+    background: #ffffff;
+    padding: 10px;
+    position: fixed;
+    width: 12%;
+    right: 40px;
+    font-size: 18px;
+    box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }

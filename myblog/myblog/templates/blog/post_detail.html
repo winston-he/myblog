@@ -1,83 +1,185 @@
-{% extends 'base/base.html' %}
-{% load static %}
-
-{%block ref%}
-<link rel="stylesheet" href="{% static 'css/post.css' %}">
-{%endblock%}
-
-{% block content %}
+{% extends 'base/base.html' %} {% load static %} {%block ref%}
+<link rel="stylesheet" href="{% static 'css/post.css' %}" />
+{%endblock%} {% block content %}
 <script src="{% static 'editor/editormd.js' %}"></script>
 <script src="{% static 'editor/lib/marked.min.js' %}"></script>
 <script src="{% static 'editor/lib/prettify.min.js' %}"></script>
 <script src="{% static 'blog/js/default.js' %}"></script>
-
 <script src="{% static 'layui/lay/modules/laypage.js' %}"></script>
+<div class="post-header-section">
+    <div class="post-header-info">
+        <h1 class="post-title">{{post.title}}</h1>
+        <div class="edit-info">
+            {{post.author.username}} | {{post.update_time}}
+        </div>
+        <div class="post-stats">
+            <div class="post-stats-item like-post-btn">
+                <a role="button" id="like-post-link">
+                    {%if user in post.liked_by.all%}
+                    <img
+                        id="like-post"
+                        src="{%static 'img/icons/red_heart.png'%}"
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                    {%else%}
+                    <img
+                        id="like-post"
+                        src="{%static 'img/icons/grey_heart.png'%}"
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                    {%endif%}
+                </a>
+                <div class="like-post-count">{{post.liked_by.count}}</div>
+            </div>
+            <div class="post-stats-item mark-post-btn">
+                <a role="button" id="mark-post-link">
+                    {%if user in post.marked_by.all%}
+                    <img
+                        id="mark-post"
+                        src="{%static 'img/icons/star.png'%}"
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                    {%else%}
+                    <img
+                        id="mark-post"
+                        src="{%static 'img/icons/grey_star.png'%}"
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                    {%endif%}
+                </a>
+                <div class="mark-post-count">{{post.marked_by.count}}</div>
+            </div>
+            <div class="post-stats-item">
+                <img
+                    id="view-post"
+                    src="{%static 'img/icons/view.png'%}"
+                    width="20"
+                    height="20"
+                    alt=""
+                />
+                <div class="view-post-count">{{post.viewed_count}}</div>
+            </div>
+        </div>
+        <div class="post-operation-btn-group">
+          {%ifequal user post.author%}
+          <a href="{%url 'post_update' pk=post.pk%}" role="button" class="post-operation-btn"
+              ><img
+                  src="{%static 'img/icons/edit.png'%}"
+                  width="20"
+                  height="20"
+                  alt=""
+          /></a>
+          <button type="button" class="post-operation-btn" id="delete-post-btn">
+              <img
+                  src="{%static 'img/icons/trash_bin.png'%}"
+                  width="20"
+                  height="20"
+                  alt=""
+              />
+          </button>
+          {%endifequal%}
+      </div>
+    </div>
+</div>
+<div class="post-left-section">
+  <div class="author-profile-info">
+    <div class="profile-image">
+        <img
+            class="profile-picture"
+            src="{%static 'upload/profile/harden.jpg'%}"
+            style="
+                width: 200px;
+                height: 200px;
+                margin: 0 auto;
+                display: block;
+                border-radius: 50%;
+            "
+        />
+    </div>
+    <div class="basic-personal-info-item nickname">
+        <h1><a href="{%url 'my_zone' pk=post.author.pk%}">{{post.author.username}}</a></h1>
+    </div>
+    <div class="basic-personal-info-item stats">
+        <h3>关注 0 | 获赞 0 | 博客 0</h3>
+    </div>
+    <div class="author-btns">
+        <a
+            href=""
+            class="layui-btn layui-btn-normal"
+            id="edit-personal-info-btn"
+            >+关注</a
+        >
+        <a
+            href=""
+            class="layui-btn layui-btn-primary"
+            id="edit-personal-info-btn"
+            >私信</a
+        >
+    </div>
+</div>
+
+  <div class="author-post-list" id="popular-post-list">
+    <h2>Ta的热门文章</h2>
+    <ul></ul>
+  </div>
+  <div class="author-post-list" id="latest-post-list">
+    <h2>Ta的最新文章</h2>
+      <ul></ul>
+  </div>
+</div>
+
+
 <div class="container" id="blog-detail-comment-area">
     <div class="blog-detail-area">
-      <h1 class="post-title">{{post.title}}</h5>
-      <div class="post-stats">
-        <div class="post-stats-item like-post-btn">
-            <a role="button" id="like-post-link">
-              {%if user in post.liked_by.all%}
-                <img id="like-post" src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt="">
-              {%else%}
-                <img id="like-post" src="{%static 'img/icons/grey_heart.png'%}" width=20 height=20 alt="">
-              {%endif%}
-            </a>
-            <div class="like-post-count">{{post.liked_by.count}}</div>
+        <div id="post-content">
+            <!-- Server-side output Markdown text -->
+            <textarea style="display: none;">{{post.content|safe}}</textarea>
         </div>
-        <div class="post-stats-item mark-post-btn">
-          <a role="button" id="mark-post-link">
-            {%if user in post.marked_by.all%}
-              <img id="mark-post" src="{%static 'img/icons/star.png'%}" width=20 height=20 alt="">
-            {%else%}
-              <img id="mark-post" src="{%static 'img/icons/grey_star.png'%}" width=20 height=20 alt="">
-            {%endif%}
-          </a>
-          <div class="mark-post-count">{{post.marked_by.count}}</div>
-        </div>
-        <div class="post-stats-item">
-          <img id="view-post" src="{%static 'img/icons/view.png'%}" width=20 height=20 alt="">  <div class="view-post-count">{{post.viewed_count}}</div>
-        </div>
-      </div>
-      <div class="last-edit-time">
-        最后编辑时间 {{post.update_time}}
-      </div>
-      <div id="post-content">
-        <!-- Server-side output Markdown text -->
-        <textarea style="display:none;">{{post.content|safe}}</textarea>             
-      </div>
     </div>
-    <div class="post-operation-btn-group">
-      {%if user.is_authenticated%}
-      <button type="button" id="post-comment-btn"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt=""></button>
-      {%endif%}
-      {%ifequal user post.author%}
-        <a  href="{%url 'post_update' pk=post.pk%}" role="button"><img src="{%static 'img/icons/edit.png'%}" width=20 height=20 alt=""></a>
-        <button type="button" id="delete-post-btn"><img src="{%static 'img/icons/trash_bin.png'%}" width=20 height=20 alt=""></button>
-      {%endifequal%}
-    </div>
+    {%if user.is_authenticated%}
+    <button type="button" id="post-comment-btn">
+        <img
+            src="{%static 'img/icons/comment.png'%}"
+            width="20"
+            height="20"
+            alt=""
+        />
+    </button>
+    {%endif%} 
     <div class="comment-list"></div>
-    <div class="comment-section">
-    </div>
+    <div class="comment-section"></div>
   </div>
+</div>
+<div id="toc-container"></div>
 
 {% csrf_token %}
 <script type="text/javascript">
     $(function() {
-	    var testView = editormd.markdownToHTML("post-content", {
+     var testView = editormd.markdownToHTML("post-content", {
             // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
             htmlDecode : true,  // Enable / disable HTML tag encode.
             htmlDecode : "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+            toc: true,
+            tocm: true,
+            tocTitle: "目录",
+            tocContainer: "#toc-container"
         });
     });
-
     function generateCommentItem(data) {
+        console.log(data);
         var text = "";
         text += "<div class=\"comment-item\" id=\"comment-item_PK_PLACEHOLDER\">".replace("PK_PLACEHOLDER", data.pk);
         text += "  <div class=\"card-header comment-header\">";
         text += "    <div class=\"d-flex w-100 justify-content-between\">";
-        text += "      发布者: 我";
+        text += data.author;
         text += "    </div>";
         text += "  </div>";
         text += "    <h6 class=comment-title\">";
@@ -107,6 +209,41 @@
       }
 
     var csrf = $('input[name="csrfmiddlewaretoken"]').val();
+    function AjaxReq() {
+      this.init = function(itemCount) {
+        // itemCount: 显示的条目数量
+        this.popularPostList();
+        this.latestPostList();
+      };
+
+      this.popularPostList = function() {
+        $.ajax({
+          url: "{%url 'post_list' page=1%}?published=true&type=popular&author_id=123".replace("123", "{{post.author.pk}}"),
+          success: function(res) {
+            var blogList = res.data;
+            console.log(res);
+            for (var i=0; i < blogList.length; i++) {
+              $("#popular-post-list ul").append("<li><a href='{%url "post_detail" pk=123%}'>".replace("123", blogList[i].id) + blogList[i].title.slice(0, 10) 
+              + "</a>" + '  <strong>阅读:</strong> ' + blogList[i].viewed_count + "</li>"); 
+            }
+          }
+        })
+      };
+      this.latestPostList = function() {
+        $.ajax({
+          url: "{%url 'post_list' page=1%}?published=true&type=popular&author_id=123".replace("123", "{{post.author.pk}}"),
+          success: function(res) {
+            var blogList = res.data;
+            console.log(res);
+            for (var i=0; i < blogList.length; i++) {
+              $("#latest-post-list ul").append("<li><a href='{%url "post_detail" pk=123%}'>".replace("123", blogList[i].id) + blogList[i].title.slice(0, 10) 
+              + "</a>" + '  <strong>发布:</strong> ' + blogList[i].published_time + "</li>"); 
+            }
+          }
+        })
+      };
+    }
+    
     function EventListener() {
       this.init = function() {
         this.likePost();
@@ -205,7 +342,7 @@
       };
       this.editPost = function() {
         $("#like-post-link").click(function() {
-          
+
         })
       };
       this.deletePost = function() {
@@ -232,7 +369,7 @@
                                 window.location.href = document.referrer;
                                 layer.msg(res.msg, {
                                     time: 2000
-                                }); 
+                                });
 
                             }
                         }
@@ -271,7 +408,7 @@
             }
           })
         })
-      }; 
+      };
       this.dislikeComment = function() {
         $(".dislike-comment-btn").click(function() {
           var url = $(this).data("href");
@@ -306,7 +443,7 @@
           url: '{%url "comment_list" pk=123%}'.replace('123', '{{post.pk}}'),
           success: function(data) {
             text = "";
-            var comments = data.data; 
+            var comments = data.data;
             for (var i=0; i <comments.length; i++) {
 
             }
@@ -317,7 +454,9 @@
 
     var commentCount, commentLimit, firstCommentPageData;
     var listener = new EventListener();
+    var ajax_req = new AjaxReq();
     listener.init();
+    ajax_req.init();
     $.get({
       url: '{%url "comment_list" pk=123%}'.replace("123", '{{post.pk}}'),
       success: function(res) {
@@ -353,6 +492,5 @@
         });
       }
     })
-
 </script>
 {% endblock %}
