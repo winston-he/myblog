@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load blog_filter %}
 
 {%block ref%}
 <link rel="stylesheet" href="{% static 'css/profile.css' %}">
@@ -21,7 +22,7 @@
         <div class="basic-personal-info-item username"><h3>{{user.username}}</h3></div>
         <div class="basic-personal-info-item email"><h3><embed src="{%static 'img/icons/email.svg'%}" type="" width="20" height="20">{{user.email}}</h3></div>
         <div class="basic-personal-info-item location"><h3><embed src="{%static 'img/icons/location.svg'%}" type="" width="20" height="20">{{user.user.location}}</h3></div>
-        <div class="basic-personal-info-item joined-time"><h3>加入时间 {{user.date_joined}}</h3></div>
+        <div class="basic-personal-info-item joined-time"><h3>加入时间 {{user.date_joined | timesince | timesince_zh}}</h3></div>
         <div class="basic-personal-info-item introduction"><h3>{%if user.user.introduction%}{{user.user.introduction}}{%else%}个人介绍是空白的~{%endif%}</h3></div>
         <a href={%url 'update_personal_info' pk=user.pk%} class="layui-btn layui-btn-lg layui-btn-normal" id="edit-personal-info-btn">编辑个人资料</a>
     </div>
@@ -31,38 +32,35 @@
                 <legend>访问记录</legend>
             </fieldset>
             <div class="layui-card visit-count">
-                    <div class="layui-card-header">个人博客总数</div>
-                    <div class="layui-card-body">
-                        总共发表 <br><span style="font-size: 30px">47</span>篇
-                    </div>
+                <div class="layui-card-header">个人博客总数</div>
+                <div class="layui-card-body">
+                    总共发表 <br><span style="font-size: 30px" id="total-posts-count"></span>篇
                 </div>
-            <div>
-            <div class="layui-card visit-count">
-                    <div class="layui-card-header">点赞</div>
-                    <div class="layui-card-body">
-                        共收获点赞 <br><span style="font-size: 30px">10496</span>次
-                    </div>
-                </div>
-            <div>
-            <div class="layui-card visit-count">
-                    <div class="layui-card-header">收藏</div>
-                    <div class="layui-card-body">
-                        一共被收藏 <br><span style="font-size: 30px">4742</span>次
-                    </div>
             </div>
-            <div>
+            <div class="layui-card visit-count">
+                <div class="layui-card-header">点赞</div>
+                <div class="layui-card-body">
+                    共收获点赞 <br><span style="font-size: 30px" id="total-likes-count"></span>次
+                </div>
+            </div>
+            <div class="layui-card visit-count">
+                <div class="layui-card-header">收藏</div>
+                <div class="layui-card-body">
+                    一共被收藏 <br><span style="font-size: 30px" id="total-marked-count"></span>次
+                </div>
+            </div>
             <div class="layui-card visit-count">
                 <div class="layui-card-header">总访问数</div>
                 <div class="layui-card-body">
-                    历史总计博客阅读 <br><span style="font-size: 30px">20479</span>次
+                    历史总计博客阅读 <br><span style="font-size: 30px" id="total-visit-count"></span>次
                 </div>
             </div>
-            <div class="layui-card visit-count">
-                <div class="layui-card-header">周访问数</div>
-                <div class="layui-card-body">
-                    本周博客阅读 <br><span style="font-size: 30px">246</span>次
-                </div>
-            </div>
+            
+            {% comment %} <div class="layui-card visit-count">
+            <div class="layui-card-header">周访问数</div>
+            <div class="layui-card-body">
+                本周博客阅读 <br><span style="font-size: 30px" id="weekly-visits-count">246</span>次
+            </div> {% endcomment %}
         </div>
         <fieldset class="layui-elem-field layui-field-title basic-info">
             <legend>个人基本信息</legend>
@@ -79,6 +77,7 @@
         <fieldset class="layui-elem-field layui-field-title employment-info">
                 <legend>工作经历</legend>
         </fieldset>
+    </div>
     </div>
     <div class="settings">
         <h2>设置</h2>
@@ -108,9 +107,20 @@
         });
     });
 
+    $(document).ready(function() {
+        $.get({
+            url: "{%url 'personal_stats'%}",
+            success: function(data) {
+                $('#total-posts-count').text(data.my_blog_count);
+                $('#total-likes-count').text(data.total_likes_count);
+                $('#total-marked-count').text(data.total_marked_count);
+                $('#total-visit-count').text(data.total_visit_count);
+            }
+        })
+    })
+
     function EventListener() {
         this.init = function() {
-
         };
         this.editBasicInfo = function() {
         }

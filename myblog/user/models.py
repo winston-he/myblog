@@ -83,11 +83,3 @@ class UserEmploymentInfo(models.Model):
 
     def __str__(self):
         return "Company: {}, Title: {}".format(self.company, self.title)
-
-#
-# class ChatGroup(Group):
-#     pass
-#
-#
-# class TopicPermission(Permission):
-#     pass

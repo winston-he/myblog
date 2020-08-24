@@ -271,6 +271,7 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 
 
 
+
 # 点赞博客
 @login_required
 def like_post(request, pk):
@@ -360,6 +361,18 @@ def increase_view_count(request, pk):
             post.save()
         return JsonResponse(post.viewed_count, safe=False)
 
+# 一些数据统计
+@login_required
+def personal_summary(request):
+    from collections import defaultdict
+
+    res = defaultdict(int)
+    res['my_blog_count'] = Post.objects.filter(published_time__isnull=False, author=request.user).count()
+    for p in Post.objects.filter(published_time__isnull=False, author=request.user):
+        res["total_likes_count"] += p.liked_by.count()
+        res["total_marked_count"] += p.marked_by.count()
+        res["total_visit_count"] += p.viewed_count
+    return JsonResponse(res)
 
 @csrf_exempt
 @xframe_options_sameorigin
