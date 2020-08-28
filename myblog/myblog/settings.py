@@ -69,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'access_log.middleware.AccessLoggerMiddleware'
 ]
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'

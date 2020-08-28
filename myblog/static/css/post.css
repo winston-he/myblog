@@ -3,6 +3,7 @@
     float: left;
     margin-left: 200px;
     margin-right: 20px;
+    margin-top: 20px;
     width: 10%;
     box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
 }
@@ -11,6 +12,7 @@
     /* background: #ffffff; */
     float: left;
     width: 50%;
+    margin-top: 20px;
 }
 
 .list-group-item {
@@ -215,4 +217,9 @@ body {
     right: 40px;
     font-size: 18px;
     box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+div img {
+    box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    margin: 10px
 }
