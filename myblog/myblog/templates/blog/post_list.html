@@ -1,5 +1,6 @@
-{%extends "base/base.html"%}
+{%extends "base/base_with_footer.html"%}
 {% load static %}
+{% load blog_filter %}
 
 {%block ref%}
 <link rel="stylesheet" href="{% static 'css/post.css' %}">
@@ -34,9 +35,9 @@
                     <div class="preview-post-content">
                         <p>
                             {%if post.content|length > 140%}
-                            {{post.content|slice:":140"|safe}}...
+                            {{post.content|slice:":140"|md_to_html|safe}}...
                             {%else%}
-                            {{post.content|safe}}
+                            {{post.content|md_to_html|safe}}
                             {%endif%}
                         </p>
                     </div>

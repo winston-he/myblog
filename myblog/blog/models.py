@@ -17,6 +17,9 @@ class Post(models.Model):
     liked_by = models.ManyToManyField(to=User, related_name='liked_posts')
     marked_by = models.ManyToManyField(to=User, related_name='marked_posts')
 
+    post_type = models.IntegerField(default=0) # 0. 公开 1. 仅订阅的人可见 2. 私密
+    status = models.IntegerField(default=0) # 0. 草稿 1. 审核中 2. 已发布 3. 举报审核 4. 举报通过
+
     # 发布
     def publish(self):
         self.published_time = timezone.now()
@@ -26,7 +29,7 @@ class Post(models.Model):
         return reverse("post_detail", kwargs={'pk': self.pk})
 
     def __str__(self):
-        return '{} by {}'.format(self.title, self.author.name)
+        return '{} by {}'.format(self.title, self.author.username)
 
 
 class Comment(models.Model):
@@ -37,6 +40,8 @@ class Comment(models.Model):
 
     liked_by = models.ManyToManyField(to=User, related_name='liked_comments')
     disliked_by = models.ManyToManyField(to=User, related_name='disliked_comments')
+
+    status = models.IntegerField(default=0) # 0. 正常 1. 举报审核 2. 举报通过
 
     def __str__(self):
         return self.content

@@ -1,9 +1,17 @@
 {% extends 'base/base.html' %} {% load static %} {%block ref%}
 <link rel="stylesheet" href="{% static 'css/post.css' %}" />
+<link rel="stylesheet" href="{% static 'editor/css/editormd.preview.css' %}" />
 {%endblock%} {% block content %}
-<script src="{% static 'editor/editormd.js' %}"></script>
+
 <script src="{% static 'editor/lib/marked.min.js' %}"></script>
 <script src="{% static 'editor/lib/prettify.min.js' %}"></script>
+<script src="{% static 'editor/lib/raphael.min.js' %}"></script>
+<script src="{% static 'editor/lib/underscore.min.js' %}"></script>
+<script src="{% static 'editor/lib/sequence-diagram.min.js' %}"></script>
+<script src="{% static 'editor/lib/flowchart.min.js' %}"></script>
+<script src="{% static 'editor/lib/jquery.flowchart.min.js' %}"></script>
+<script src="{% static 'editor/editormd.js' %}"></script>
+
 <script src="{% static 'blog/js/default.js' %}"></script>
 <script src="{% static 'layui/lay/modules/laypage.js' %}"></script>
 <div class="post-header-section">
@@ -139,9 +147,9 @@
 
 <div class="container" id="blog-detail-comment-area">
     <div class="blog-detail-area">
-        <div id="post-content">
+        <div class="post-content editormd-preview-theme-dark" id="post-content">
             <!-- Server-side output Markdown text -->
-            <textarea style="display: none;">{{post.content|safe}}</textarea>
+            <textarea style="display: none;">{{post.content}}</textarea>
         </div>
     </div>
     {%if user.is_authenticated%}
@@ -165,16 +173,22 @@
     $(function() {
      var testView = editormd.markdownToHTML("post-content", {
             // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
-            htmlDecode : true,  // Enable / disable HTML tag encode.
-            htmlDecode : "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+            htmlDecode: "style,script,iframe|on*",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
             toc: true,
             tocm: true,
             tocTitle: "目录",
-            tocContainer: "#toc-container"
+            tocContainer: "#toc-container",
+            taskList: true,
+            emoji: true,
+            tex: true,
+            codeFold: true,
+            theme: "dark",
+            previewTheme: "dark",
+            flowChart: true,
+            sequenceDiagram: true, 
         });
     });
     function generateCommentItem(data) {
-        console.log(data);
         var text = "";
         text += "<div class=\"comment-item\" id=\"comment-item_PK_PLACEHOLDER\">".replace("PK_PLACEHOLDER", data.pk);
         text += "  <div class=\"card-header comment-header\">";

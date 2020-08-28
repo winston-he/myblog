@@ -4,6 +4,7 @@
     margin-left: 200px;
     margin-right: 20px;
     width: 10%;
+    box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
 }
 
 .blog-list-container {
@@ -15,7 +16,8 @@
 .list-group-item {
     margin-bottom: 10px;
     background: #ffffff;
-    padding: 8px;
+    padding: 10px 20px;
+    box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
 }
 
 .left-sidebar-item {
@@ -91,6 +93,7 @@ body {
 #post-content {
     margin: 10px;
     padding: 30px 100px;
+    width: fit-content;
 }
 
 .post-title {
@@ -173,14 +176,14 @@ body {
     background: #ffffff;
     text-align: center!important;
     padding: 20px 40px;
-    box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
 }
 
 .author-post-list {
-    margin-top: 50px;
+    margin-top: 30px;
     background: #ffffff;
     padding: 10px 20px;
-    box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
 
 }
 

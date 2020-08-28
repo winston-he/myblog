@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'user',
     'blog',
     'widget_tweaks',
+    'access_log'
     # 'channels',
     # 'chat',
 ]

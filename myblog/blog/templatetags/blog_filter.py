@@ -9,7 +9,7 @@
 from datetime import datetime, timedelta
 
 from django import template
-
+import codecs, markdown
 
 register = template.Library()
 
@@ -23,3 +23,8 @@ def timesince_zh(val: str):
     val = val.replace("month", "个月")
     val = val.replace("years", "年")
     return val.replace("year", "年")
+
+
+@register.filter
+def md_to_html(md_string: str):
+    return markdown.markdown(md_string)

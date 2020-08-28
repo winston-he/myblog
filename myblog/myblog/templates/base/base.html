@@ -7,12 +7,16 @@
 
     {%block ref%}
     {%endblock ref%}
+    
 </head>
 <body>
     <link rel="icon" href="{% static 'img/icons/favicon.png' %}" >
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
     <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'layer/theme/default/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'layui/layui.js' %}"></script>
     <script src="{% static 'layer/layer.js' %}"></script>
@@ -39,8 +43,14 @@
         {%endif%}
       </li> 
     </ul>
-    {% block content %}
-    {% endblock content %}
+    <div class="main-container">
+      {% block content %}
+      {% endblock content %}
+    </div>
+    
+    {% block footer %}
+    {% endblock footer %}
+
   <script>
   </script>
 </body>
