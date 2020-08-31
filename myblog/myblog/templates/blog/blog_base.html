@@ -1,0 +1,25 @@
+{%extends "base/base_with_footer.html"%}
+{% load static %}
+{% load blog_filter %}
+
+{%block ref%}
+<link rel="stylesheet" href="{% static 'css/post.css' %}">
+{%endblock%}
+
+{%block content%}
+        <div class="left-side-bar-container">
+            <ul class="left-side-bar">
+                    <li class="left-sidebar-item all-blog"><a href="{%url 'post_list' page=1%}?all=true&published=true" class="side-bar-btn">所有博客</a></li>
+                    <li class="left-sidebar-item write-blog"><a href="{%url 'post_new'%}" class="side-bar-btn">写文章</a></li>
+                    <li class="left-sidebar-item my-comment"><a href="{%url 'my_comments'%}" class="side-bar-btn">我的评论</a></li>
+                    <li class="left-sidebar-item my-marked"><a href="{%url 'marked_post_list'%}" class="side-bar-btn">我收藏的</a></li>
+                    <li class="left-sidebar-item my-marked"><a href="{%url 'marked_post_list'%}" class="side-bar-btn">我的关注</a></li>
+                    <li class="left-sidebar-item my-marked"><a href="{%url 'marked_post_list'%}" class="side-bar-btn">我关注的人</a></li>
+                    <li class="left-sidebar-item my-posts"><a href="{%url 'post_list' page=1%}?all=false" class="side-bar-btn">我的文章</a></li>
+            </ul>
+        </div>
+    {% block main_content %}
+    {% endblock main_content %}
+{%endblock content%}
+{%block right_navbar%}
+{%endblock%}

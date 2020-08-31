@@ -1,4 +1,4 @@
-{%extends 'base/base.html' %}
+{%extends 'base/base_with_footer.html' %}
 {% load widget_tweaks %}
 {% load static %}
 {%block ref%}
@@ -7,7 +7,7 @@
 {%endblock%}
 {%block content%}
     <div class="login-box">
-        <div class="layui-tab">
+        <div class="layui-tab" lay-filter="login-tab">
             <ul class="layui-tab-title">
                 <li class="layui-this">登录</li>
                 <li>注册</li>
@@ -19,7 +19,7 @@
                 {%else%}
                     <div class="layui-tab-item">
                 {%endif%}
-                    <form action="{%url 'login'%}" method="POST">
+                    <form action="{%url 'login'%}" method="POST" id="login-form">
                         {%csrf_token%}
                         <div class="layui-form-item">
                             <label class="layui-form-label">用户名或邮箱</label>
@@ -38,9 +38,9 @@
                                 用户名或密码错误！
                             {% endif %}
                         </div>
-                        <div id="verify-section" style="margin-top:50px;">
+                        <div class="verify-section login" style="margin-top:50px; display: none">
                         </div>
-                        <button type="submit" class="layui-btn layui-btn-normal" id="login-confirm-btn">登录</button>
+                        <button type="button" class="layui-btn layui-btn-normal" id="login-confirm-btn">登录</button>
                     </form>
                 </div>
                     {%if action_type == 'register'%}
@@ -48,7 +48,7 @@
                     {%else%}
                         <div class="layui-tab-item">
                     {%endif%}
-                    <form class="" method="POST" action="{% url 'new_user' %}">
+                    <form class="" method="POST" action="{% url 'new_user' %}" id="register-form">
                         {%csrf_token%}
                         <div class="layui-form-item">
                             <label class="layui-form-label">用户名</label>
@@ -79,7 +79,9 @@
                             </div>
                             <small style="color: #ff0000">{{errors.password2}}</small>
                         </div>
-                        <button type="submit" class="layui-btn layui-btn-normal" id="signup-confirm-btn">注册</button>
+                        <div class="verify-section register" style="margin-top:50px;">
+                        </div>
+                        <button type="button" class="layui-btn layui-btn-normal" id="signup-confirm-btn">注册</button>
                     </form>
                 </div>
             </div>
@@ -87,36 +89,85 @@
     </div>
     <script type="text/javascript" src="{%static 'verify/js/verify.js'%}" ></script>
     <script>
-        layui.use('element', function(){
-        var element = layui.element;
-        });
-        $('#verify-section').slideVerify({
-            type : 2,		//类型
-            vOffset : 5,	//误差量，根据需求自行调整
-            vSpace : 5,	//间隔
-            imgUrl: "{%static 'verify/images/'%}",
-            imgName : ['1.jpg', '2.jpg'],
-            imgSize : {
-                width: '400px',
-                height: '200px',
-            },
-            blockSize : {
-                width: '40px',
-                height: '40px',
-            },
-            barSize : {
-                width : '400px',
-                height : '40px',
-            },
-            ready : function() {
-            },
-            success : function() {
-                alert('验证成功，添加你自己的代码！');
-            },
-            error : function() {
-                console.log("{%static 'verify/images/1.jpg'%}");
+        var validated = false;
+        layui.use('element', function() {
+            function refreshVerifySection(className, action) {
+                $(className).slideVerify({
+                    type : 2,		//类型
+                    vOffset : 5,	//误差量，根据需求自行调整
+                    vSpace : 5,	//间隔
+                    imgUrl: "{%static 'verify/images/'%}",
+                    imgName : ['1.jpg', '2.jpg'],
+                    imgSize : {
+                        width: '400px',
+                        height: '200px',
+                    },
+                    blockSize : {
+                        width: '40px',
+                        height: '40px',
+                    },
+                    barSize : {
+                        width : '400px',
+                        height : '40px',
+                    },
+                    ready : function() {
+                    },
+                    success : function() {
+                        validated = !validated;
+                        if (action == "login") {
+                            $("#login-form").submit();
+                        }
+                        else
+                            $("#register-form").submit();
+                    },
+                    error : function() {
+                    }
+                    
+                });
             }
-            
-        });
+
+            $("#login-confirm-btn").click(function() {
+                if (!validated) {
+                    var allFilled = false;
+                    for (var i=0; i < $("#login-form input").length; i++) {
+                        if ($("#login-form input")[i].value == "") {
+                            layer.msg("所有字段必须填写！", {
+                                delay: 3000
+                            })
+                            break;
+                        }
+                        if (i == $("#login-form input").length-1) allFilled = true;
+                    }
+                    if (allFilled)
+                        $(".verify-section.login").css("display", "block");
+                }
+                    
+            })
+            $("#signup-confirm-btn").click(function() {
+                if (!validated) {
+                    var allFilled = false;
+                    for (var i=0; i < $("#register-form input").length; i++) {
+                        if ($("#register-form input")[i].value == "") {
+                            layer.msg("所有字段必须填写！", {
+                                delay: 3000
+                            })
+                            break;
+                        }
+                        if (i == $("#register-form input").length-1) allFilled = true;
+                    }
+                    if (allFilled)
+                        $(".verify-section.register").css("display", "block");
+                }
+            })
+
+        refreshVerifySection(".verify-section.login", "login");
+        refreshVerifySection(".verify-section.register", "register");
+        {% comment %} var element = layui.element;
+        element.on('tab(login-tab)', function(data){
+            $(".verify-section").html("");
+            refreshVerifySection();
+        }); {% endcomment %}
+    });
+
     </script>
 {%endblock%}

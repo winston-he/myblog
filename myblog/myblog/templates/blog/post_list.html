@@ -1,58 +1,43 @@
-{%extends "base/base_with_footer.html"%}
+{%extends "blog/blog_base.html"%}
 {% load static %}
 {% load blog_filter %}
 
-{%block ref%}
-<link rel="stylesheet" href="{% static 'css/post.css' %}">
-{%endblock%}
-
-{%block content%}
-    <div class="left-side-bar-container">
-        <ul class="left-side-bar">
-                <li class="left-sidebar-item all-blog"><a href="{%url 'post_list' page=1%}?all=true&published=true" class="side-bar-btn">所有博客</a></li>
-                <li class="left-sidebar-item write-blog"><a href="{%url 'post_new'%}" class="side-bar-btn">写文章</a></li>
-                <li class="left-sidebar-item my-comment"><a href="" class="side-bar-btn">我的评论</a></li>
-                <li class="left-sidebar-item my-marked"><a href="{%url 'marked_post_list'%}" class="side-bar-btn">我收藏的</a></li>
-                <li class="left-sidebar-item my-posts"><a href="{%url 'post_list' page=1%}?all=false" class="side-bar-btn">我的文章</a></li>
-        </ul>
-    </div>
-    <div class="blog-list-container">
-        <ul class="list-group">
-            {%for post in post_list%}
-                {%if post.published_time%}
-                    <li class="list-group-item post-item">
-                {%else%}
-                    <li class="list-group-item draft-item">
-                {%endif%}
-                    {%block blog-item-extension%}
-                    {%endblock blog-item-extension%}
-                    <div class="preview-post-title">
-                        <h4><a href="{%url 'post_detail' pk=post.pk%}" class="post-title-link" id=preview-post-{{post.pk}}><span style="font-size: 30px;">{{post.title}}</span></a></h4>
-                    </div>
-                    <div class="preview-post-date">
-                        <p>Created on: {{post.create_time|date:"N d, Y"}} by: {{post.author}}</p>
-                    </div>
-                    <div class="preview-post-content">
-                        <p>
-                            {%if post.content|length > 140%}
-                            {{post.content|slice:":140"|md_to_html|safe}}...
-                            {%else%}
-                            {{post.content|md_to_html|safe}}
-                            {%endif%}
-                        </p>
-                    </div>
-                    <div class="preview-visit-stats">
-                            <div id="liked-count" class="stats"><img src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt=""> {{post.liked_by.count}}</div>
-                            <div id="marked-count" class="stats"><img src="{%static 'img/icons/star.png'%}" width=20 height=20 alt="">{{post.marked_by.count}}</div>
-                            <div id="viewed-count" class="stats"><img src="{%static 'img/icons/view.png'%}" width=20 height=20 alt=""> {{post.viewed_count}}</div>
-                            <div id="comment-count" class="stats"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt="">{{post.post_comments.count}}</div>
-                    </div>
-                </li>
-            {%endfor%}
-        </ul>
-    </div>
-
-    
+    {% block main_content %}
+        <div class="blog-list-container">
+            <ul class="list-group">
+                {%for post in post_list%}
+                    {%if post.published_time%}
+                        <li class="list-group-item post-item">
+                    {%else%}
+                        <li class="list-group-item draft-item">
+                    {%endif%}
+                        {%block blog-item-extension%}
+                        {%endblock blog-item-extension%}
+                        <div class="preview-post-title">
+                            <h4><a href="{%url 'post_detail' pk=post.pk%}" class="post-title-link" id=preview-post-{{post.pk}}><span style="font-size: 30px;">{{post.title}}</span></a></h4>
+                        </div>
+                        <div class="preview-post-date">
+                            <p>Created on: {{post.create_time|date:"N d, Y"}} by: {{post.author}}</p>
+                        </div>
+                        <div class="preview-post-content">
+                            <p>
+                                {%if post.content|length > 140%}
+                                {{post.content|slice:":140"|md_to_html|safe}}...
+                                {%else%}
+                                {{post.content|md_to_html|safe}}
+                                {%endif%}
+                            </p>
+                        </div>
+                        <div class="preview-visit-stats">
+                                <div id="liked-count" class="stats"><img src="{%static 'img/icons/red_heart.png'%}" width=20 height=20 alt=""> {{post.liked_by.count}}</div>
+                                <div id="marked-count" class="stats"><img src="{%static 'img/icons/star.png'%}" width=20 height=20 alt="">{{post.marked_by.count}}</div>
+                                <div id="viewed-count" class="stats"><img src="{%static 'img/icons/view.png'%}" width=20 height=20 alt=""> {{post.viewed_count}}</div>
+                                <div id="comment-count" class="stats"><img src="{%static 'img/icons/comment.png'%}" width=20 height=20 alt="">{{post.post_comments.count}}</div>
+                        </div>
+                    </li>
+                {%endfor%}
+            </ul>
+        </div>   
     {% csrf_token %}
     <script type="text/javascript">
         csrf();
@@ -91,7 +76,7 @@
                 text += "</div>";
                 text += "<div class=\"preview-post-content\">";
                 text += "    <p>";
-                text += r.content.slice(0, 140)
+                text += r.content.slice(0, 140);
                 text += "    </p>";
                 text += "</div>";
                 text += "<div class=\"preview-visit-stats\">";
@@ -110,11 +95,11 @@
             flow.load({
                 elem: '.list-group' //指定列表容器
                 ,done: function(page, next) { //到达临界点（默认滚动触发），触发下一页
+                console.log(page);
                 var lis = [];
                 //以jQuery的Ajax请求为例，请求下一页数据（注意：page是从2开始返回）
-                var url = '{%url "posts_by_page" page=1%}?all=true'.replace('1', page);
+                var url = '{%url "post_list" page=1%}?all=true'.replace('1', page);
                 console.log("triggered");
-                
                 $.get(url, function(res) {
                     console.log(res);
                     //假设你的列表返回在data集合中
@@ -132,7 +117,6 @@
         });
         {%endblock js_section%}
     </script>
-{%endblock content%}
-
+    {% endblock main_content %} 
 {%block right_navbar%}
 {%endblock%}

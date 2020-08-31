@@ -6,8 +6,12 @@
 {%endblock%}
 
 {%block content%}
-<div class="main-container">
+
     <div class="center-section">
+        <div style="text-align: right">
+            <button type="button" class="layui-btn layui-btn-normal" id="update-setting-btn">确认修改</button>
+            <a href={%url 'my_zone' pk=user.pk%} type="button" class="layui-btn layui-btn-normal" id="update-setting-btn">返回个人中心</a>
+        </div>
         <form class="layui-form" action="">
             <fieldset class="layui-elem-field layui-field-title">
                 <legend>基本信息</legend>
@@ -37,7 +41,7 @@
             </fieldset>
             <div class="education-info-section">
                 {% for e in user.education.all %}
-                    <div class="layui-inline school-info">
+                    <div class="layui-block school-info_"{{forloop.counter0 | add:"1"}}>
                         <label class="layui-form-label school-info-item">学校</label>
                         <div class="layui-input-block">
                             <input type="text" name="edu_school_"{{forloop.counter0 | add:"1"}} required  lay-verify="required" autocomplete="off" class="layui-input" value={{e.edu_school}}>
@@ -50,14 +54,15 @@
                         <div class="layui-input-block">
                             <input type="text" name="edu_degree_"{{forloop.counter0 | add:"1"}} required  lay-verify="required" autocomplete="off" class="layui-input" value={{e.edu_degree}}>
                         </div>        
-                    </div>
-                    <label class="layui-form-label">开始时间</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="edu_start_date_"{{forloop.counter0 | add:"1"}} required  lay-verify="required" autocomplete="off" class="layui-input" value={{e.start_date}}>
-                    </div>
-                    <label class="layui-form-label">结束时间</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="edu_end_date_"{{forloop.counter0 | add:"1"}} autocomplete="off" class="layui-input" value={{e.end_date}}>
+                    
+                        <label class="layui-form-label">开始时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="edu_start_date_"{{forloop.counter0 | add:"1"}} required  lay-verify="required" autocomplete="off" class="layui-input" value={{e.start_date}}>
+                        </div>
+                        <label class="layui-form-label">结束时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="edu_end_date_"{{forloop.counter0 | add:"1"}} autocomplete="off" class="layui-input" value={{e.end_date}}>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
@@ -66,32 +71,34 @@
                 <legend>工作经历</legend>
             </fieldset>
             <div class="employment-info-section">
-
                 {%for m in user.employment.all%}
-                    <div class="layui-inline">
+                    <div class="layui-block employment-info_"{{forloop.counter0 | add:"1"}}>
                         <label class="layui-form-label">公司</label>
-                        <div class="layui-input-inline">
+                        <div class="layui-input-block">
                             <input type="text" name="edu_school_"{{forloop.counter0 | add:"1"}} required  lay-verify="required" autocomplete="off" class="layui-input" value={{m.company}}>
                         </div>
+                        
                         <label class="layui-form-label">职位</label>
-                        <div class="layui-input-inline">
+                        <div class="layui-input-block">
                             <input type="text" name="edu_major_"{{forloop.counter0 | add:"1"}} required  lay-verify="required" autocomplete="off" class="layui-input" value={{m.title}}>
                         </div>
-                    </div>
-                    <label class="layui-form-label">开始时间</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="edu_start_date_"{{forloop.counter0 | add:"1"}} required  lay-verify="required" autocomplete="off" class="layui-input" value={{m.start_date}}>
-                    </div>
-                    <label class="layui-form-label">结束时间</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="edu_end_date_"{{forloop.counter0 | add:"1"}} autocomplete="off" class="layui-input" value={{m.end_date}}>
+                        
+                        <label class="layui-form-label">开始时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="edu_start_date_"{{forloop.counter0 | add:"1"}} required  lay-verify="required" autocomplete="off" class="layui-input" value={{m.start_date}}>
+                        </div>
+                        
+                        <label class="layui-form-label">结束时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="edu_end_date_"{{forloop.counter0 | add:"1"}} autocomplete="off" class="layui-input" value={{m.end_date}}>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
             <button type="button" class="layui-btn layui-btn-normal" id="add-employment-item-btn">增加</button>
         </form>
     </div>
-</div>
+
 
 {% csrf_token %}
 <script type="text/javascript">
@@ -99,48 +106,51 @@
     var employmentCount = '{{user.employment.count}}';
     $("#add-education-item-btn").click(function() {
         educationCount++;
-        var text = "<div class=\"layui-inline school-info\">";
-        text += "                    <div class=\"layui-input-inline\">";
+        var text = "<div class=\"layui-block school-info_" + educationCount + ">";
         text += "                    <label class=\"layui-form-label\">学校</label>";
+        text += "                    <div class=\"layui-input-block\">";
         text += "                        <input type=\"text\" name=edu_school_" + educationCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">";
         text += "</div>";
-        text += "                    <div class=\"layui-input-inline\">";
         text += "                    <label class=\"layui-form-label\">专业</label>";
+        text += "                    <div class=\"layui-input-block\">";
+
         text += "                        <input type=\"text\" name=edu_major_" + educationCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">";
         text += "                    </div>";
-        text += "                    <div class=\"layui-input-inline\">";
         text += "                    <label class=\"layui-form-label\">学位</label>";
+        text += "                    <div class=\"layui-input-block\">";
         text += "                        <input type=\"text\" name=edu_degree_" + educationCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">";
-        text += "                    </div></div>";
+        text += "                    </div>";
         text += "                    <label class=\"layui-form-label\">开始时间</label>";
         text += "                    <div class=\"layui-input-block\">";
         text += "                        <input type=\"text\" name=edu_start_date_" + educationCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">";
         text += "                    </div>";
-        text += "                    <div class=\"layui-input-block\">";
         text += "                    <label class=\"layui-form-label\">结束时间</label>";
+        text += "                    <div class=\"layui-input-block\">";
         text += "                        <input type=\"text\" name=edu_end_date_" + educationCount + " autocomplete=\"off\" class=\"layui-input\">";
+        text += "                    </div>";
         text += "                    </div>";
         $(".education-info-section").append(text);
     });
     $("#add-employment-item-btn").click(function() {
         employmentCount++;
-        var text = "";
-        text += "<div class=\"layui-inline\">";
+        var text = "<div class=\"layui-block employment-info_" + employmentCount + ">";
         text += "    <label class=\"layui-form-label\">公司</label>";
-        text += "    <div class=\"layui-input-inline\">";
+        text += "<div class=\"layui-block\">";
+        text += "    <div class=\"layui-input-block\">";
         text += "        <input type=\"text\" name=edu_school_" + employmentCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">";
         text += "    </div>";
         text += "    <label class=\"layui-form-label\">职位</label>";
-        text += "    <div class=\"layui-input-inline\">";
+        text += "    <div class=\"layui-input-block\">";
         text += "        <input type=\"text\" name=edu_major_" + employmentCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">";
         text += "    </div>";
         text += "</div>";
         text += "<label class=\"layui-form-label\">开始时间</label>";
         text += "<div class=\"layui-input-block\">";
-        text += "    <input type=\"text\" name=edu_start_date_" + employmentCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">";
+        text += "    <input type=\"text\" name=edu_start_date_" + employmentCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\"></div>";
         text += "<label class=\"layui-form-label\">结束时间</label>";
         text += "<div class=\"layui-input-block\">";
-        text += "    <input type=\"text\" name=edu_end_date_" + employmentCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">";
+        text += "    <input type=\"text\" name=edu_end_date_" + employmentCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\"></div>";
+        text += "</div>";
         $(".employment-info-section").append(text);
     })
 </script>

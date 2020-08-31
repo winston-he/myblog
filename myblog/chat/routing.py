@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 # @Author: winston he
 # @File: routing.py
-# @Time: 2020-06-01 16:54
+# @Time: 2020-08-25 14:40
 # @Email: winston.wz.he@gmail.com
 # @Desc:
 from django.urls import re_path

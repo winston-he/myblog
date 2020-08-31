@@ -32,7 +32,6 @@ class PostListView(ListView):
             schema = BlogPostPreviewSchema(many=True)
             schema.fields.pop("content")
             res = schema.dump(self.get_queryset())
-
             return JsonResponse({"result": "OK", "data": res})
 
         return super().get(request, *args, **kwargs)
@@ -40,9 +39,10 @@ class PostListView(ListView):
     def get_queryset(self, page=1):
         all = True if self.request.GET.get("all") is not None and self.request.GET.get("all") == 'true' else False
         author_id = self.request.GET.get("author_id")
-        published = True if self.request.GET.get("published") is not None and self.request.GET.get("published") == 'true' else False
+        published = True if self.request.GET.get("published") is not None and self.request.GET.get(
+            "published") == 'true' else False
         # 如果查询我的文章但是当前用户未登陆
-        if not all and not self.request.user.is_authenticated:
+        if not all and not self.request.user.is_authenticated and not author_id:
             return "nonauthenticated"
 
         if all and not published:
@@ -69,8 +69,6 @@ class PostListView(ListView):
                     return Post.objects.filter(**conditions).order_by('-published_time')[:5]
         return Post.objects.filter(**conditions).order_by('-published_time')[start: end]
 
-
-
     @staticmethod
     def get_posts_by_page(request, page):
         published = True if request.GET.get("all") == 'true' else False
@@ -85,7 +83,7 @@ class PostListView(ListView):
         all_set = Post.objects.filter(**conditions).order_by('-published_time')
         pages = ceil(all_set.count() / BLOG_PER_PAGE)
 
-        raw_set = all_set[(int(page))*BLOG_PER_PAGE: (int(page))*BLOG_PER_PAGE+BLOG_PER_PAGE]
+        raw_set = all_set[(int(page)) * BLOG_PER_PAGE: (int(page)) * BLOG_PER_PAGE + BLOG_PER_PAGE]
         for record in raw_set:
             record.authorname = record.author.username
             record.liked_count = record.liked_by.count()
@@ -100,6 +98,7 @@ class PostListView(ListView):
 class MarkedPostListView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'post_list.html'
+
     def get_queryset(self):
         return Post.objects.filter(marked_by=self.request.user).order_by('-published_time')
 
@@ -135,23 +134,22 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     template_name = "blog/post_form.html"
 
     def form_valid(self, form):
-
         if form.cleaned_data['is_publish']:
             form.instance.published_time = timezone.now()
         form.instance.author = self.request.user
         form.instance.update_time = timezone.now()
         form.save()
-        return JsonResponse({"result": 1, "msg": "OK", "pk": form.instance.pk})
+        if not self.request.is_ajax():
+            self.kwargs['pk'] = form.instance.pk
+            return super().form_valid(form)
 
-    def form_invalid(self, form):
-        print("hahah")
-        return JsonResponse({"1": "1"})
+    def get_success_url(self):
+        return reverse('post_detail', kwargs=self.kwargs)
+
 
 class UpdatePostView(LoginRequiredMixin, UpdateView):
     form_class = PostForm
     template_name = "blog/post_form.html"
-
-
 
     def get_queryset(self):
         return Post.objects.filter(**self.kwargs)
@@ -173,8 +171,6 @@ class UpdatePostView(LoginRequiredMixin, UpdateView):
         return reverse('post_detail', kwargs=self.kwargs)
 
 
-
-
 class DeletePostView(LoginRequiredMixin, DeleteView):
     # model = Post
     success_url = reverse_lazy('post_list', **{"all": "false"})
@@ -184,7 +180,6 @@ class DeletePostView(LoginRequiredMixin, DeleteView):
 
     def get_object(self, queryset=None):
         return
-
 
     def delete(self, request, *args, **kwargs):
         # 不重定向，而是返回ajax response
@@ -210,6 +205,8 @@ class CommentListView(ListView):
         if self.request.is_ajax():
             query_set = self.get_queryset()
             res = []
+
+            # comment的总数
             total_comment = Comment.objects.filter(post=int(kwargs['pk'])).count()
             for record in query_set:
                 res.append({
@@ -230,15 +227,54 @@ class CommentListView(ListView):
         limit = self.paginate_by
         page = self.request.GET.get('page', None)
         page = 1 if page is None else int(page)
-        return Comment.objects.filter(post=int(self.kwargs['pk'])).order_by('-create_time')[(page-1)*limit: (page)*limit]
+        return Comment.objects.filter(post=int(self.kwargs['pk'])).order_by('-create_time')[
+               (page - 1) * limit: (page) * limit]
 
 
-class CreateCommentView(LoginRequiredMixin, CreateView):
+class MyCommentList(LoginRequiredMixin, ListView):
+
+    paginate_by = 10
+    template_name = 'blog/my_comment_list.html'
+
+    def get(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            comment_count = Comment.objects.filter(author=self.request.user).count()
+            query_set = self.get_queryset()
+            res = []
+            for item in query_set:
+                res.append({
+                    "pk": item.pk,
+                    "post": item.post.title,
+                    "post_pk": item.post.pk,
+                    "create_time": item.create_time.strftime("%b %d, %Y %I:%M %p"),
+                    "content": item.content
+                })
+            return JsonResponse({"result": 1, "data": res, "total_comment": comment_count, "limit": self.paginate_by})
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        limit = self.paginate_by
+        page = self.request.GET.get('page', None)
+        page = 1 if page is None else int(page)
+        return Comment.objects.filter(author=self.request.user).order_by('-create_time')[
+               (page - 1) * limit: (page) * limit]
+
+
+
+
+class CreateCommentView(CreateView):
     login_url = '/login/'
     model = Comment
 
     template_name = 'blog/comment_form.html'
-    fields = ["content",]
+    fields = ["content", ]
+
+    def get(self, request, *args, **kwargs):
+        print("hello world")
+        if not request.user.is_authenticated:
+            return JsonResponse({"result": -1, "msg": "not logged in yet"})
+        return super().get(request, *args, **kwargs)
 
     def render_to_response(self, context, **response_kwargs):
         context['pk'] = self.kwargs['pk']
@@ -269,7 +305,12 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-
+        pk = self.object.pk
+        if self.object.author == self.request.user:
+            self.object.delete()
+            return  JsonResponse({"result": 0, "msg": "操作成功", "pk": pk})
+        else:
+            return JsonResponse({"result": -1, "msg": "操作失败", "pk":  pk})
 
 
 
@@ -342,15 +383,6 @@ def dislike_comment(request, pk):
     return JsonResponse({"result": result, "pk": pk})
 
 
-# 移除评论
-@login_required
-def remove_comment(request, pk):
-    if request.method == "POST" and request.is_ajax():
-        comment = get_object_or_404(Comment, pk=pk)
-        comment.delete()
-        return JsonResponse(data={'result': 0})
-
-
 # 博客阅读次数+1
 @login_required
 def increase_view_count(request, pk):
@@ -361,6 +393,7 @@ def increase_view_count(request, pk):
             post.viewed_count += 1
             post.save()
         return JsonResponse(post.viewed_count, safe=False)
+
 
 # 一些数据统计
 @login_required
@@ -374,6 +407,7 @@ def personal_summary(request):
         res["total_marked_count"] += p.marked_by.count()
         res["total_visit_count"] += p.viewed_count
     return JsonResponse(res)
+
 
 @csrf_exempt
 @xframe_options_sameorigin

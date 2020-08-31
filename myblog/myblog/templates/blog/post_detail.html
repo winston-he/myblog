@@ -118,20 +118,32 @@
     <div class="basic-personal-info-item stats">
         <h3>关注 0 | 获赞 0 | 博客 0</h3>
     </div>
-    <div class="author-btns">
-        <a
-            href=""
-            class="layui-btn layui-btn-normal"
-            id="edit-personal-info-btn"
-            >+关注</a
-        >
-        <a
-            href=""
-            class="layui-btn layui-btn-primary"
-            id="edit-personal-info-btn"
-            >私信</a
-        >
-    </div>
+    {%if post.author != user%}
+      <div class="author-btns">
+          {% if post.author in user.user.subscribe_to.all %}
+           <button
+              href=""
+              class="layui-btn layui-btn-normal"
+              id="subscribe-btn"
+              >取关</button
+          >         
+          {%else%}
+           <button
+              href=""
+              class="layui-btn layui-btn-normal"
+              id="subscribe-btn"
+              >+关注</button
+          >  
+          {% endif %}
+
+          <button
+              href=""
+              class="layui-btn layui-btn-primary"
+              id="pm-btn"
+              >私信</button
+          >
+      </div>
+    {%endif%}
 </div>
 
   <div class="author-post-list" id="popular-post-list">
@@ -152,7 +164,6 @@
             <textarea style="display: none;">{{post.content}}</textarea>
         </div>
     </div>
-    {%if user.is_authenticated%}
     <button type="button" id="post-comment-btn">
         <img
             src="{%static 'img/icons/comment.png'%}"
@@ -161,7 +172,6 @@
             alt=""
         />
     </button>
-    {%endif%} 
     <div class="comment-list"></div>
     <div class="comment-section"></div>
   </div>
@@ -170,6 +180,11 @@
 
 {% csrf_token %}
 <script type="text/javascript">
+    var layer;
+    layui.use('layer', function() {
+      layer = layui.layer;
+    });
+
     $(function() {
      var testView = editormd.markdownToHTML("post-content", {
             // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
@@ -210,7 +225,7 @@
         text += "        ";
         text += "        <div class=\"comment-action-item dislike-comment\">";
         text += "          <a role=\"button\" class=dislike-comment-btn data-href=\"{% url 'dislike_comment' pk=123 %}\">".replace("123", data.pk);
-        text += "              <img src=\"{%static 'img/icons/thumb_down_unselected.png'%}\" class=\"dislike-comment\" id=\"dislike-123\" width=20 height=20>".replace("123", data.pk).replace("thumb_down_unselected.png", data.is_disliked?"thumb_up_selected.png":"thumb_down_unselected.png");
+        text += "              <img src=\"{%static 'img/icons/thumb_down_unselected.png'%}\" class=\"dislike-comment\" id=\"dislike-123\" width=20 height=20>".replace("123", data.pk).replace("thumb_down_unselected.png", data.is_disliked?"thumb_down_selected.png":"thumb_down_unselected.png");
         text += "          </a>";
         text += "          <div id=\"comment-dislike-number_" + data.pk + "\" class=comment-action-item>"  + data.dislikes_count + "</div>";
         text += "        </div>";
@@ -264,6 +279,8 @@
         this.markPost();
         this.makeComment();
         this.deletePost();
+        this.subscribe();
+        this.goToChat();
         {% comment %} this.likeComment();
         this.dislikeComment(); {% endcomment %}
         {% comment %} this.getCommentList(); {% endcomment %}
@@ -317,38 +334,43 @@
         //
         let that = this;
         $("#post-comment-btn").click(function() {
-          $.get('{%url "comment_new" pk=123%}'.replace("123", '{{post.pk}}'), {}, function(str) {
-            layer.prompt(
-              {
-                title: "发表您的见解",
-                fixed: false,
-                resize: false,
-                content: str,
-                btn: null,
-                success: function() {
-                  $("#save-comment").click(function() {
-                    $.post({
-                      url: '{%url "comment_new" 123%}'.replace('123', '{{post.pk}}'),
-                      data: {
-                        "content": $("#comment-content").val(),
-                        "csrfmiddlewaretoken": csrf,
-                      },
-                      success: function(res) {
-                        var data = res.data;
-                        var text = generateCommentItem(data);
-                        $(".comment-list").append(text);
-                        that.likeComment();
-                        that.dislikeComment();
-                        layer.closeAll();
-                      }
+          $.get('{%url "comment_new" pk=123%}'.replace("123", '{{post.pk}}'), {}, function(data) {
+
+            if (data.result == -1)
+              window.location.href = '{%url "login"%}';
+            else
+              layer.prompt(
+                {
+                  title: "发表您的见解",
+                  fixed: false,
+                  resize: false,
+                  content: data,
+                  btn: null,
+                  success: function() {
+                    $("#save-comment").click(function() {
+                      $.post({
+                        url: '{%url "comment_new" 123%}'.replace('123', '{{post.pk}}'),
+                        data: {
+                          "content": $("#comment-content").val(),
+                          "csrfmiddlewaretoken": csrf,
+                        },
+                        success: function(res) {
+                          var data = res.data;
+                          var text = generateCommentItem(data);
+                          $(".comment-list").append(text);
+                          that.likeComment();
+                          that.dislikeComment();
+                          that.deleteComment();
+                          layer.closeAll();
+                        }
+                      })
                     })
-                  })
+                  }
+                },
+                function(value, index, elem) {
+                  alert(value);
                 }
-              },
-              function(value, index, elem) {
-                alert(value);
-              }
-            )
+              )
           })
 
 
@@ -450,7 +472,42 @@
         })
       };
       this.deleteComment = function() {
-
+        $(".delete-comment-btn").click(function() {
+              var url = $(this).data("href");
+              var clickedBtn = $(this);
+              layer.prompt(
+                {
+                  title: "发表您的见解",
+                  fixed: false,
+                  resize: false,
+                  content: "确定要删除这条评论吗？",
+                  yes: function() {
+                    $.ajax({
+                      url: url,
+                      headers: {
+                          'X-CSRFToken': csrf,
+                      },
+                      method: "delete",
+                      success: function(res) {
+                        if (res.result == 0) {
+                          console.log("#comment-item_" + res.pk);
+                          $("#comment-item_" + res.pk).remove();
+                        } 
+                        else {
+                          layer.msg("操作失败", {
+                            delay: 2000
+                          })
+                        }
+                      }
+                    })
+                    layer.closeAll();
+                  }
+                },
+                function(value, index, elem) {
+                  alert(value);
+                }
+              )
+        })
       };
       this.getCommentList = function() {
         $.get({
@@ -462,6 +519,33 @@
 
             }
           }
+        })
+      }
+      this.subscribe = function() {
+        $("#subscribe-btn").click(function() {
+          var clickedBtn = $(this);
+          $.get( {
+              url: '{%url "subscribe" pk=123%}'.replace('123', '{{post.author.pk}}'),
+              success: function(res) {
+                // 关注
+                if (res.result == 0)  {
+                  clickedBtn.text("取关");
+                }
+                // 取关
+                else if (res.result == 1) {
+                  clickedBtn.text("+关注");
+                  clickedBtn.css("background", "rbga(30, 159, 255)");
+                }
+              }
+            }
+          )
+
+        })
+      }
+
+      this.goToChat = function() {
+        $("#pm-btn").click(function() {
+          window.location.href = '{%url "chat"%}';
         })
       }
     }
@@ -500,6 +584,7 @@
                   $(".comment-list").html(text);
                   listener.likeComment();
                   listener.dislikeComment();
+                  listener.deleteComment();
                 }
               })
           }

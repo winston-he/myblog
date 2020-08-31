@@ -69,9 +69,7 @@
   csrf();
   function EventListener() {
         this.init = function() {
-          this.saveToDraft();
           this.textInputLimit();
-          this.postToBlog();
         }
         // 保存到草稿按钮
         this.saveToDraft = function() {
@@ -87,7 +85,7 @@
                 "content": $("#editor-textarea").val()},
             success: function(data) {
               console.log(data);
-              window.location = '{%url "post_detail" pk=123%}'.replace("123", data.pk);
+              window.location.href = '{%url "post_detail" pk=123%}'.replace("123", data.pk);
             }
           }) 
         })

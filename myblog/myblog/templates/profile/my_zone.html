@@ -78,18 +78,19 @@
                 <legend>工作经历</legend>
         </fieldset>
     </div>
-    </div>
-    <div class="settings">
-        <h2>设置</h2>
-        <h3>别人可以看到我的</h3>
-        <div class="layui-form">
-            <div class="layui-input-block access-setting">
-                <form class="layui-form" action="">
-                    <input class="setting-checkbox" type="checkbox" name="" title="访问记录" lay-skin="primary">
-                    <input class="setting-checkbox" type="checkbox" name="" title="教育背景" lay-skin="primary">
-                    <input class="setting-checkbox" type="checkbox" name="" title="工作经历" lay-skin="primary">
-                    <button type="submit" class="layui-btn layui-btn-normal" id="update-setting-btn" lay-filter="update-setting" disabled>更新</button>
-                </form>
+        <div class="settings">
+            <h2>设置</h2>
+            <h3>别人可以看到我的</h3>
+            <div class="layui-form">
+                <div class="layui-input-block access-setting">
+                    <form class="layui-form" method="POST" action={%url 'update_preference' pk=user.pk%}>
+                        {%csrf_token%}
+                        <input class="setting-checkbox" type="checkbox" name="record_access" title="访问记录" lay-skin="primary">
+                        <input class="setting-checkbox" type="checkbox" name="education_access" title="教育背景" lay-skin="primary">
+                        <input class="setting-checkbox" type="checkbox" name="employment_access" title="工作经历" lay-skin="primary">
+                        <button type="submit" class="layui-btn layui-btn-normal" id="update-setting-btn" lay-filter="update-setting">更新</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -121,9 +122,13 @@
 
     function EventListener() {
         this.init = function() {
+            {% comment %} this.updatePreference(); {% endcomment %}
         };
         this.editBasicInfo = function() {
         }
     }
+
+    listener = new EventListener();
+    {% comment %} listener.init(); {% endcomment %}
 </script>
 {%endblock%}

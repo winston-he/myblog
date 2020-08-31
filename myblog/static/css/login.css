@@ -3,7 +3,7 @@ body {
 }
 
 .login-box {
-    width: 400px;
+    width: fit-content;
     height: auto;
     margin: 200px auto;
     background: #ffffff

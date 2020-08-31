@@ -2,15 +2,15 @@
 # -*- coding:utf-8 -*-
 # @Author: winston he
 # @File: urls.py
-# @Time: 2020-06-01 15:04
+# @Time: 2020-08-25 14:05
 # @Email: winston.wz.he@gmail.com
 # @Desc:
 from django.conf.urls import url
 
-from chat import views
+from . import views
 
 urlpatterns = [
-    url(r'^chat/$', views.index, name='index'),
-    url(r'^chat/(?P<room_name>\w+)/', views.room, name='room')
+    # url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^chat/$', views.ChatRoomView.as_view(), name='chat'),
+    url(r'^chat/signature', views.update_signature, name='update_signature'),
 ]
-

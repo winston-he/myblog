@@ -14,9 +14,14 @@ class UserManager(models.Manager):
     def get_queryset(self):
         return super(UserManager, self).get_queryset()
 
+class UserPreference(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="preference", null=False)
+    record_access = models.BooleanField(default=False)
+    education_access = models.BooleanField(default=False)
+    employment_access = models.BooleanField(default=False)
 
 class UserProfile(models.Model):
-    '''用户、用户信息'''
+    '''用户信息'''
 
     class Meta:
         ordering = ['user__date_joined']
@@ -34,6 +39,7 @@ class UserProfile(models.Model):
     introduction = models.CharField(max_length=300, null=True)
     profile_image = models.ImageField(upload_to='profile/%Y/%m', null=True)
     location = models.CharField(max_length=100, null=True)
+    subscribe_to = models.ManyToManyField(User, related_name="subscribe_to")
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

@@ -10,10 +10,7 @@ from . import views
 urlpatterns = [
     # url(r'^about/$', views.AboutView.as_view(), name='about')
     url(r'^post_list/(?P<page>\d+)/$', views.PostListView.as_view(), name='post_list'),
-    url(r'^posts/(?P<page>\d+)/$', views.PostListView.get_posts_by_page, name='posts_by_page'),
     # url(r'^drafts/$', views.MyPostListView.as_view(), name='my_post_list'),
-
-
     url(r'^post/marked/$', views.MarkedPostListView.as_view(), name='marked_post_list'),
     url(r'^post/(?P<pk>\d+)/detail/$', views.PostDetailView.as_view(), name='post_detail'),
     url(r'post/uploadimage/$', views.upload_image, name='upload_image'),
@@ -25,15 +22,14 @@ urlpatterns = [
     url(r'^post/(?P<pk>\d+)/comment/$', views.CreateCommentView.as_view(), name='comment_new'),
 
     url(r'^post/(?P<pk>\d+)/comment/count$', views.PostDetailView.get_total_comment_count, name='comment_count'),
-    url(r'^comment/(?P<pk>\d+)/delete/$', views.remove_comment, name='comment_remove'),
+    url(r'^comment/(?P<pk>\d+)/delete/$', views.DeleteCommentView.as_view(), name='comment_remove'),
     url(r'^post/(?P<pk>\d+)/comment-list/$', views.CommentListView.as_view(), name='comment_list'),
     url(r'^post/(?P<pk>\d+)/like/$', views.like_post, name='like_post'),
     url(r'^post/(?P<pk>\d+)/mark/$', views.mark_post, name='mark_post'),
     url(r'^comment/(?P<pk>\d+)/like/$', views.like_comment, name='like_comment'),
     url(r'^comment/(?P<pk>\d+)/dislike/$', views.dislike_comment, name='dislike_comment'),
+    url(r'^my_comments/$', views.MyCommentList.as_view(), name='my_comments'),
 
     url(r'^personal_stats/$', views.personal_summary, name='personal_stats'),
-    url(r'^post/(?P<pk>\d+)/view/$', views.increase_view_count, name='view_count')
+    url(r'^post/(?P<pk>\d+)/view/$', views.increase_view_count, name='view_count'),
 ]
-
-

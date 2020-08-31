@@ -2,14 +2,18 @@
 # -*- coding:utf-8 -*-
 # @Author: winston he
 # @File: consumers.py
-# @Time: 2020-06-01 15:33
+# @Time: 2020-08-25 14:38
 # @Email: winston.wz.he@gmail.com
 # @Desc:
+# chat/consumers.py
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    channel_layer_alias = 'echo_alias'
+
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
@@ -33,7 +37,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-
+        print(text_data)
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -46,7 +50,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from room group
     async def chat_message(self, event):
         message = event['message']
-
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message

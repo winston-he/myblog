@@ -144,9 +144,14 @@ body {
 }
 
 .comment-section {
-    margin-top: 10px;
+    /* margin-top: 10px; */
+    /* align-items: center; */
+    /* align-content: center; */
+    margin: 10px auto;
+    display: block;
+    width: 80%;
+    text-align: center;
 }
-
 .delete-comment-btn {
     background: #ffffff;
     border: none;
@@ -219,7 +224,11 @@ body {
     box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
-div img {
+#post-content img {
     box-shadow: 0 12px 15px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
     margin: 10px
+}
+
+#post-content .emoji {
+    box-shadow: none;
 }

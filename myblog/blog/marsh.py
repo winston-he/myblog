@@ -21,5 +21,6 @@ class BlogPostPreviewSchema(Schema):
     comment_count = fields.Integer()
     viewed_count = fields.Integer()
 
+
 class BlogCommentDetailSchema(Schema):
     pass

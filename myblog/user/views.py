@@ -1,7 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import DetailView, UpdateView
 from itsdangerous import SignatureExpired, BadSignature
@@ -10,13 +11,14 @@ from mail.mail_string import get_activate_msg
 from mail.views import send_email
 from myblog.settings import EMAIL_FROM
 from .forms import UserRegisterForm, PersonalInfoForm
-from .models import User, UserProfile
+from .models import User, UserProfile, UserPreference
 from .utils import generate_token, load_token
 
 
 class MyLogoutView(LogoutView):
     # def re
     pass
+
 
 class UpdatePersonalInfoView(LoginRequiredMixin, UpdateView):
     template_name = "profile/personal_info_form.html"
@@ -30,6 +32,30 @@ class UpdatePersonalInfoView(LoginRequiredMixin, UpdateView):
 class PersonalInfoDetailView(LoginRequiredMixin, DetailView):
     template_name = 'profile/my_zone.html'
     model = User
+
+
+def update_preference_setting(request, pk):
+    r_access = request.POST.get("record_access")
+    edu_access = request.POST.get("education_access")
+    emp_access = request.POST.get("employment_access")
+    d = {
+        "on": True,
+        "off": False
+    }
+
+    update_data = {}
+    if r_access is not None:
+        update_data['record_access'] = d[r_access]
+    if edu_access is not None:
+        update_data['education_access'] = d[edu_access]
+    if emp_access is not None:
+        update_data['employment_access'] = d[emp_access]
+    if request.user.preference is None:
+        update_data['user'] = request.user
+        UserPreference(**update_data).save()
+    else:
+        request.user.preference.update(**update_data)
+    return JsonResponse({"result": 0, "msg": "更新成功"})
 
 
 def user_register(request):
@@ -50,7 +76,6 @@ def user_register(request):
                                                                                                  form.cleaned_data[
                                                                                                      'username']}))),
                              expires=2)
-            print("邮件发送完毕")
             # return redirect(reverse('activate_user'))
             return render(request, 'registration/activate.html', context={
                 "username": form.cleaned_data['username'],
@@ -63,6 +88,21 @@ def user_register(request):
                     print(e.messages)
                     errors[key] = " ".join(e.messages)
             return render(request, 'registration/login.html', context={"action_type": "register", "errors": errors})
+
+# 关注/取关
+@login_required
+def subscribe(request, pk):
+    subscribe_to = User.objects.filter(pk=pk).first()
+    # 关注
+    if subscribe_to and subscribe_to not in request.user.user.subscribe_to.all():
+        request.user.user.subscribe_to.add(subscribe_to)
+        result = 0
+    # 取关
+    else:
+        request.user.user.subscribe_to.remove(subscribe_to)
+        result = 1
+    request.user.user.save()
+    return JsonResponse({"result": result, "msg": "操作成功"})
 
 
 def reset_password_done(request):

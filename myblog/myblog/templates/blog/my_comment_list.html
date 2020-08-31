@@ -1,0 +1,36 @@
+{% extends 'blog/blog_base.html' %}
+
+{% block main_content %}
+    <div class='my-comments'>
+        <ul id="comment-list">
+        </ul>
+        <div id="comment-page-section"></div>
+    </div>
+
+<script>
+    generateCommentItem = function() {
+
+    }
+
+    var laypage = layui.laypage;
+    //执行一个laypage实例
+    laypage.render({
+    elem: document.getElementById('comment-page-section') //注意，这里的 test1 是 ID，不用加 # 号
+    , count: commentCount
+    , limit: commentLimit
+    , first: function(obj, first) {
+        
+    }
+    , jump: function(obj, first) {
+        $.get({
+            url: '{%url "my_comment_list" pk=123%}' + '?page=' + obj.curr,
+            success: function(res) {
+            var text = "";
+            var data = res.data;
+            $(".comment-list").html(text);
+            }
+        })
+    }
+    });
+</script>
+{% endblock main_content %}
