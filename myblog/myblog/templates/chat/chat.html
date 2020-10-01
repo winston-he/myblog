@@ -103,7 +103,6 @@ layui.use('layim', function(layim){
         },         //连接成功回调 
         onClosed: function ( message ) {},         //连接关闭回调
         onTextMessage: function(msg) {
-            console.log("收到一條消息", msg);
             layim.getMessage({
             username: msg.from //消息来源用户名
             ,avatar: "http://tp1.sinaimg.cn/1571889140/180/40030060651/1" //消息来源用户头像
@@ -203,7 +202,7 @@ layui.use('layim', function(layim){
                 ,"id": "{{user.pk}}" //我的ID
                 ,"status": "online" //在线状态 online：在线、hide：隐身
                 ,"sign": '{%if user.chat_info.signature%}{{user.chat_info.signature}}{%else%}没有签名哦~{%endif%}' //我的签名
-                ,"avatar": "a.jpg" //我的头像
+                ,"avatar": "{%url 'profile_image'%}" //我的头像
                 },
                 "friend": friends,
                 "group": []

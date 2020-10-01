@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db.models import Q
 from django.http import JsonResponse
+from django.urls import reverse
 from django.views.generic import TemplateView, ListView
 from django_redis import get_redis_connection
 # class IndexView(TemplateView):
@@ -58,7 +59,7 @@ class ChatListView(LoginRequiredMixin, ListView):
                 private_chat_list.append({
                     "username": friend.username,
                     "id": friend.username,
-                    "avatar": "a.jpg",
+                    "avatar": reverse("profile_image"),
                     "sign": "Hello World",
                     "status": "online"  # default setting
                 })
