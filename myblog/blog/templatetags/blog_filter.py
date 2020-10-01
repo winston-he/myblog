@@ -22,6 +22,8 @@ def timesince_zh(val: str):
     val = val.replace("months", "个月")
     val = val.replace("month", "个月")
     val = val.replace("years", "年")
+    val = val.replace('week', '周')
+    val = val.replace('weeks', '周')
     return val.replace("year", "年")
 
 

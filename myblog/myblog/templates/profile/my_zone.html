@@ -11,7 +11,7 @@
 <div class="main-container">
     <div class="basic-personal-info">
         <div class="profile-image">
-            <img class="profile-picture" src="{%static 'upload/profile/harden.jpg'%}" 
+            <img class="profile-picture" src="{%url 'profile_image'%}" 
             style="width: 200px;
             height: 200px;
             margin: 0 auto;  
@@ -69,7 +69,15 @@
             <div class="personal-info-item">用户ID: {{user.pk}}</div>
             <div class="personal-info-item">用户名: {{user.username}}</div>
             <div class="personal-info-item">昵称: {{user.user.nickname}}</div>
-            <div class="personal-info-item">性别: {{user.user.gender}}</div>
+            <div class="personal-info-item">性别: 
+            {% if user.user.gender == 0 %}
+                男
+            {% elif user.user.gender == 1 %}
+                女
+            {% else %}
+                保密
+            {% endif %}
+            </div>
         </div>
         <fieldset class="layui-elem-field layui-field-title education-info">
                 <legend>教育背景</legend>
@@ -92,11 +100,16 @@
                     </form>
                 </div>
             </div>
+            <div>
+                <button id="change-password-btn" type="button" class="layui-btn layui-btn-primary">修改登录密码</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    var csrf = $('input[name="csrfmiddlewaretoken"]').val();
+
     //Demo
     layui.use('form', function(){
         var form = layui.form;
@@ -123,12 +136,34 @@
     function EventListener() {
         this.init = function() {
             {% comment %} this.updatePreference(); {% endcomment %}
+            this.changePassword();
         };
         this.editBasicInfo = function() {
+        }
+
+        this.changePassword = function() {
+            $("#change-password-btn").click(function() {
+                layer.open({
+                    "title": "提示",
+                    "content": "我们将向您的邮箱 placeholder 发送修改密码的链接，您可以进入链接修改密码。确定要继续吗？".replace("placeholder", "{{user.email|safe}}"),
+                    "yes": function() {
+                        $.post({
+                            url: "{%url 'reset_password'%}",
+                            headers: {
+                            'X-CSRFToken': csrf
+                            },
+                            data: {"email": "{{user.email}}"},
+                            success: function() {
+                                layer.msg("邮件已发送成功！请注意查收")
+                            }
+                        })
+                    }
+                })
+            })
         }
     }
 
     listener = new EventListener();
-    {% comment %} listener.init(); {% endcomment %}
+    listener.init();
 </script>
 {%endblock%}

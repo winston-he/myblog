@@ -118,6 +118,22 @@ body {
     border: none
 }
 
+#edit-post-btn {
+    background: transparent;
+    border: none
+}
+
+#report-post {
+    background: transparent;
+    border: none;
+}
+
+.report-comment-btn {
+    border: none;
+    color: transparent;
+    float: left;
+}
+
 #post-comment-btn {
     background: transparent;
     border: none;
@@ -231,4 +247,69 @@ body {
 
 #post-content .emoji {
     box-shadow: none;
+}
+
+.my-comments {
+    float: left;
+    margin: 20px;
+    width: 30%
+}
+
+.my-comment-item {
+    background: #ffffff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.my-comment-item .delete-btn {
+    float: right;
+    border: none;
+    background: none;
+}
+
+.my-comment-item .comment-to {
+    margin-top: 20px;
+}
+
+#comment-page-section {
+    text-align: center;
+}
+
+.my-subscribe-item {
+    background: #ffffff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.my-subscribe-item .delete-btn {
+    float: right;
+    border: none;
+    background: none;
+}
+
+
+#subscribe-page-section {
+    text-align: center;
+}
+
+.my-subscribes {
+    float: left;
+    margin: 20px;
+    width: 30%
+}
+
+#post-operation-buttons {
+    text-align: right;
+}
+
+.post-status-text {
+    font-family:'LiDeBiao-Xing32384eb894f2276d';
+    font-family:'LiDeBiao-Xing32384f774462276d';
+    font-family:'LiDeBiao-Xing32384f5841f2276d';
+    font-family:'LiDeBiao-Xing32384f6c6b12276d';
+    float: right;
+}
+
+.violation-options {
+    
 }

@@ -20,6 +20,7 @@ class UserPreference(models.Model):
     education_access = models.BooleanField(default=False)
     employment_access = models.BooleanField(default=False)
 
+
 class UserProfile(models.Model):
     '''用户信息'''
 
@@ -32,13 +33,12 @@ class UserProfile(models.Model):
         (1, '女'),
         (2, '保密')
     )
-
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user', null=True)
     nickname = models.CharField(max_length=50, null=True)
     gender = models.IntegerField(choices=gender_choices, default=2)
     introduction = models.CharField(max_length=300, null=True)
     profile_image = models.ImageField(upload_to='profile/%Y/%m', null=True)
-    location = models.CharField(max_length=100, null=True)
+    location = models.CharField(max_length=300, null=True)
     subscribe_to = models.ManyToManyField(User, related_name="subscribe_to")
 
     def save(self, force_insert=False, force_update=False, using=None,

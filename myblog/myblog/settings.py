@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-# import djcelery
+import djcelery
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,9 +26,9 @@ EMAIL_HOST_USER = 'winstonhwz@163.com'
 EMAIL_FROM = 'myblog<winstonhwz@163.com>'
 DEFAULT_FROM_EMAIL = 'winstonhwz@163.com'
 
-# djcelery.setup_loader()
+djcelery.setup_loader()
 
-BROKER_URL = 'amqp://localhost:5672/'
+BROKER_URL = 'amqp://123.57.201.57:5672/'
 CELERY_IMPORTS = ('myblog.mail.views', )
 
 
@@ -42,7 +42,7 @@ SECRET_KEY = '(jb+3$2eou!atmyen56l*6c4w@^*5wxn)xyyjw)4$0o#^y6b+c'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '192.168.1.3']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '192.168.31.150']
 
 # Application definition
 
@@ -56,9 +56,9 @@ INSTALLED_APPS = [
     'user',
     'blog',
     'widget_tweaks',
-    'access_log'
+    'access_log',
     # 'channels',
-    # 'chat',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -103,10 +103,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'myblog',
-        'HOST': 'localhost',
+        'HOST': '123.57.201.57',
         'PORT': '3306',
-        'USER': 'root',
-        'PASSWORD': 'hwzhen123'
+        'USER': 'winston',
+        'PASSWORD': 'Hwzhen123.'
     }
 }
 
@@ -158,7 +158,18 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('123.57.201.57', 6379)],
         },
     },
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://:wins1603@123.57.201.57:6379/1",
+        "OPTIONS": {
+            "CONNECTION_POOL_KWARGS": {"decode_responses": True, "max_connections": 100},
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
 }

@@ -9,8 +9,13 @@
     <div class="login-box">
         <div class="layui-tab" lay-filter="login-tab">
             <ul class="layui-tab-title">
-                <li class="layui-this">登录</li>
-                <li>注册</li>
+                {%if action_type != 'register' %}
+                    <li class="layui-this" id="login-tab-title">登录</li>
+                    <li id="register-tab-title">注册</li>
+                {%else%}
+                    <li id="login-tab-title">登录</li>
+                    <li class="layui-this" id="register-tab-title">注册</li>               
+                {%endif%}
             </ul>
             <div class="layui-tab-content">
                 
@@ -33,10 +38,16 @@
                                     <input type="password" name="password" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
                             </div>
                         </div>
+                        <div class="forget-password">
+
+                            <a href="{%url 'reset_password'%}">忘记密码</a>
+                        </div>
                         <div class="login-hint-text">
                             {%if form.errors%}
-                                用户名或密码错误！
+                                <span style="color: #ff0000">{{form.errors}}</span>
                             {% endif %}
+                            <span style="color: #ff0000">{{errors}}</span>
+
                         </div>
                         <div class="verify-section login" style="margin-top:50px; display: none">
                         </div>
@@ -79,8 +90,10 @@
                             </div>
                             <small style="color: #ff0000">{{errors.password2}}</small>
                         </div>
-                        <div class="verify-section register" style="margin-top:50px;">
+                        <div class="verify-section register" style="margin-top:50px; display: none">
                         </div>
+                        
+                        <span style="color: red">{{errors}}</span>
                         <button type="button" class="layui-btn layui-btn-normal" id="signup-confirm-btn">注册</button>
                     </form>
                 </div>
@@ -90,6 +103,10 @@
     <script type="text/javascript" src="{%static 'verify/js/verify.js'%}" ></script>
     <script>
         var validated = false;
+        var layer;
+        layui.use('layer', function(){
+            layer = layui.layer;
+        });
         layui.use('element', function() {
             function refreshVerifySection(className, action) {
                 $(className).slideVerify({
@@ -131,6 +148,7 @@
                     var allFilled = false;
                     for (var i=0; i < $("#login-form input").length; i++) {
                         if ($("#login-form input")[i].value == "") {
+                            console.log("haha");
                             layer.msg("所有字段必须填写！", {
                                 delay: 3000
                             })
@@ -162,11 +180,16 @@
 
         refreshVerifySection(".verify-section.login", "login");
         refreshVerifySection(".verify-section.register", "register");
-        {% comment %} var element = layui.element;
+        var element = layui.element;
+
         element.on('tab(login-tab)', function(data){
-            $(".verify-section").html("");
-            refreshVerifySection();
-        }); {% endcomment %}
+            var action = this.id.split("-")[0];
+            if (action == "register"||action == "login") {
+                $(".verify-section").html("");
+                refreshVerifySection(".verify-section." + action, action);
+            } 
+
+        }); 
     });
 
     </script>

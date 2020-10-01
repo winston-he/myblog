@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}">{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+    <ul class="layui-nav layui-nav-tree" lay-filter="test">
+    {% if app_list %}
+        {% for app in app_list %}
+            <li class="layui-nav-item"><a href="{{app.app_url}}">{{app.name}}</a></li>
+        {% endfor %}
+    {% endif %}
+    </ul>
+    <div id="main-content">
+    </div>
+{% endblock %}
+

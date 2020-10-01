@@ -30,6 +30,11 @@ urlpatterns = [
     url(r'^comment/(?P<pk>\d+)/dislike/$', views.dislike_comment, name='dislike_comment'),
     url(r'^my_comments/$', views.MyCommentList.as_view(), name='my_comments'),
 
+    url(r'^my_subscribes/$', views.SubscribeListView.as_view(), name='my_subscribes'),
+
     url(r'^personal_stats/$', views.personal_summary, name='personal_stats'),
     url(r'^post/(?P<pk>\d+)/view/$', views.increase_view_count, name='view_count'),
+
+    # 举报违规内容
+    url(r'^report/(?P<type>\d+)/(?P<pk>\d+)/$', views.ReportViolationView.as_view(), name='report_violation'),
 ]

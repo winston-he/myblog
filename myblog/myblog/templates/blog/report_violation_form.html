@@ -1,0 +1,51 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}">
+    <script src="{% static 'layui/layui.js' %}"></script>
+    <style>
+        button {
+            margin: 10px auto;
+            display: block;
+        }
+
+        body {
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+<form class="layui-form" id="report_violation_form"  method="post">
+    <span style="color: red">{{form.errors}}</span>
+    {% csrf_token %}
+    <h3>请选择违规的类型：</h3>
+    <div class="violation-options">
+        {% for index, v in violation_type %}
+        <div class="layui-input-block">
+            <input type="radio" name="violation_type" value={{index}} title={{v}}>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <h3>请填写一些文字说明（140字以内，选填）</h3>
+    <textarea name="comment" maxlength=140 required lay-verify="required" placeholder="填入详细描述，更方便管理员审核~" class="layui-textarea"></textarea>
+    <button type='submit' class="layui-btn layui-btn-danger" name="submit-violation-form-btn">提交</button>
+</form>
+
+<script> 
+layui.use(['form', 'layer', 'jquery'], function(){
+    var form = layui.form;
+    var $ = layui.jquery;
+
+    $("[name='submit-violation-form-btn']").click(function() {
+        var index = parent.layer.getFrameIndex(window.name); 
+        parent.layer.close(index);
+    })
+});
+</script>
+</body>
+</html>

@@ -1,36 +1,90 @@
 {% extends 'blog/blog_base.html' %}
 
 {% block main_content %}
+    {% csrf_token %}
     <div class='my-comments'>
-        <ul id="comment-list">
-        </ul>
+        <div id="comment-list">
+        </div>
         <div id="comment-page-section"></div>
     </div>
-
 <script>
-    generateCommentItem = function() {
 
-    }
+    // 拿到初始信息，comment的条目数和总数 以及第一页的数据
+    var commentCount, commentLimit, firstPageData;
+    var csrf = $('input[name="csrfmiddlewaretoken"]').val();
+    $.get({
+        url: "{%url 'my_comments'%}?page=" + 1,
+        async: false,
+        success: function(res) {
+            commentCount = res.total_comment;
+            commentLimit = res.limit;
+            firstPageData = res.data;
 
-    var laypage = layui.laypage;
-    //执行一个laypage实例
-    laypage.render({
-    elem: document.getElementById('comment-page-section') //注意，这里的 test1 是 ID，不用加 # 号
-    , count: commentCount
-    , limit: commentLimit
-    , first: function(obj, first) {
-        
-    }
-    , jump: function(obj, first) {
-        $.get({
-            url: '{%url "my_comment_list" pk=123%}' + '?page=' + obj.curr,
-            success: function(res) {
-            var text = "";
-            var data = res.data;
-            $(".comment-list").html(text);
+            if (commentCount == 0) {
+                $("#comment-list").append("您还没有发表过任何评论哦~");
+                $("#comment-page-section").css("display", "none");
             }
-        })
+
+            if (commentCount <= commentLimit) {
+                $("#comment-page-section").css("display", "none");
+            }
+        }
+    })
+    
+    generateCommentItem = function(commentInfo) {
+        var str = "";
+        str += '<div class="my-comment-item" id="my-comment-item-COMMENT_ID_PLACEHOLDER">'.replace("COMMENT_ID_PLACEHOLDER", commentInfo.pk);
+        str += "<button data-href=\"{%url 'comment_remove' pk=123%}\" class=delete-btn>删除</button>".replace("123", commentInfo.pk);
+        str += "<div class=\"comment-to\">DATE_PLACEHOLDER 在 <a href=\"{%url 'post_detail' pk=123%}\">\"POST_TITLE_PLACEHOLDER\"</a>中评论道：</div>".replace("123", commentInfo.post_pk).replace("DATE_PLACEHOLDER", commentInfo.create_time).replace("POST_TITLE_PLACEHOLDER", commentInfo.post);
+        str += '<div class="my-comment-content">COMMENT_CONTENT_PLACEHOLDER (赞：COMMENT_LIKES_PLACEHOLDER | 踩：COMMENT_DISLIKES_PLACEHOLDER)</div>'.replace("COMMENT_CONTENT_PLACEHOLDER", commentInfo.content).replace("COMMENT_LIKES_PLACEHOLDER", commentInfo.likes).replace("COMMENT_DISLIKES_PLACEHOLDER", commentInfo.dislikes);
+        str += '</div>';
+        return str;
     }
-    });
+
+    if (commentCount > 0)
+        layui.use(['laypage', 'layer'], function() {
+            var laypage = layui.laypage;
+            var layer = layui.layer;
+            //执行一个laypage实例
+            laypage.render({
+            elem: document.getElementById('comment-page-section') //注意，这里的 test1 是 ID，不用加 # 号
+            , count: commentCount
+            , limit: commentLimit
+
+            , jump: function(obj, first) {
+                $("#comment-list").html("");
+                $.get({
+                    url: '{%url "my_comments"%}' + '?page=' + obj.curr,
+                    success: function(res) {
+                        var comment_list = res.data;
+                        for (var i=0; i < comment_list.length; i++) {
+                            var str = generateCommentItem(comment_list[i]);
+                            $("#comment-list").append(str);
+                        }
+                        $(".my-comment-item .delete-btn").click(function() {
+                            console.log("clicked");
+                            var url = $(this).data("href");
+                            var clickedBtn = $(this);
+                            $.post({
+                                url: url,
+                                headers: {
+                                    'X-CSRFToken': csrf
+                                },
+                                success: function() {
+                                    var parent = clickedBtn.parent();
+                                    parent.remove();
+                                    layer.msg("评论已删除");
+                                }
+                            })
+
+                        })
+                    }
+                })
+            }
+            });
+        })
+
+
+
 </script>
 {% endblock main_content %}

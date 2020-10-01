@@ -16,3 +16,4 @@ Pillow==7.2.0
 marshmallow==3.7.1
 django-widget-tweaks==1.4.8
 Markdown==3.2.2
+django-redis==4.7.0

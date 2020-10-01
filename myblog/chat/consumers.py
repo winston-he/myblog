@@ -14,17 +14,24 @@ from channels.db import database_sync_to_async
 class ChatConsumer(AsyncWebsocketConsumer):
     channel_layer_alias = 'echo_alias'
 
-    async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'chat_%s' % self.room_name
+    # async def connect(self):
+    #     self.room_name = self.scope['url_route']['kwargs']['room_name']
+    #     self.room_group_name = 'chat_%s' % self.room_name
+    #
+    #     # Join room group
+    #     await self.channel_layer.group_add(
+    #         self.room_group_name,
+    #         self.channel_name
+    #     )
+    #
+    #     await self.accept()
 
-        # Join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-
-        await self.accept()
+    async def websocket_connect(self, message):
+        print("connected", message)
+        await self.send({
+            "type": "websocket.send",
+            "text": "Hello World"
+        })
 
     async def disconnect(self, close_code):
         # Leave room group

@@ -20,6 +20,10 @@ from django.contrib.auth import views
 
 from myblog.home import home
 
+admin.site.site_header = 'Super Blog admin'
+
+
+
 urlpatterns = [
     url('^admin/', admin.site.urls),
     url(r'', include('blog.urls'), name='blog'),

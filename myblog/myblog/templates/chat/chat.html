@@ -2,12 +2,161 @@
 {% load static %}
 {% block load_jquery %}
 {% endblock load_jquery %}
+
+{% block ref %}
+<script  src="{% static 'webim/websdk3.1.4.js' %}"></script>
+{% endblock ref %}
+
 {% block content %}
 <script src="{% static 'socketio/socket.io.js' %}"></script>
+
 {% csrf_token %}
 <script>
-    layui.use('layim', function(layim){
-        var $ = layui.jquery;
+
+layui.use('layim', function(layim){
+
+    let $ = layui.jquery;
+
+    // 获取一些必要的信息
+    var token, orgName, appName, host, appKey;
+    $.get({
+        url: "{%url 'webim_info'%}",
+        async: false,
+        success: function(res) {
+            token = res.token;
+            orgName = res.org_name;
+            appName = res.app_name;
+            host = res.host;
+            appKey = res.app_key;
+        } 
+    })
+
+    function getUrl(){
+        var apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
+        var socketUrl = '//im-api-v2.easemob.com/ws'
+        if(window.location.href.indexOf('webim-h5.easemob.com') !== -1 ){
+            apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
+            socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
+        }
+        else if(window.location.href.indexOf('webim-hsb-ly.easemob.com') !== -1){
+            apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
+            socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
+        }
+        else if(window.location.href.indexOf('localhost') !== -1){
+            apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
+            socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
+        }
+        return {
+            apiUrl: apiUrl,
+            socketUrl: socketUrl,
+            sandBoxApiUrl: 'https://a1-hsb.easemob.com',
+            sandboxSocketUrl: 'https://im-api-v2-hsb.easemob.com/ws'
+        }
+    }
+
+    var config = {
+        socketServer: getUrl().socketUrl, //(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
+        restServer: getUrl().apiUrl, //(window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
+        appkey: appKey,
+        Host: 'easemob.com',
+        https: true,
+        isHttpDNS: false,
+        isMultiLoginSessions: true,
+        isSandBox: false,
+        isDebug: false,
+        autoReconnectNumMax: 5,
+        isWebRTC: window.RTCPeerConnection && /^https\:$/.test(window.location.protocol),
+        useOwnUploadFun: false,
+        i18n: 'cn',
+        isAutoLogin: false,
+        p2pMessageCacheSize: 500,
+        delivery: false,
+        groupMessageCacheSize: 200,
+        loglevel: 'ERROR',
+        enableLocalStorage: true
+    }
+    let conn = {};
+    WebIM.config = config;
+    conn = WebIM.conn = new WebIM.connection({
+        appKey: WebIM.config.appkey,
+        isHttpDNS: WebIM.config.isHttpDNS,
+        isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
+        https: WebIM.config.https,
+        url: WebIM.config.socketServer,
+        apiUrl: WebIM.config.restServer,
+        isAutoLogin: WebIM.config.isAutoLogin,
+        heartBeatWait: WebIM.config.heartBeatWait,
+        autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
+        autoReconnectInterval: WebIM.config.autoReconnectInterval,
+        delivery: WebIM.config.delivery,
+        useOwnUploadFun: WebIM.config.useOwnUploadFun
+    })
+
+
+    function receiveMsg() {
+        console.log("我收到一条消息啦");
+    }
+
+    conn.listen({
+        onOpened: function ( message ) {
+            console.log("成功，准备监听新的消息");
+        },         //连接成功回调 
+        onClosed: function ( message ) {},         //连接关闭回调
+        onTextMessage: function(msg) {
+            console.log("收到一條消息", msg);
+            layim.getMessage({
+            username: msg.from //消息来源用户名
+            ,avatar: "http://tp1.sinaimg.cn/1571889140/180/40030060651/1" //消息来源用户头像
+            ,id: msg.from //消息的来源ID（如果是私聊，则是用户id，如果是群聊，则是群组id）
+            ,type: "friend" //聊天窗口来源类型，从发送消息传递的to里面获取
+            ,content: msg.data //消息内容
+            ,cid: msg.id //消息id，可不传。除非你要对消息进行一些操作（如撤回）
+            ,mine: false //是否我发送的消息，如果为true，则会显示在右方
+            ,fromid: msg.from //消息的发送者id（比如群组中的某个消息发送者），可用于自动解决浏览器多窗口时的一些问题
+            ,timestamp: Number(msg.time) //服务端时间戳毫秒数。注意：如果你返回的是标准的 unix 时间戳，记得要 *1000
+            });
+        },    //收到文本消息
+        onEmojiMessage: receiveMsg,   //收到表情消息
+        onPictureMessage: receiveMsg, //收到图片消息
+        onCmdMessage: receiveMsg,     //收到命令消息
+        onAudioMessage: receiveMsg,   //收到音频消息
+        onLocationMessage: receiveMsg,//收到位置消息
+        onFileMessage: receiveMsg,    //收到文件消息
+        onVideoMessage: function (message) {
+            var node = document.getElementById('privateVideo');
+            var option = {
+                url: message.url,
+                headers: {
+                'Accept': 'audio/mp4'
+                },
+                onFileDownloadComplete: function (response) {
+                    var objectURL = WebIM.utils.parseDownloadResponse.call(conn, response);
+                    node.src = objectURL;
+                },
+                onFileDownloadError: function () {
+                    console.log('File down load error.')
+                }
+            };
+            WebIM.utils.download.call(conn, option);
+        },   //收到视频消息
+        onPresence: function ( message ) {},       //处理“广播”或“发布-订阅”消息，如联系人订阅请求、处理群组、聊天室被踢解散等消息
+        onRoster: function ( message ) {},         //处理好友申请
+        onInviteMessage: function ( message ) {},  //处理群组邀请
+        onOnline: function () {},                  //本机网络连接成功
+        onOffline: function () {},                 //本机网络掉线
+        onError: function ( message ) {},          //失败回调
+        onBlacklistUpdate: function (list) {       //黑名单变动
+            // 查询黑名单，将好友拉黑，将好友从黑名单移除都会回调这个函数，list则是黑名单现有的所有好友信息
+            console.log(list);
+        },
+        onRecallMessage: function(message){},      //收到撤回消息回调
+        onReceivedMessage: function(message){},    //收到消息送达服务器回执
+        onDeliveredMessage: function(message){},   //收到消息送达客户端回执
+        onReadMessage: function(message){},        //收到消息已读回执
+        onCreateGroup: function(message){},        //创建群组成功回执（需调用createGroupNew）
+        onMutedMessage: function(message){}        //如果用户在A群组被禁言，在A群发消息会走这个回调并且消息不会传递给群其它成员
+    });
+
         var csrf = $('input[name="csrfmiddlewaretoken"]').val();
         var socket = io('ws://' + window.location.host + '/ws/chat/', {
             transportOptions: {
@@ -18,10 +167,35 @@
                 }
             }
         });
-        socket.on('connect', function() {
-            console.log("I'm connected");
-        })
 
+
+        // 使用token登录
+        var options = {
+            apiUrl: WebIM.config.restServer,
+            username: '{{user.username}}',
+            password: '123',
+            user: '{{user.username}}',
+            pwd: '123',
+            appKey: WebIM.config.appkey,
+            success: function(msg) {
+                console.log("登录成功，用户名：{{user.username}}");
+            },
+            error: function(msg) {
+                console.log("登录失败了，用户名：{{user.username}}", msg);
+            },
+        };
+        conn.open(options);
+        console.log("执行到这里啦");
+
+        // 获取好友
+        var friends;
+        $.get({
+            url: "{%url 'chat_record_list'%}",
+            async: false,
+            success: function(res) {
+                friends = res.friends;
+            }
+        })
         layim.config({
             init: {
                 "mine": {
@@ -31,96 +205,44 @@
                 ,"sign": '{%if user.chat_info.signature%}{{user.chat_info.signature}}{%else%}没有签名哦~{%endif%}' //我的签名
                 ,"avatar": "a.jpg" //我的头像
                 },
-                "friend": [{
-                    "groupname": "知名人物"
-                    ,"id": 0
-                    ,"list": [{
-                        "username": "贤心"
-                        ,"id": "100001"
-                        ,"avatar": "//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg"
-                        ,"sign": "这些都是测试数据，实际使用请严格按照该格式返回"
-                        ,"status": "online"
-                    },{
-                        "username": "刘小涛"
-                        ,"id": "100001222"
-                        ,"sign": "如约而至，不负姊妹欢乐颂"
-                        ,"avatar": "//tva4.sinaimg.cn/crop.0.1.1125.1125.180/475bb144jw8f9nwebnuhkj20v90vbwh9.jpg"
-                    },{
-                        "username": "谢小楠"
-                        ,"id": "10034001"
-                        ,"avatar": "//tva2.sinaimg.cn/crop.1.0.747.747.180/633f068fjw8f9h040n951j20ku0kr74t.jpg"
-                        ,"sign": ""
-                    },{
-                        "username": "马小云"
-                        ,"id": "168168"
-                        ,"avatar": "//tva1.sinaimg.cn/crop.0.0.180.180.180/7fde8b93jw1e8qgp5bmzyj2050050aa8.jpg"
-                        ,"sign": "让天下没有难写的代码"
-                    },{
-                        "username": "徐小峥"
-                        ,"id": "666666"
-                        ,"avatar": "//tva1.sinaimg.cn/crop.0.0.512.512.180/6a4acad5jw8eqi6yaholjj20e80e8t9f.jpg"
-                        ,"sign": "代码在囧途，也要写到底"
-                    }]
-                    },{
-                    "groupname": "网红声优"
-                    ,"id": 1
-                    ,"list": [{
-                        "username": "罗小凤"
-                        ,"id": "121286"
-                        ,"avatar": "//tva4.sinaimg.cn/crop.0.0.640.640.180/4a02849cjw8fc8vn18vktj20hs0hs75v.jpg"
-                        ,"sign": "在自己实力不济的时候，不要去相信什么媒体和记者。他们不是善良的人，有时候候他们的采访对当事人而言就是陷阱"
-                    },{
-                        "username": "Z_子晴"
-                        ,"id": "108101"
-                        ,"avatar": "//tva1.sinaimg.cn/crop.0.23.1242.1242.180/8693225ajw8fbimjimpjwj20yi0zs77l.jpg"
-                        ,"sign": "微电商达人"
-                    },{
-                        "username": "大鱼_MsYuyu"
-                        ,"id": "12123454"
-                        ,"avatar": "//tva2.sinaimg.cn/crop.0.0.512.512.180/005LMAegjw8f2bp9qg4mrj30e80e8dg5.jpg"
-                        ,"sign": "我瘋了！這也太準了吧  超級笑點低"
-                    },{
-                        "username": "醋醋cucu"
-                        ,"id": "102101"
-                        ,"avatar": "//tva2.sinaimg.cn/crop.0.0.640.640.180/648fbe5ejw8ethmg0u9egj20hs0ht0tn.jpg"
-                        ,"sign": ""
-                    },{
-                        "username": "柏雪近在它香"
-                        ,"id": "3435343"
-                        ,"avatar": "//tva2.sinaimg.cn/crop.0.8.751.751.180/961a9be5jw8fczq7q98i7j20kv0lcwfn.jpg"
-                        ,"sign": ""
-                    }]
-                    },{
-                    "groupname": "女神艺人"
-                    ,"id": 2
-                    ,"list": [{
-                        "username": "王小贤"
-                        ,"id": "76543"
-                        ,"avatar": "//tvax3.sinaimg.cn/crop.0.0.996.996.180/006Ftl1oly8g8ckqshrgjj30ro0rojst.jpg?KID=imgbed,tva&Expires=1576236580&ssig=6IEtTJL5so"
-                        ,"sign": "我爱贤心"
-                    },{
-                        "username": "佟小娅"
-                        ,"id": "4803920"
-                        ,"avatar": "//tva3.sinaimg.cn/crop.0.0.750.750.180/5033b6dbjw8etqysyifpkj20ku0kuwfw.jpg"
-                        ,"sign": "我也爱贤心吖吖啊"
-                    }]
-                    }]
-                    ,
+                "friend": friends,
                 "group": []
             },
             brief: false, //是否简约模式（如果true则不显示主面板）
             isgroup: false
         }).chat({
-            name: '客服姐姐'
+            name: '{{target_user.username}}'
             ,type: 'friend'
             ,avatar: 'http://tp1.sinaimg.cn/5619439268/180/40030060651/1'
-            ,id: -2
+            ,id: '{{target_user.pk}}'
         });
 
-        // 发送消息
-        layim.on('sendMessage', function(res) {
-            socket.send(JSON.stringify(res))
+
+
+        // 监听发送消息的事件
+        layim.on('sendMessage', function(msg) {
+            var id = conn.getUniqueId();
+            var deliverMessage = new WebIM.message('txt', id);
+            deliverMessage.set({
+                msg: msg.mine.content,
+                from: '{{user.username}}',
+                to: msg.to.username,
+                roomType: false,
+                success: function() {
+                    console.log("从我这里发出了一条消息");
+                },
+                fail: function(e) {
+                    console.log("发送消息失败");
+                }
+            });
+            console.log(deliverMessage);
+            deliverMessage.body.chatType = 'singleChat';
+            conn.send(deliverMessage.body);
+            console.log("消息发出去了！");
         })
+
+        // 收到消息
+        
 
         // 修改签名
         layim.on('sign', function(value) {

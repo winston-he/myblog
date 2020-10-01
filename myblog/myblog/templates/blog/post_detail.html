@@ -75,26 +75,13 @@
                 />
                 <div class="view-post-count">{{post.viewed_count}}</div>
             </div>
+            <div class="post-stats-item report-blog">
+                <button id="report-post">
+                  <img src="{%static 'img/icons/report.svg'%}" type="image/svg+xml" height="20" width="20">
+                </img>
+                </button>
+            </div>
         </div>
-        <div class="post-operation-btn-group">
-          {%ifequal user post.author%}
-          <a href="{%url 'post_update' pk=post.pk%}" role="button" class="post-operation-btn"
-              ><img
-                  src="{%static 'img/icons/edit.png'%}"
-                  width="20"
-                  height="20"
-                  alt=""
-          /></a>
-          <button type="button" class="post-operation-btn" id="delete-post-btn">
-              <img
-                  src="{%static 'img/icons/trash_bin.png'%}"
-                  width="20"
-                  height="20"
-                  alt=""
-              />
-          </button>
-          {%endifequal%}
-      </div>
     </div>
 </div>
 <div class="post-left-section">
@@ -102,7 +89,7 @@
     <div class="profile-image">
         <img
             class="profile-picture"
-            src="{%static 'upload/profile/harden.jpg'%}"
+            src="{%url 'profile_image'%}"
             style="
                 width: 200px;
                 height: 200px;
@@ -136,11 +123,11 @@
           >  
           {% endif %}
 
-          <button
-              href=""
+          <a
+              href="{%url 'chat'%}?target=true&talk_to={{post.author.username}}"
               class="layui-btn layui-btn-primary"
               id="pm-btn"
-              >私信</button
+              >私信</a
           >
       </div>
     {%endif%}
@@ -158,6 +145,14 @@
 
 
 <div class="container" id="blog-detail-comment-area">
+    
+    <div id="post-operation-buttons">
+      {% if post.author == user %}
+        <button id="delete-post-btn">删除</button>
+        <button id="edit-post-btn">编辑</button>    
+      {% endif %}
+    </div>
+
     <div class="blog-detail-area">
         <div class="post-content editormd-preview-theme-dark" id="post-content">
             <!-- Server-side output Markdown text -->
@@ -207,6 +202,7 @@
         var text = "";
         text += "<div class=\"comment-item\" id=\"comment-item_PK_PLACEHOLDER\">".replace("PK_PLACEHOLDER", data.pk);
         text += "  <div class=\"card-header comment-header\">";
+        text += "<button class=\"report-comment-btn\">举报</button>"
         text += "    <div class=\"d-flex w-100 justify-content-between\">";
         text += data.author;
         text += "    </div>";
@@ -243,6 +239,7 @@
         // itemCount: 显示的条目数量
         this.popularPostList();
         this.latestPostList();
+        
       };
 
       this.popularPostList = function() {
@@ -275,15 +272,14 @@
     
     function EventListener() {
       this.init = function() {
+        this.reportPost();
         this.likePost();
         this.markPost();
+        this.editPost();
         this.makeComment();
         this.deletePost();
         this.subscribe();
         this.goToChat();
-        {% comment %} this.likeComment();
-        this.dislikeComment(); {% endcomment %}
-        {% comment %} this.getCommentList(); {% endcomment %}
       }
 
       this.likePost = function() {
@@ -361,6 +357,7 @@
                           that.likeComment();
                           that.dislikeComment();
                           that.deleteComment();
+                          that.reportComment();
                           layer.closeAll();
                         }
                       })
@@ -377,8 +374,8 @@
         })
       };
       this.editPost = function() {
-        $("#like-post-link").click(function() {
-
+        $("#edit-post-btn").click(function() {
+          window.location.href = "{%url 'post_update' pk=123%}".replace("123", '{{post.pk}}');
         })
       };
       this.deletePost = function() {
@@ -477,7 +474,7 @@
               var clickedBtn = $(this);
               layer.prompt(
                 {
-                  title: "发表您的见解",
+                  title: "提示",
                   fixed: false,
                   resize: false,
                   content: "确定要删除这条评论吗？",
@@ -509,6 +506,24 @@
               )
         })
       };
+
+      this.reportComment = function() {
+        $(".report-comment-btn").click(function() {
+          console.log("aaa");
+          var commentId = $(this).parents(".comment-item").prop("id").split("_")[1];
+          index = layer.open({
+            type: 2,
+            title: '违规举报',
+            area: ["600px", "500px"],
+            resize: false,
+            content: "{% url 'report_violation' type=1 pk=123 %}".replace("123", commentId),
+            yes: function() {
+              layer.msg("感谢您的反馈，我们会尽快处理");
+            }
+          });
+        })
+      };
+
       this.getCommentList = function() {
         $.get({
           url: '{%url "comment_list" pk=123%}'.replace('123', '{{post.pk}}'),
@@ -542,19 +557,38 @@
 
         })
       }
-
-      this.goToChat = function() {
-        $("#pm-btn").click(function() {
-          window.location.href = '{%url "chat"%}';
+      this.reportPost = function() {
+        console.log("123");
+        console.log($("#report-post"));
+        $("#report-post").on("click", function() {
+          index = layer.open({
+            type: 2,
+            title: '违规举报',
+            area: ["600px", "500px"],
+            resize: false,
+            content: "{% url 'report_violation' type=0 pk=123 %}".replace("123", '{{post.pk}}'),
+            yes: function() {
+              layer.msg("感谢您的反馈，我们会尽快处理");
+            }
+          });
         })
+      }
+      this.goToChat = function() {
+        {% comment %} $("#pm-btn").click(function() {
+          window.location.href = '{%url "chat"%}';
+        }) {% endcomment %}
       }
     }
 
     var commentCount, commentLimit, firstCommentPageData;
     var listener = new EventListener();
     var ajax_req = new AjaxReq();
-    listener.init();
-    ajax_req.init();
+    
+    $(document).ready(function() {
+      listener.init();
+      ajax_req.init();
+    })
+
     $.get({
       url: '{%url "comment_list" pk=123%}'.replace("123", '{{post.pk}}'),
       success: function(res) {
@@ -562,7 +596,6 @@
         commentLimit = res.limit;
         firstCommentPageData = res.data;
         var laypage = layui.laypage;
-
         var text = "";
         for (var i=0; i<firstCommentPageData.length; i++) {
           text += generateCommentItem(firstCommentPageData[i]);
@@ -585,6 +618,7 @@
                   listener.likeComment();
                   listener.dislikeComment();
                   listener.deleteComment();
+                  listener.reportComment();
                 }
               })
           }

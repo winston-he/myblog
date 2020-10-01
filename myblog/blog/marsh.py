@@ -12,10 +12,11 @@ from rest_framework.serializers import Serializer
 class BlogPostPreviewSchema(Schema):
     id = fields.Integer()
     author = fields.String()
-    published_time = fields.DateTime(format="%Y/%m/%d %H:%M:%S")
-    create_time = fields.DateTime(format="%Y/%m/%d %H:%M:%S")
+    published_time = fields.DateTime(format="%b %d, %Y")
+    create_time = fields.DateTime(format="%b %d, %Y")
     title = fields.String()
     content = fields.Field()
+    status = fields.Integer()
     liked_count = fields.Integer()
     marked_count = fields.Integer()
     comment_count = fields.Integer()

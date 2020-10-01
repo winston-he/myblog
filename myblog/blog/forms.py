@@ -5,7 +5,7 @@
 # @Time: 2020-03-04 15:42
 # @Email: winston.wz.he@gmail.com
 from django import forms
-from .models import Post, Comment
+from .models import Post, Comment, ViolationReport
 
 
 class PostForm(forms.ModelForm):
@@ -51,6 +51,15 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea', 'rows': 4, 'cols': 80}),
         }
+
+
+class ViolationReportForm(forms.ModelForm):
+
+
+
+    class Meta:
+        model = ViolationReport
+        fields = ['violation_type', 'comment']
 
 
 class UploadFileForm(forms.Form):

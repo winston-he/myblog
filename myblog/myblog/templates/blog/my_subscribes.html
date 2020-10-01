@@ -1,0 +1,86 @@
+{% extends 'blog/blog_base.html' %}
+
+{% block main_content %}
+    {% csrf_token %}
+    <div class='my-subscribes'>
+        <div id="subscribe-list">
+        </div>
+        <div id="subscribe-page-section"></div>
+    </div>
+<script>
+
+    // 拿到初始信息，subscribe的条目数和总数 以及第一页的数据
+    var subscribeCount, subscribeLimit, firstPageData;
+    var csrf = $('input[name="csrfmiddlewaretoken"]').val();
+    $.get({
+        url: "{%url 'my_subscribes'%}?page=" + 1,
+        async: false,
+        success: function(res) {
+            subscribeCount = res.total_subscribes;
+            subscribeLimit = res.limit;
+            firstPageData = res.data;
+            if (subscribeCount == 0) {
+                $("#subscribe-list").append("您还没有关注过任何人~");
+                $("#subscribe-page-section").css("display", "none");
+            }
+
+            if (subscribeCount <= subscribeLimit) {
+                $("#subscribe-page-section").css("display", "none");
+            }
+        }
+    })
+
+    function generateSubscribeItem(subscribeInfo) {
+        var str = "";
+        str += '<div class="my-subscribe-item">';
+        str += "<button data-href=\"{%url 'subscribe' pk=123%}\" class=delete-btn>删除</button>".replace("123", subscribeInfo.pk);
+        str += "<div class='profile'><img src=''></img></div>";
+        str += "<div class='username'>USERNAME_PLACEHOLDER</div>".replace("USERNAME_PLACEHOLDER", subscribeInfo.username);
+        str += "<div class=numbers>关注数：SUBSCRIBED_COUNT_PLACEHOLDER | 博客数：POST_COUNT_PLACEHOLDER </div>".replace("SUBSCRIBED_COUNT_PLACEHOLDER", subscribeInfo.subscribe_count).replace("POST_COUNT_PLACEHOLDER", subscribeInfo.post_count);
+        str += '</div>';
+        return str;
+    }
+
+    if (subscribeCount > 0)
+        layui.use(['laypage', 'layer'], function() {
+            var laypage = layui.laypage;
+            var layer = layui.layer;
+            //执行一个laypage实例
+            laypage.render({
+            elem: document.getElementById('subscribe-page-section') //注意，这里的 test1 是 ID，不用加 # 号
+            , count: subscribeCount
+            , limit: subscribeLimit
+            , jump: function(obj, first) {
+                $("#subscribe-list").html("");
+                $.get({
+                    url: '{%url "my_subscribes"%}' + '?page=' + obj.curr,
+                    success: function(res) {
+                        var subscribe_list = res.data;
+                        for (var i=0; i < subscribe_list.length; i++) {
+                            var str = generateSubscribeItem(subscribe_list[i]);
+                            $("#subscribe-list").append(str);
+                        }
+                        $(".my-subscribe-item .delete-btn").click(function() {
+                            console.log("clicked");
+                            var url = $(this).data("href");
+                            var clickedBtn = $(this);
+                            $.post({
+                                url: url,
+                                headers: {
+                                    'X-CSRFToken': csrf
+                                },
+                                success: function() {
+                                    var parent = clickedBtn.parent();
+                                    parent.remove();
+                                    layer.msg("已取消关注");
+                                }
+                            })
+
+                        })
+                    }
+                })
+            }
+            });
+        })
+</script>
+{% endblock %}
