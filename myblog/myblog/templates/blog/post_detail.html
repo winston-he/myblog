@@ -244,7 +244,7 @@
 
       this.popularPostList = function() {
         $.ajax({
-          url: "{%url 'post_list' page=1%}?published=true&type=popular&author_id=123".replace("123", "{{post.author.pk}}"),
+          url: "{%url 'post_list'%}?published=true&type=popular&author_id=123&page=1".replace("123", "{{post.author.pk}}"),
           success: function(res) {
             var blogList = res.data;
             console.log(res);
@@ -257,7 +257,7 @@
       };
       this.latestPostList = function() {
         $.ajax({
-          url: "{%url 'post_list' page=1%}?published=true&type=popular&author_id=123".replace("123", "{{post.author.pk}}"),
+          url: "{%url 'post_list'%}?published=true&type=popular&author_id=123&page=1".replace("123", "{{post.author.pk}}"),
           success: function(res) {
             var blogList = res.data;
             console.log(res);

@@ -150,7 +150,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'upload')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'post_list'
 LOGOUT_REDIRECT_URL = LOGIN_URL
 
 

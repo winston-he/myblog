@@ -9,7 +9,7 @@ from . import views
 
 urlpatterns = [
     # url(r'^about/$', views.AboutView.as_view(), name='about')
-    url(r'^post_list/(?P<page>\d+)/$', views.PostListView.as_view(), name='post_list'),
+    url(r'^post_list/$', views.PostListView.as_view(), name='post_list'),
     # url(r'^drafts/$', views.MyPostListView.as_view(), name='my_post_list'),
     url(r'^post/marked/$', views.MarkedPostListView.as_view(), name='marked_post_list'),
     url(r'^post/(?P<pk>\d+)/detail/$', views.PostDetailView.as_view(), name='post_detail'),

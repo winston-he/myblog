@@ -28,7 +28,6 @@ class MyLoginView(LoginView):
     success_url = reverse_lazy("post_list")
 
     def dispatch(self, request, *args, **kwargs):
-        print("hello world")
         username = self.request.POST.get('username')
         user = User.objects.filter(username=username).first()
         if user is not None and user.is_active == 0:

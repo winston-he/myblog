@@ -129,7 +129,7 @@
             ,done: function(page, next) { //到达临界点（默认滚动触发），触发下一页
             var lis = [];
             //以jQuery的Ajax请求为例，请求下一页数据（注意：page是从2开始返回）
-            var url = '{%url "post_list" page=1%}?all=true'.replace('1', page+1).replace("true", "{{all}}");
+            var url = '{%url "post_list"%}?all=true&page=1'.replace('1', page+1).replace("true", "{{all}}");
             $.get(url, function(res) {
                 console.log(res);
                 //假设你的列表返回在data集合中

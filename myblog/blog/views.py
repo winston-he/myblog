@@ -46,10 +46,12 @@ class PostListView(ListView):
         return super().render_to_response(context, **response_kwargs)
 
     def get_queryset(self):
-        page = self.kwargs['page']
+        page = self.request.GET.get("page")
         if page is None:
-            return []
-        page = int(page)
+            print("page is None")
+            page = 1
+        else:
+            page = int(page)
 
         all = True if self.request.GET.get("all") is not None and self.request.GET.get("all") == 'true' else False
         author_id = self.request.GET.get("author_id")
