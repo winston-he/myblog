@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>您好，以下是截止{{time}}需要您处理的一些条目</h1>
+    
+
+    <h2>待审核条目：{{blog_to_approve | length}}个</h2> 
+    
+    {% if blog_to_approve|length > 0 %}
+        <h3>以下为您显示前10条</h3>
+        <table>
+            <thead>
+                <th>发布用户</th>
+                <th>发布时间</th>
+                <th>标题</th>
+            </thead>
+        {% for blog in blog_to_approve[0:10] %}
+            <tr>
+                <td>{{blog[0]}}</td>
+                <td>{{blog[1]}}</td>
+                <td>{{blog[2]}}</td>
+            </tr>
+        {% endfor %}
+        </table> 
+    {% endif %}
+
+    <h2>举报的博客：{{violation_items.blogs | length}}个</h2>
+    
+    {% if violation_items.blogs|length > 0 %}
+        <h3>以下为您显示前10条</h3>
+        <table>
+            <thead>
+                <th>博客标题</th>
+                <th>创建时间</th>
+                <th>用户留言</th>
+                <th>创建用户</th>
+            </thead>
+            {% for a in violation_items.blogs[0:10] %}
+                <tr>
+                    <td>{{a[0]}}</td>
+                    <td>{{a[1]}}</td>
+                    <td>{{a[2]}}</td>
+                    <td>{{a[3]}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    <h2>举报的评论：{{violation_items.comments | length}}个</h2>
+    {% if violation_items.comments|length > 0 %}
+        <h3>以下为您显示前10条</h3>
+        <table>
+            <thead>
+                <th>评论内容</th>
+                <th>创建时间</th>
+                <th>用户留言</th>
+                <th>创建用户</th>
+            </thead>
+            {% for b in violation_items.comments[0:10] %}
+                <tr>
+                    <td>{{b[0]}}</td>
+                    <td>{{b[1]}}</td>
+                    <td>{{b[2]}}</td>
+                    <td>{{b[3]}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+</body>
+</html>
