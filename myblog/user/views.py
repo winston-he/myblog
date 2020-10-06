@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, PasswordResetView, PasswordResetConfirmView, LoginView
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse, FileResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -18,7 +18,7 @@ from chat import *
 from chat.models import UserChatInfo
 from mail.views import send_email
 from myblog.settings import EMAIL_FROM
-from .forms import UserRegisterForm, PersonalInfoForm, PasswordResetForm
+from .forms import UserRegisterForm, PersonalInfoForm, PasswordResetForm, LoginAuthenticationForm
 from .models import User, UserProfile, UserPreference
 from .utils import generate_token, load_token
 
@@ -27,13 +27,29 @@ from .utils import generate_token, load_token
 class MyLoginView(LoginView):
     success_url = reverse_lazy("post_list")
 
-    def dispatch(self, request, *args, **kwargs):
-        username = self.request.POST.get('username')
-        user = User.objects.filter(username=username).first()
+    form_class = LoginAuthenticationForm
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     username = self.request.POST.get('username')
+    #     user = User.objects.filter(username=username).first()
+    #
+    #     return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(reverse('home'))
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        user = User.objects.filter(username=form.cleaned_data['username']).first()
+        msg = "账户名或密码错误，请重试"
         if user is not None and user.is_active == 0:
-            return render(self.request, 'registration/login.html',
-                          context={"action_type": "login", "errors": "该用户没有被激活，请前往邮箱进行激活"})
-        return super().dispatch(request, *args, **kwargs)
+            msg = "该用户没有被激活，请前往邮箱进行激活"
+        return render(self.request, 'registration/login.html', context={"action_type": "login", "errors": msg})
 
 
 class MyLogoutView(LogoutView):
@@ -56,13 +72,13 @@ class PasswordReset(PasswordResetView):
         }).decode('utf-8')
         link = "http://{}/{}/{}".format(self.request.META.get('HTTP_HOST'), 'registration/password/reset', token)
         print(link)
-        send_email.delay(subject="Myblog密码重置",
+        send_email.delay(subject="Socialblog密码重置",
                          message='',
                          from_email=EMAIL_FROM,
                          recipient_list=[form.cleaned_data['email'], ],
                          html_message=render_to_string('mail/reset_password.html', context={"username": user.username,
                                                                                             "link": link}),
-                         expires=2)
+                         expires=5)
         return render(self.request, 'registration/password_reset_hint.html')
 
 
@@ -78,9 +94,9 @@ class PasswordResetConfirm(FormView):
         try:
             info = serializer.loads(token)
         except SignatureExpired:
-            return render(self.request, 'generic/message.html', context={"message": "您的链接已过期，请重新获取"})
+            return render(self.request, 'generic/message.html', context={"message": "您的链接已过期，请点击\"忘记密码\"重新获取"})
         except BadSignature:
-            return render(self.request, 'generic/message.html', context={"message": "您的链接可能遭到恶意篡改，请重新获取"})
+            return render(self.request, 'generic/message.html', context={"message": "您的链接异常（可能被篡改），请点击\"忘记密码\"重新获取"})
 
         curr_user = User.objects.get(username=info['username'])
         # 更新密码
@@ -90,7 +106,6 @@ class PasswordResetConfirm(FormView):
         return render(self.request, 'generic/message.html', context={"message": "您的密码已成功修改"})
 
     def form_invalid(self, form):
-        print("hahaha")
         return super().form_invalid(form)
 
 
@@ -147,7 +162,7 @@ def update_preference_setting(request, pk):
     return JsonResponse({"result": 0, "msg": "更新成功"})
 
 
-@webim_token_check
+# @webim_token_check
 def user_register(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
@@ -165,9 +180,7 @@ def user_register(request):
             UserProfile(user=user).save()
             UserPreference(user=user).save()
             # 聊天: 创建一个聊天用户
-            # create_chat_user(form.cleaned_data['username'], form.cleaned_data['password'])
-
-
+            create_chat_user(form.cleaned_data['username'], '123')
             host = request.get_host()
             link = "http://{}/{}/{}".format(host, 'registration/activate',
                                             generate_token({"username":
@@ -178,19 +191,22 @@ def user_register(request):
                              message='',
                              from_email=EMAIL_FROM,
                              recipient_list=[form.cleaned_data['email'], ],
-                             html_message=render_to_string('generic/message.html',
-                                                           context={"message": "请点击以下链接以激活账号: " + link}),
+                             html_message=render_to_string('mail/activate_account.html',
+                                                           context={"username": form.cleaned_data['username'],
+                                                                    "link": link}),
                              expires=2)
-            return render(request, 'registration/activate.html', context={
-                "username": form.cleaned_data['username'],
-                "email": form.cleaned_data['email']
+            return render(request, 'generic/message.html', context={
+                "message": "账号创建成功！尊敬的用户：{},"
+                           "系统已经向您的邮箱{}发送了验证邮件，"
+                           "请在24小时内点击邮件中的链接完成验证".format(form.cleaned_data['username'],
+                                                                                           form.cleaned_data['email'])
             })
         else:
             errors = form.errors.as_data()
             for key in errors.keys():
                 for e in errors[key]:
                     errors[key] = " ".join(e.messages)
-            return render(request, 'registration/login.html', context={"action_type": "register", "errors": errors})
+            return render(request, 'registration/login.html', context={"action_type": "register", "errors": errors, "form": form})
 
 
 # 关注/取关
@@ -212,10 +228,15 @@ def subscribe(request, pk):
 class ProfileImageView(LoginRequiredMixin, View):
 
     def get(self, request):
-        response = FileResponse(self.request.user.user.profile_image)
+        username = request.GET.get('u')
+        user = User.objects.filter(username=username).first()
+        if user is not None:
+            response = FileResponse(user.user.profile_image)
+        else:
+            response = FileResponse(self.request.user.user.profile_image)
         response['Content-Type'] = 'application/octet-stream'
         filename = 'attachment; filename=' + '{}.png'.format('xxx')
-        # TODO 设置文件名的包含中文编码方式
+
         response['Content-Disposition'] = filename.encode('utf-8', 'ISO-8859-1')
         return response
 

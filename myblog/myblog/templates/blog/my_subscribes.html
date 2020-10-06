@@ -34,7 +34,7 @@
         var str = "";
         str += '<div class="my-subscribe-item">';
         str += "<button data-href=\"{%url 'subscribe' pk=123%}\" class=delete-btn>删除</button>".replace("123", subscribeInfo.pk);
-        str += "<div class='profile'><img src={%url 'profile_image'%} height=60px width=60px></img></div>";
+        str += "<div class='profile'><img src={%url 'profile_image'%}?u=" + subscribeInfo.username + " height=60px width=60px></img></div>";
         str += "<div class='username'>USERNAME_PLACEHOLDER</div>".replace("USERNAME_PLACEHOLDER", subscribeInfo.username);
         str += "<div class=numbers>关注数：SUBSCRIBED_COUNT_PLACEHOLDER | 博客数：POST_COUNT_PLACEHOLDER </div>".replace("SUBSCRIBED_COUNT_PLACEHOLDER", subscribeInfo.subscribe_count).replace("POST_COUNT_PLACEHOLDER", subscribeInfo.post_count);
         str += '</div>';

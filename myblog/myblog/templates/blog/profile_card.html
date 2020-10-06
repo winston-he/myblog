@@ -1,0 +1,47 @@
+    <div class="author-profile-info">
+        <div class="profile-image">
+            <img
+                class="profile-picture"
+                src="{%url 'profile_image'%}?u={{post.author.username}}"
+                style="
+                    width: 200px;
+                    height: 200px;
+                    margin: 0 auto;
+                    display: block;
+                    border-radius: 50%;
+                "
+            />
+        </div>
+        <div class="basic-personal-info-item nickname">
+            <h1><a href="{%url 'my_zone' pk=post.author.pk%}">{{post.author.username}}</a></h1>
+        </div>
+        <div class="basic-personal-info-item stats">
+            <h3>关注 0 | 获赞 0 | 博客 0</h3>
+        </div>
+        {%if post.author != user%}
+          <div class="author-btns">
+              {% if post.author in user.user.subscribe_to.all %}
+               <button
+                  href=""
+                  class="layui-btn layui-btn-normal"
+                  id="subscribe-btn"
+                  >取关</button
+              >
+              {%else%}
+               <button
+                  href=""
+                  class="layui-btn layui-btn-normal"
+                  id="subscribe-btn"
+                  >+关注</button
+              >
+              {% endif %}
+
+              <a
+                  href="{%url 'chat'%}?target=true&talk_to={{post.author.username}}"
+                  class="layui-btn layui-btn-primary"
+                  id="pm-btn"
+                  >私信</a
+              >
+          </div>
+        {%endif%}
+  </div> 

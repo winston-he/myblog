@@ -6,7 +6,8 @@ body {
     width: fit-content;
     height: auto;
     margin: 200px auto;
-    background: #ffffff
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(149,157,165,.2)!important;
 }
 
 .layui-form-item {

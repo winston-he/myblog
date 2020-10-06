@@ -18,12 +18,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'myblog', 'templates')
 GENERAL_TEMPLATES_DIR = os.path.join(BASE_DIR, 'general_templates')
 
-EMAIL_HOST_PASSWORD = 'FAGMKMUDKYUBEYQP'
+EMAIL_HOST_PASSWORD = 'XMBIMECXJDUCJAOK'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'winstonhwz@163.com'
-EMAIL_FROM = 'myblog<winstonhwz@163.com>'
+EMAIL_FROM = 'Socialblog'
 DEFAULT_FROM_EMAIL = 'winstonhwz@163.com'
 
 djcelery.setup_loader()
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'access_log',
     # 'channels',
     'chat',
+    'intro'
 ]
 
 MIDDLEWARE = [
@@ -173,3 +174,4 @@ CACHES = {
         }
     }
 }
+

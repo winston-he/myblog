@@ -29,5 +29,6 @@ urlpatterns = [
     url(r'', include('blog.urls'), name='blog'),
     url(r'', include('user.urls'), name='registration'),
     url(r'', include('chat.urls'), name='chat'),
+    url(r'', include('intro.urls'), name='intro'),
     url(r'', home, name='home'),
 ]

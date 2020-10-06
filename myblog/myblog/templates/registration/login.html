@@ -29,7 +29,7 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">用户名或邮箱</label>
                             <div class="layui-input-block">
-                                <input type="text" name="username" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                                <input type="text" name="username" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value={{form.data.username}}>
                             </div>
                         </div>
                             <div class="layui-tab-item layui-show">
@@ -64,7 +64,7 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">用户名</label>
                             <div class="layui-input-block">
-                                <input type="text" name="username" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                                <input type="text" name="username" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input", value={{form.data.username}}>
                             </div>
                             
                             <small style="color: #ff0000">{{errors.username}}</small>
@@ -72,7 +72,7 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">邮箱</label>
                             <div class="layui-input-block">
-                                <input type="text" name="email" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                                <input type="text" name="email" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value={{form.data.email}}>
                             </div>
                             <small style="color: #ff0000">{{errors.email}}</small>
                         </div>
@@ -100,14 +100,19 @@
             </div>
         </div>
     </div>
+    <div class="site-introduction">
+    </div>
     <script type="text/javascript" src="{%static 'verify/js/verify.js'%}" ></script>
     <script>
+
         var validated = false;
         var layer;
+
         layui.use('layer', function(){
             layer = layui.layer;
         });
         layui.use('element', function() {
+
             function refreshVerifySection(className, action) {
                 $(className).slideVerify({
                     type : 2,		//类型
@@ -134,14 +139,52 @@
                         if (action == "login") {
                             $("#login-form").submit();
                         }
-                        else
+                        else if (action == "register") {
                             $("#register-form").submit();
+                        }
+                            
                     },
                     error : function() {
                     }
                     
                 });
             }
+
+            // site introduction
+            $.get({
+                url: {% url 'introduction' %},
+                success: function(res) {
+                    $(".site-introduction").html(res);
+                    $("#signup-confirm-btn-2").click(function() {
+                        if (!validated) {
+                            var allFilled = false;
+                            console.log($("#register-form-2 input"));
+                            for (var i=0; i < $("#register-form-2 input").length; i++) {
+                                if ($("#register-form-2 input")[i].value == "") {
+                                    layer.msg("所有字段必须填写！", {
+                                        delay: 3000
+                                    })
+                                    break;
+                                }
+                                if (i == $("#register-form-2 input").length-1) allFilled = true;
+                            }
+                            if (allFilled) {
+                                console.log("filled");
+                                $(".verify-section.register-2").css("display", "block");
+                                $("#register-form-2").append('{% csrf_token %}');
+                                $("#register-form-2").submit();
+                            }
+                            else {
+                                console.log("not filled");
+                            }
+                                
+                        }
+                            {% comment %} refreshVerifySection(".verify-section.register-2", "register-2"); {% endcomment %}
+                        })  
+                    }
+            })
+
+
 
             $("#login-confirm-btn").click(function() {
                 if (!validated) {
@@ -161,35 +204,42 @@
                 }
                     
             })
-            $("#signup-confirm-btn").click(function() {
-                if (!validated) {
-                    var allFilled = false;
-                    for (var i=0; i < $("#register-form input").length; i++) {
-                        if ($("#register-form input")[i].value == "") {
-                            layer.msg("所有字段必须填写！", {
-                                delay: 3000
-                            })
-                            break;
+
+            function signupConfirmBtnInit() {
+                $("#signup-confirm-btn").click(function() {
+                    console.log("This is insane");
+                    if (!validated) {
+                        var allFilled = false;
+                        for (var i=0; i < $("#register-form input").length; i++) {
+                            if ($("#register-form input")[i].value == "") {
+                                layer.msg("所有字段必须填写！", {
+                                    delay: 3000
+                                })
+                                break;
+                            }
+                            if (i == $("#register-form input").length-1) allFilled = true;
                         }
-                        if (i == $("#register-form input").length-1) allFilled = true;
+                        if (allFilled)
+                            $(".verify-section.register").css("display", "block");
+
                     }
-                    if (allFilled)
-                        $(".verify-section.register").css("display", "block");
-                }
-            })
+                })    
+            }
 
-        refreshVerifySection(".verify-section.login", "login");
-        refreshVerifySection(".verify-section.register", "register");
-        var element = layui.element;
+            signupConfirmBtnInit();
+            refreshVerifySection(".verify-section.login", "login");
+            refreshVerifySection(".verify-section.register", "register");
+            
+            var element = layui.element;
 
-        element.on('tab(login-tab)', function(data){
-            var action = this.id.split("-")[0];
-            if (action == "register"||action == "login") {
-                $(".verify-section").html("");
-                refreshVerifySection(".verify-section." + action, action);
-            } 
+            element.on('tab(login-tab)', function(data){
+                var action = this.id.split("-")[0];
+                if (action == "register"||action == "login") {
+                    $(".verify-section").html("");
+                    refreshVerifySection(".verify-section." + action, action);
+                } 
 
-        }); 
+            }); 
     });
 
     </script>

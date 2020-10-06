@@ -23,11 +23,14 @@ COMMENT_PER_PAGE = 5
 BLOG_PER_PAGE = 5
 
 
+# some signals
+NONAUTHENTICATED = 'nonauthenticated'
+
 class PostListView(ListView):
     model = Post
 
     def get(self, request, *args, **kwargs):
-        if self.get_queryset() == 'nonauthenticated':
+        if self.get_queryset() == NONAUTHENTICATED:
             return redirect(reverse("login"))
         if self.request.is_ajax():
             schema = BlogPostPreviewSchema(many=True)
@@ -59,7 +62,7 @@ class PostListView(ListView):
             "published") == 'true' else False
         # 如果查询我的文章但是当前用户未登陆
         if not all and not self.request.user.is_authenticated and not author_id:
-            return "nonauthenticated"
+            return NONAUTHENTICATED
 
         if all and not published:
             published = True
@@ -204,7 +207,7 @@ class CommentListView(ListView):
         if self.request.is_ajax():
             query_set = self.get_queryset()
 
-            if query_set == 'nonauthenticated':
+            if query_set == NONAUTHENTICATED:
                 return redirect(reverse("login"))
             res = []
 

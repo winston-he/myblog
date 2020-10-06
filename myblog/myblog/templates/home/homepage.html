@@ -1,5 +1,167 @@
-{%extends "base/base.html"%}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/post.css' %}">
+<link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'css/personal_info.css' %}"> -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<link rel="stylesheet" href="{%static 'editor/css/editormd.css'%}" />
+<script src="{%static 'editor/editormd.min.js'%}"></script>
+<link rel="stylesheet" href="{% static 'layui/css/layui.css' %}">
+<script src="{% static 'layui/layui.js' %}"></script>
 
-{% block content %}
-<h1>Hello World</h1>
-{% endblock content %}
+<div class="d1">
+    <div class="d1-1">
+        <p class="text t1">发表文章，和人们分享你的思想</p>
+        <p class="text t2">使用Markdown编辑器<a href="https://github.com/pandao/editor.md">Editor.md</a>撰写你的博客</p>
+    </div>
+    <div class="d1-2">
+        <div id="test-editormd">
+            <textarea id="editor-textarea" type="text" style="display:none;" name="content">{%if post.content%}{{post.content}}{%else%}{%endif%}</textarea>
+        </div>
+    </div>
+</div>
+<div class="d2">
+    <div class="d2-1">{% include "blog/profile_card.html" %}</div>
+        
+    <div class="d2-2">
+        <p class="text t1">关注感兴趣的博主，并与他们私信</p>
+    </div>
+</div>
+<div class="d3">
+    <div class="d3-2">
+        <img src="{%static 'img/example/chat_example.PNG'%}" alt="">
+    </div>
+    <div class="d3-1">
+        <p class="text t1">聊天窗口</p>
+    </div>
+</div>
+<div class="d4">
+    <div class="d4-1">
+        <p class="text t1">编辑个人主页，让人们更快认识你</p>
+    </div>
+    <div class="d4-2">
+        <form class="layui-form" method="POST" name="example-form-1">
+            <div style="text-align: right">
+                </div>
+            <label class="layui-form-label">姓</label>
+            <div class="layui-input-block">
+                <input type="text" name="last_name" required lay-verify="required" autocomplete="off" class="layui-input" value={{user.last_name}}>
+            </div>
+            <label class="layui-form-label">名</label>
+            <div class="layui-input-block">
+                <input type="text" name="first_name" required lay-verify="required" autocomplete="off" class="layui-input" value={{user.first_name}}>
+            </div>
+            <label class="layui-form-label">昵称</label>
+            <div class="layui-input-block">
+                <input type="text" name="nickname" required lay-verify="required" autocomplete="off" class="layui-input" value={%if user.user.nickname%}{{user.user.nickname}}{%else%}{%endif%}>
+            </div>
+            <label class="layui-form-label">头像</label>
+            <div class="profile-image">
+                <img src="{%url 'profile_image' %}" alt="" height="120px" width="120px">
+            </div>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" id="upload-profile-btn">
+                    <i class="layui-icon">&#xe67c;</i>上传头像
+                </button>
+            </div>
+            <div class="layui-form-item">
+                    <label class="layui-form-label">本人所在地</label>
+                    <div class="layui-input-inline">
+                      <select name="location1" lay-filter="location1" layui-required lay-search>
+                        <option value="">请选择国家</option>
+                      </select>
+                    </div>
+                    <div class="layui-input-inline">
+                      <select name="location2" lay-filter="location2" layui-required lay-search>
+                        <option value="">请选择省/市</option>
+                      </select><div class="layui-unselect layui-form-select">
+                      <div class="layui-select-title"><input type="text" placeholder="请选择市" value="" readonly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div><dl class="layui-anim layui-anim-upbit" style=""><dd lay-value="" class="layui-select-tips">请选择市</dd><dd lay-value="杭州" class="layui-this">杭州</dd><dd lay-value="宁波" class="layui-disabled">宁波</dd><dd lay-value="温州" class="">温州</dd><dd lay-value="温州" class="">台州</dd><dd lay-value="温州" class="">绍兴</dd></dl></div>
+                    </div>
+                    <div class="layui-input-inline" >
+                      <select name="location3" lay-filter="location3" layui-required lay-search>
+                        <option value="">请选择县/区</option>
+                      </select>
+                      <div class="layui-unselect layui-form-select"><div class="layui-select-title"><input type="text" placeholder="请选择县/区" value="" readonly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div><dl class="layui-anim layui-anim-upbit" style=""><dd lay-value="" class="layui-select-tips layui-this">请选择县/区</dd><dd lay-value="西湖区" class="">西湖区</dd><dd lay-value="余杭区" class="">余杭区</dd><dd lay-value="拱墅区" class="">临安市</dd></dl></div>
+                    </div>
+                  </div>
+            <label class="layui-form-label">个人简介</label>
+            <div class="layui-input-block">
+              <textarea name="introduction" class="layui-textarea">{{user.user.introduction}}</textarea>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="d5">
+    <div class="d5-1">
+        <p class="text t1 t-dark">还没有账号？赶快创建一个吧！</p>
+    </div>
+    <div class="d5-2">
+        <form class="" method="POST" action="{% url 'new_user' %}" id="register-form-2">
+            {{errors}}
+            <div class="layui-inline">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="username" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                    </div>
+                    
+                    <small style="color: #ff0000">{{errors.username}}</small>
+            
+               
+                    <label class="layui-form-label">邮箱</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="email" required  lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                    </div>
+                    <small style="color: #ff0000">{{errors.email}}</small>
+           
+ 
+                    <label class="layui-form-label">密码</label>
+                    <div class="layui-input-inline">
+                            <input type="password" name="password1" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                    </div>
+                    <small style="color: #ff0000">{{errors.password1}}</small>
+            
+ 
+                    <label class="layui-form-label">确认密码</label>
+                    <div class="layui-input-inline">
+                            <input type="password" name="password2" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                    </div>
+                    <small style="color: #ff0000">{{errors.password2}}</small>
+                </div>
+            </div>
+            <span style="color: red">{{errors}}</span>
+            <button type="button" class="layui-btn layui-btn-normal" id="signup-confirm-btn-2">注册</button>
+        </form>
+        <div class="verify-section register-2" style=" display: none">
+        </div>
+    </div>
+</div>
+<script>
+    var testEditor;
+    testEditor = editormd("test-editormd", {
+        width: "80%",
+        height: 800,
+        path: '{% static 'editor/lib/' %}',
+        codeFold: true,
+        saveHTMLToTextarea: true,
+        searchReplace: true,
+        htmlDecode: "style,script,iframe|on*",
+        emoji: true,
+        taskList: true,
+        tocm: true,       
+        tex: true,                   
+        flowChart: true,             
+        sequenceDiagram: true,       
+        imageUpload: true,
+        imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+        onload: function () {
+            console.log('onload', this);
+        },
+        editorTheme: "pastel-on-dark",
+        theme: "dark",
+        previewTheme: "dark"
+    });
+    // var form;
+    // layui.use("form", function() {
+    //     form = layui.form;
+    // })
+</script>
