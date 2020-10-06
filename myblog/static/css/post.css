@@ -130,8 +130,8 @@ body {
 
 .report-comment-btn {
     border: none;
-    color: transparent;
-    float: left;
+    background: transparent;
+    float: right;
 }
 
 #post-comment-btn {

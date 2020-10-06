@@ -32,7 +32,7 @@ urlpatterns = [
 
     url(r'^my_subscribes/$', views.SubscribeListView.as_view(), name='my_subscribes'),
 
-    url(r'^personal_stats/$', views.personal_summary, name='personal_stats'),
+    url(r'^personal_stats/(?P<pk>\d+)/$', views.personal_summary, name='personal_stats'),
     url(r'^post/(?P<pk>\d+)/view/$', views.increase_view_count, name='view_count'),
 
     # 举报违规内容

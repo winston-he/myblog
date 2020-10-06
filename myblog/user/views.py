@@ -29,12 +29,6 @@ class MyLoginView(LoginView):
 
     form_class = LoginAuthenticationForm
 
-    # def dispatch(self, request, *args, **kwargs):
-    #     username = self.request.POST.get('username')
-    #     user = User.objects.filter(username=username).first()
-    #
-    #     return super().dispatch(request, *args, **kwargs)
-
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect(reverse('home'))
@@ -71,7 +65,6 @@ class PasswordReset(PasswordResetView):
 
         }).decode('utf-8')
         link = "http://{}/{}/{}".format(self.request.META.get('HTTP_HOST'), 'registration/password/reset', token)
-        print(link)
         send_email.delay(subject="Socialblog密码重置",
                          message='',
                          from_email=EMAIL_FROM,
@@ -114,6 +107,11 @@ class UpdatePersonalInfoView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = PersonalInfoForm
 
+    def get(self, request, *args, **kwargs):
+        if 'pk' in kwargs and int(kwargs['pk']) == self.request.user.pk:
+            return super().get(request, *args, **kwargs)
+        return redirect(reverse('my_zone', kwargs=kwargs))
+
     def get_success_url(self):
         return reverse("my_zone", kwargs={"pk": self.request.user.pk})
 
@@ -136,6 +134,14 @@ class UpdatePersonalInfoView(LoginRequiredMixin, UpdateView):
 class PersonalInfoDetailView(LoginRequiredMixin, DetailView):
     template_name = 'profile/my_zone.html'
     model = User
+    context_object_name = 'user_to_visit'
+
+
+    def get_context_data(self, **kwargs):
+        kwargs["is_my_page"] = kwargs['object'] == self.request.user
+        kwargs["user"] = self.request.user
+        return super().get_context_data(**kwargs)
+
 
 
 def update_preference_setting(request, pk):
@@ -225,15 +231,18 @@ def subscribe(request, pk):
     return JsonResponse({"result": result, "msg": "操作成功"})
 
 
-class ProfileImageView(LoginRequiredMixin, View):
+class ProfileImageView(View):
 
     def get(self, request):
-        username = request.GET.get('u')
+        username = request.GET.get('u')  # specify user
         user = User.objects.filter(username=username).first()
         if user is not None:
-            response = FileResponse(user.user.profile_image)
+            response = FileResponse(user.user.profile_image) if user.user.profile_image else FileResponse()
         else:
-            response = FileResponse(self.request.user.user.profile_image)
+            if self.request.user.is_authenticated:
+                response = FileResponse(self.request.user.user.profile_image) if self.request.user.user.profile_image else FileResponse()
+            else:
+                response = FileResponse()
         response['Content-Type'] = 'application/octet-stream'
         filename = 'attachment; filename=' + '{}.png'.format('xxx')
 

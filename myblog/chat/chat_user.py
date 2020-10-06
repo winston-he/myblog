@@ -31,7 +31,9 @@ def create_chat_user(username: str, password: str):
     assert resp.status_code == 200
 
 @webim_token_check
-def add_chat_user(owner, friend, token):
+def add_chat_user(owner, friend):
+    conn = get_redis_connection("default")
+    token = conn.hget("webim_info", "token")
     requests.post('{}/users/{}/contact/users/{}'.format(REQUEST_PREFIX, owner, friend),
                   headers={"authorization": "Bearer " + token})
 

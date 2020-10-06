@@ -16,7 +16,7 @@ from chat.decorators import webim_token_check
 from chat.models import PrivateChatRecord
 
 
-class ChatRoomView(TemplateView):
+class ChatRoomView(LoginRequiredMixin, TemplateView):
     template_name = 'chat/chat.html'
 
     def get(self, request, *args, **kwargs):

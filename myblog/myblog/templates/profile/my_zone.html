@@ -18,13 +18,16 @@
             display: block;
             border-radius: 50%;">
         </div>
-        <div class="basic-personal-info-item nickname"><h1>{{user.username}}</h1></div>
-        <div class="basic-personal-info-item username"><h3>{{user.username}}</h3></div>
-        <div class="basic-personal-info-item email"><h3><embed src="{%static 'img/icons/email.svg'%}" type="" width="20" height="20">{{user.email}}</h3></div>
-        <div class="basic-personal-info-item location"><h3><embed src="{%static 'img/icons/location.svg'%}" type="" width="20" height="20">{{user.user.location}}</h3></div>
-        <div class="basic-personal-info-item joined-time"><h3>加入时间 {{user.date_joined | timesince | timesince_zh}}</h3></div>
-        <div class="basic-personal-info-item introduction"><h3>{%if user.user.introduction%}{{user.user.introduction}}{%else%}个人介绍是空白的~{%endif%}</h3></div>
-        <a href={%url 'update_personal_info' pk=user.pk%} class="layui-btn layui-btn-lg layui-btn-normal" id="edit-personal-info-btn">编辑个人资料</a>
+        <div class="basic-personal-info-item nickname"><h1>{{user_to_visit.username}}</h1></div>
+        <div class="basic-personal-info-item username"><h3>{{user_to_visit.username}}</h3></div>
+        <div class="basic-personal-info-item email"><h3><embed src="{%static 'img/icons/email.svg'%}" type="" width="20" height="20">{{user_to_visit.email}}</h3></div>
+        <div class="basic-personal-info-item location"><h3><embed src="{%static 'img/icons/location.svg'%}" type="" width="20" height="20">{{user_to_visit.user.location}}</h3></div>
+        <div class="basic-personal-info-item joined-time"><h3>加入时间 {{user_to_visit.date_joined | timesince | timesince_zh}}</h3></div>
+        <div class="basic-personal-info-item introduction"><h3>{%if user_to_visit.user.introduction%}{{user_to_visit.user.introduction}}{%else%}个人介绍是空白的~{%endif%}</h3></div>
+        {% if is_my_page %}
+            <a href={%url 'update_personal_info' pk=user.pk%} class="layui-btn layui-btn-lg layui-btn-normal" id="edit-personal-info-btn">编辑个人资料</a>
+        {% endif %}
+        
     </div>
     <div class="detailed-personal-info">
         <div class="overall-visit-count">
@@ -66,13 +69,13 @@
             <legend>个人基本信息</legend>
         </fieldset>
         <div class="personal-info">
-            <div class="personal-info-item">用户ID: {{user.pk}}</div>
-            <div class="personal-info-item">用户名: {{user.username}}</div>
-            <div class="personal-info-item">昵称: {{user.user.nickname}}</div>
+            <div class="personal-info-item">用户ID: {{user_to_visit.pk}}</div>
+            <div class="personal-info-item">用户名: {{user_to_visit.username}}</div>
+            <div class="personal-info-item">昵称: {{user_to_visit.user.nickname}}</div>
             <div class="personal-info-item">性别: 
-            {% if user.user.gender == 0 %}
+            {% if user_to_visit.user.gender == 0 %}
                 男
-            {% elif user.user.gender == 1 %}
+            {% elif user_to_visit.user.gender == 1 %}
                 女
             {% else %}
                 保密
@@ -86,8 +89,8 @@
                 <legend>工作经历</legend>
         </fieldset>
     </div>
-        <div class="settings">
-            <h2>设置</h2>
+        {% comment %} <div class="settings"> {% endcomment %}
+            {% comment %} <h2>设置</h2>
             <h3>别人可以看到我的</h3>
             <div class="layui-form">
                 <div class="layui-input-block access-setting">
@@ -99,11 +102,14 @@
                         <button type="submit" class="layui-btn layui-btn-normal" id="update-setting-btn" lay-filter="update-setting">更新</button>
                     </form>
                 </div>
+            </div> {% endcomment %}
+            <div class="personal-settings">
+                {% if is_my_page %}
+                    <button id="change-password-btn" type="button" class="layui-btn layui-btn-primary">修改登录密码</button>
+                {% endif %}
+                
             </div>
-            <div>
-                <button id="change-password-btn" type="button" class="layui-btn layui-btn-primary">修改登录密码</button>
-            </div>
-        </div>
+        {% comment %} </div> {% endcomment %}
     </div>
 </div>
 
@@ -123,7 +129,7 @@
 
     $(document).ready(function() {
         $.get({
-            url: "{%url 'personal_stats'%}",
+            url: "{%url 'personal_stats' pk=user_to_visit.pk%}",
             success: function(data) {
                 $('#total-posts-count').text(data.my_blog_count);
                 $('#total-likes-count').text(data.total_likes_count);

@@ -104,15 +104,13 @@
     </div>
     <script type="text/javascript" src="{%static 'verify/js/verify.js'%}" ></script>
     <script>
-
+        
         var validated = false;
         var layer;
-
         layui.use('layer', function(){
             layer = layui.layer;
         });
         layui.use('element', function() {
-
             function refreshVerifySection(className, action) {
                 $(className).slideVerify({
                     type : 2,		//类型

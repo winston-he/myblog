@@ -50,10 +50,12 @@ class UserRegisterForm(forms.Form):
 
 class PersonalInfoForm(forms.ModelForm):
     nickname = forms.CharField(required=True, max_length=64)
-    introduction = forms.CharField(max_length=300, required=False)
+    introduction = forms.CharField(max_length=300, required=False,)
     location1 = forms.CharField(max_length=100, required=False)
     location2 = forms.CharField(max_length=100, required=False)
     location3 = forms.CharField(max_length=100, required=False)
+
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

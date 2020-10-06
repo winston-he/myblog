@@ -32,8 +32,8 @@
     </div>
     
     <h3>请填写一些文字说明（140字以内，选填）</h3>
-    <textarea name="comment" maxlength=140 required lay-verify="required" placeholder="填入详细描述，更方便管理员审核~" class="layui-textarea"></textarea>
-    <button type='submit' class="layui-btn layui-btn-danger" name="submit-violation-form-btn">提交</button>
+    <textarea name="comment" maxlength=140 placeholder="填入详细描述，更方便管理员审核~" class="layui-textarea"></textarea>
+    <button type='submit' class="layui-btn layui-btn-danger" name="submit-violation-form-btn" lay-filter="*">提交</button>
 </form>
 
 <script> 
@@ -41,7 +41,8 @@ layui.use(['form', 'layer', 'jquery'], function(){
     var form = layui.form;
     var $ = layui.jquery;
 
-    $("[name='submit-violation-form-btn']").click(function() {
+    form.on('submit(*)', function(data) {
+        console.log(data.field);
         var index = parent.layer.getFrameIndex(window.name); 
         parent.layer.close(index);
     })

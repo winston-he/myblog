@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %} {% load static %} {%block ref%}
+{% extends 'base/base_with_footer.html' %} {% load static %} {%block ref%}
 <link rel="stylesheet" href="{% static 'css/post.css' %}" />
 <link rel="stylesheet" href="{% static 'editor/css/editormd.preview.css' %}" />
 {%endblock%} {% block content %}
@@ -294,10 +294,14 @@
                   var likePostCount = Number($(".like-post-count").text());
                   $(".like-post-count").text(likePostCount+1);
                 }
-                else {
+                else if (res.result == -1) {
                   $("#like-post").prop("src", '{%static "img/icons/grey_heart.png"%}');
                   var likePostCount = Number($(".like-post-count").text());
                   $(".like-post-count").text(likePostCount-1);
+                }
+                // unauthorized
+                else if (res.result == -2) {
+                  window.location.href = "{%url 'login'%}";
                 }
               }
             }
@@ -316,10 +320,14 @@
                   var markPostCount = Number($(".mark-post-count").text());
                   $(".mark-post-count").text(markPostCount+1);
                 }
-                else {
+                else if (res.result == -1) {
                   $("#mark-post").prop("src", '{%static "img/icons/grey_star.png"%}');
                   var markPostCount = Number($(".mark-post-count").text());
                   $(".mark-post-count").text(markPostCount-1);
+                }
+                // unauthorized
+                else if (res.result == -2) {
+                  window.location.href = "{%url 'login'%}";
                 }
               }
             }
@@ -433,10 +441,13 @@
                 clickedBtn.find("img").prop("src", '{%static "img/icons/thumb_up_unselected.png"%}');
               }
               // 如果没有点赞，返回0，加入点赞
-              else {
+              else if (res.result == 0) {
                 var prevLikes = $("#comment-like-number_" + res.pk).text();
                 $("#comment-like-number_" + res.pk).text(Number(prevLikes)+1);
                 clickedBtn.find("img").prop("src", '{%static "img/icons/thumb_up_selected.png"%}');
+              }
+              else if (res.result == -2) {
+                window.location.href = "{%url 'login'%}";
               }
             }
           })
@@ -449,6 +460,7 @@
           $.get({
             url: url,
             success: function(res) {
+              console.log(res);
               if (res.result == -1) {
                   layer.msg("您已经点过赞了！:)", {
                     time: 2000
@@ -459,10 +471,13 @@
                 $("#comment-dislike-number_" + res.pk).text(Number(prevDislikes)-1);
                 clickedBtn.find("img").prop("src", '{%static "img/icons/thumb_down_unselected.png"%}');
               }
-              else {
+              else if (res.result == 0) {
                 var prevDislikes = $("#comment-dislike-number_" + res.pk).text();
                 $("#comment-dislike-number_" + res.pk).text(Number(prevDislikes)+1);
                 clickedBtn.find("img").prop("src", '{%static "img/icons/thumb_down_selected.png"%}');
+              }
+              else if (res.result == -2) {
+                window.location.href = "{%url 'login'%}";
               }
             }
           })
@@ -509,18 +524,24 @@
 
       this.reportComment = function() {
         $(".report-comment-btn").click(function() {
-          console.log("aaa");
-          var commentId = $(this).parents(".comment-item").prop("id").split("_")[1];
-          index = layer.open({
-            type: 2,
-            title: '违规举报',
-            area: ["600px", "500px"],
-            resize: false,
-            content: "{% url 'report_violation' type=1 pk=123 %}".replace("123", commentId),
-            yes: function() {
-              layer.msg("感谢您的反馈，我们会尽快处理");
-            }
-          });
+          var authenticated = '{{user.is_authenticated}}';
+          if (authenticated == "True") {
+            var commentId = $(this).parents(".comment-item").prop("id").split("_")[1];
+            index = layer.open({
+              type: 2,
+              title: '违规举报',
+              area: ["600px", "500px"],
+              resize: false,
+              content: "{% url 'report_violation' type=1 pk=123 %}".replace("123", commentId),
+              yes: function() {
+                layer.msg("感谢您的反馈，我们会尽快处理");
+              }
+            });
+          }
+          else {
+            window.location.href = "{%url 'login'%}";
+          }
+
         })
       };
 
@@ -551,6 +572,9 @@
                   clickedBtn.text("+关注");
                   clickedBtn.css("background", "rbga(30, 159, 255)");
                 }
+                else {
+                  window.location.href = "{%url 'login'%}"
+                }
               }
             }
           )
@@ -558,19 +582,25 @@
         })
       }
       this.reportPost = function() {
-        console.log("123");
-        console.log($("#report-post"));
         $("#report-post").on("click", function() {
-          index = layer.open({
-            type: 2,
-            title: '违规举报',
-            area: ["600px", "500px"],
-            resize: false,
-            content: "{% url 'report_violation' type=0 pk=123 %}".replace("123", '{{post.pk}}'),
-            yes: function() {
-              layer.msg("感谢您的反馈，我们会尽快处理");
+            var authenticated = '{{user.is_authenticated}}';
+            console.log(authenticated);
+            if (authenticated == "True") {
+              index = layer.open({
+                type: 2,
+                title: '违规举报',
+                area: ["600px", "500px"],
+                resize: false,
+                content: "{% url 'report_violation' type=0 pk=123 %}".replace("123", '{{post.pk}}'),
+                yes: function() {
+                  layer.msg("感谢您的反馈，我们会尽快处理");
+                }
+              });
             }
-          });
+            else {
+              window.location.href = "{%url 'login'%}";
+            }
+              
         })
       }
       this.goToChat = function() {

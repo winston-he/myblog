@@ -55,8 +55,6 @@ class CommentForm(forms.ModelForm):
 
 class ViolationReportForm(forms.ModelForm):
 
-
-
     class Meta:
         model = ViolationReport
         fields = ['violation_type', 'comment']

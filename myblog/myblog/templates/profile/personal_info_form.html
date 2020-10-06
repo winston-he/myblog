@@ -18,6 +18,9 @@
             <fieldset class="layui-elem-field layui-field-title">
                 <legend>基本信息</legend>
             </fieldset>
+            <span style="color: red;">
+                {{form.errors}}
+            </span>
             <label class="layui-form-label">姓</label>
             <div class="layui-input-block">
                 <input type="text" name="last_name" required lay-verify="required" autocomplete="off" class="layui-input" value={{user.last_name}}>
@@ -62,7 +65,8 @@
                   </div>
             <label class="layui-form-label">个人简介<span style="font-size: 10px">（300字以内）</span></label>
             <div class="layui-input-block">
-              <textarea name="introduction" class="layui-textarea">{{user.user.introduction}}</textarea>
+              <textarea name="introduction" class="layui-textarea" placeholder="简单的介绍自己" maxlength=300>{% if user.user.introduction %}{{user.user.introduction}}{% endif %}</textarea>
+                
             </div>
             <fieldset class="layui-elem-field layui-field-title">
                 <legend>教育背景</legend>
@@ -136,7 +140,7 @@
 
         var my_location = '{{user.user.location}}';
         console.log(my_location);
-        if (my_location&&my_location!="") {
+        if (my_location&&my_location!=""&&my_location!="None") {
             my_location = my_location.split('#');
             $("[name='location1']").html("<option value=" + my_location[0] + ">" + my_location[0] + "</option>");
             $("[name='location2']").html("<option value=" + my_location[1] + ">" + my_location[1] + "</option>");
@@ -198,7 +202,7 @@
             }
             else {
                 layer.msg("请填写完整的所在地！（或不填）");
-                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+                return false; 
             }
             
         });
@@ -206,7 +210,8 @@
     });
 
     $("#add-education-item-btn").click(function() {
-        educationCount++;
+        layer.msg("该栏目暂未开放");
+        {% comment %} educationCount++;
         var text = "<div class=\"layui-block school-info_" + educationCount + ">";
         text += "                    <label class=\"layui-form-label\">学校</label>";
         text += "                    <div class=\"layui-input-block\">";
@@ -230,10 +235,11 @@
         text += "                        <input type=\"text\" name=edu_end_date_" + educationCount + " id=edu_end_date_" + educationCount + " autocomplete=\"off\" class=\"layui-input\" placeholder=\"格式：yyyy-mm-dd\">";
         text += "                    </div>";
         text += "                    </div>";
-        $(".education-info-section").append(text);
+        $(".education-info-section").append(text); {% endcomment %}
     });
     $("#add-employment-item-btn").click(function() {
-        employmentCount++;
+        layer.msg("该栏目暂未开放");
+        {% comment %} employmentCount++;
         var text = "<div class=\"layui-block employment-info_" + employmentCount + ">";
         text += "    <label class=\"layui-form-label\">公司</label>";
         text += "<div class=\"layui-block\">";
@@ -252,7 +258,7 @@
         text += "<div class=\"layui-input-block\">";
         text += "    <input type=\"text\" name=emp_end_date_" + employmentCount + " required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\" placeholder=\"格式：yyyy-mm-dd\"></div>";
         text += "</div>";
-        $(".employment-info-section").append(text);
+        $(".employment-info-section").append(text); {% endcomment %}
     })
 
     // 头像图片上传

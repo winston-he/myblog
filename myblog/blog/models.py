@@ -85,7 +85,7 @@ class ViolationReport(models.Model):
     related_object = models.IntegerField(null=False, verbose_name="相关条目")
     violation_type = models.SmallIntegerField(default=0, null=False, choices=VIOLATION_CHOICES, verbose_name="违规类型")
     status = models.SmallIntegerField(default=0, null=False, choices=VIOLATION_REPORT_STATUS, verbose_name="当前处理状态")
-    comment = models.CharField(max_length=500, default='', null=True, verbose_name="举报用户留言")
+    comment = models.CharField(max_length=500, default='没有留言', verbose_name="举报用户留言")
     post_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='report_items', default=None, verbose_name="举报用户")
     handled_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='handled_report_items', default=None, null=True, verbose_name="处理人")
     create_time = models.DateTimeField(default=timezone.now, verbose_name="创建时间")

@@ -36,7 +36,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user', null=True)
     nickname = models.CharField(max_length=50, null=True)
     gender = models.IntegerField(choices=gender_choices, default=2)
-    introduction = models.CharField(max_length=300, null=True)
+    introduction = models.CharField(max_length=300, null=True, verbose_name="个人简介")
     profile_image = models.ImageField(upload_to='profile/%Y/%m', null=True)
     location = models.CharField(max_length=300, null=True)
     subscribe_to = models.ManyToManyField(User, related_name="subscribe_to")

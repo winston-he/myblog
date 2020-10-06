@@ -370,8 +370,11 @@ class ReportViolationView(LoginRequiredMixin, CreateView):
 
 
 # 点赞博客
-@login_required
+# @login_required
 def like_post(request, pk):
+    if not request.user.is_authenticated:
+        return JsonResponse({"result": -2, "msg": "当前用户未登录"})
+
     post = get_object_or_404(Post, pk=pk)
     if not request.user.liked_posts.filter(pk=post.pk):
         request.user.liked_posts.add(post)
@@ -383,8 +386,10 @@ def like_post(request, pk):
 
 
 # 收藏博客
-@login_required
+# @login_required
 def mark_post(request, pk):
+    if not request.user.is_authenticated:
+        return JsonResponse({"result": -2, "msg": "当前用户未登录"})
     # if request.method == 'POST':
     post = get_object_or_404(Post, pk=pk)
     # u = UserProfile.objects.filter(pk=request.registration.id).first()
@@ -399,7 +404,7 @@ def mark_post(request, pk):
 
 
 # 点赞评论
-@login_required
+# @login_required
 def like_comment(request, pk):
     """
     :param request:
@@ -409,6 +414,8 @@ def like_comment(request, pk):
     如果已经点赞，返回1，取消点赞
     如果没有点赞，返回0，加入点赞
     """
+    if not request.user.is_authenticated:
+        return JsonResponse({"result": -2, "msg": "当前用户未登录"})
     comment = get_object_or_404(Comment, pk=pk)
     if request.user.disliked_comments.filter(pk=pk):
         result = -1
@@ -423,8 +430,10 @@ def like_comment(request, pk):
 
 
 # 点灭评论
-@login_required
+# @login_required
 def dislike_comment(request, pk):
+    if not request.user.is_authenticated:
+        return JsonResponse({"result": -2, "msg": "当前用户未登录"})
     comment = get_object_or_404(Comment, pk=pk)
     if request.user.liked_comments.filter(pk=pk):
         result = -1
@@ -452,12 +461,12 @@ def increase_view_count(request, pk):
 
 # 一些数据统计
 @login_required
-def personal_summary(request):
+def personal_summary(request, pk):
     from collections import defaultdict
-
     res = defaultdict(int)
-    res['my_blog_count'] = Post.objects.filter(published_time__isnull=False, author=request.user).count()
-    for p in Post.objects.filter(published_time__isnull=False, author=request.user):
+    user = User.objects.filter(pk=pk).first()
+    res['my_blog_count'] = Post.objects.filter(status=2, author=user).count()
+    for p in Post.objects.filter(status=2, author=user):
         res["total_likes_count"] += p.liked_by.count()
         res["total_marked_count"] += p.marked_by.count()
         res["total_visit_count"] += p.viewed_count
