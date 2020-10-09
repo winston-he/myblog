@@ -21,7 +21,6 @@ class AccessLoggerMiddleware:
                   remote_addr=request.META.get("REMOTE_ADDR"),
                   host_addr=request.META.get("HTTP_HOST")).save()
         response = self.get_response(request)
-
-
+        # 返回相应之前
         return response
 
