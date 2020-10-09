@@ -16,7 +16,7 @@ from chat.decorators import webim_token_check
 from chat.models import PrivateChatRecord
 
 
-class ChatRoomView(TemplateView):
+class ChatRoomView(LoginRequiredMixin, TemplateView):
     template_name = 'chat/chat.html'
 
     def get(self, request, *args, **kwargs):
@@ -32,7 +32,7 @@ class ChatRoomView(TemplateView):
                     PrivateChatRecord.objects.filter(Q(user_1=talk_to) & Q(user_2=self.request.user)).first()):
                 PrivateChatRecord(user_1=self.request.user, user_2=talk_to).save()
             context['target'] = True
-            context['target_user'] = target_user
+            context['target_user'] = talk_to
         else:
             context['target'] = False
         return self.render_to_response(context)

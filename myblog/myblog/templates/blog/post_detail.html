@@ -239,7 +239,7 @@
         // itemCount: 显示的条目数量
         this.popularPostList();
         this.latestPostList();
-        
+        this.getPostAuthorInfo();
       };
 
       this.popularPostList = function() {
@@ -268,6 +268,15 @@
           }
         })
       };
+      this.getPostAuthorInfo = function() {
+        $.get({
+          url: "{%url 'author_info' pk=post.author.pk%}",
+          success: function(data) {
+            console.log(data);
+            $(".basic-personal-info-item.stats h3").html("关注 "+data.data.subscribe_count+" | 获赞 "+data.data.author_like_count+" | 博客 {{post.author.posts.count}}")
+          }
+        })
+      }
     }
     
     function EventListener() {
