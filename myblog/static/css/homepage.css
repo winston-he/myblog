@@ -1,0 +1,109 @@
+.text {
+
+}
+
+.t1 {
+    font-size: 48px!important;
+}
+
+.t2 {
+    font-size: 20px!important;
+}
+
+.t-dark {
+    color: #fff;
+}
+
+
+.d1 {
+    margin: 0 auto;
+    width: 80%;
+}
+
+.d1-1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.d2 {
+    width: 65%;
+    margin: 100px auto;
+    min-height: 350px;
+}
+
+.d2-1 {
+    width: 400px;
+    float: right;
+}
+
+.d2-2 {
+    position: relative;
+    top: 100px;
+}
+
+.d3 {
+    width: 60%;
+    margin: 0 auto;
+    min-height: 700px;
+}
+
+.d3-1 {
+    position: relative;
+    top: 150px;
+    text-align: end;
+}
+
+.d3-2 {
+    float: left;
+}
+
+.d4 {
+    width: 60%;
+    margin: 0 auto;
+    box-shadow: 0 8px 24px rgba(149,157,165,.2)!important;
+    padding: 40px 20px;
+    background: #ffffff;
+}
+
+.d4-1 {
+    text-align: center;
+    margin: 20px 40px;
+    padding-left: 5%;
+}
+
+.d4-2 {
+    text-align: center;
+}
+
+.d5 {
+    background-color: #24292e;
+    margin-top: 100px;
+    padding: 60px 30px 20px 60px;
+    min-height: 400px;
+}
+
+.d5-1 {
+    text-align: center;
+}
+
+.d5-2 {
+    text-align: center;
+}
+
+.d5-2 form .layui-form-item {
+    float: left;
+}
+
+.d5-2 form .layui-form-item .layui-form-label {
+    color: #fff;
+    font-size: 20px;
+}
+
+[name="example-form-1"] {
+    width: 70%;
+    margin: 0 auto;
+}
+
+[name="example-form-1"] input {
+    margin: 15px;
+}

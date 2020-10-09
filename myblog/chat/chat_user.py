@@ -8,6 +8,7 @@
 '''
 import requests
 from django.core.cache import cache
+from django_redis import get_redis_connection
 
 from .decorators import webim_token_check
 from . import *
@@ -16,7 +17,8 @@ REQUEST_PREFIX = WEBIM_REQUEST_HOST + '/' + ORG_NAME + '/' + APP_NAME
 
 @webim_token_check
 def create_chat_user(username: str, password: str):
-    token = cache.get("webim_token")
+    conn = get_redis_connection("default")
+    token = conn.hget("webim_info", "token")
     resp = requests.post('{}/{}/{}/users'.format(WEBIM_REQUEST_HOST, ORG_NAME, APP_NAME), json={
         "username": username,
         "password": password

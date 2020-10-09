@@ -6,6 +6,10 @@
 @File: forms.py
 @Time: 2020/4/11 19:26
 '''
+import re
+
+from django.contrib.auth import authenticate
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.forms import IntegerField, RadioSelect, CharField, EmailField
 from django import forms
@@ -29,9 +33,9 @@ class PasswordResetForm(forms.Form):
 
 # 用户注册使用的表单
 class UserRegisterForm(forms.Form):
-    username = CharField(max_length=50, min_length=10, required=True, error_messages={"username": "用户名长度介于10到50之间"})
-    password1 = CharField(max_length=25, min_length=8, required=True, error_messages={"password1": "密码长度介于8到25之间"})
-    password2 = CharField(max_length=25, min_length=8, required=True, error_messages={"password2": "密码长度介于8到25之间"})
+    username = CharField(max_length=50, min_length=8, required=True, error_messages={"username": "用户名长度介于8到50之间"})
+    password1 = CharField(max_length=25, min_length=6, required=True, error_messages={"password1": "密码长度介于6到25之间"})
+    password2 = CharField(max_length=25, min_length=6, required=True, error_messages={"password2": "密码长度介于6到25之间"})
     email = EmailField(error_messages={"email": "请输入合法的邮箱"})
 
     def clean(self):
@@ -82,5 +86,29 @@ class PersonalInfoForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name']
+
+
+class LoginAuthenticationForm(AuthenticationForm):
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        # 使用邮箱登录
+        if username is not None and password:
+            if re.match(r"^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$", username):
+                # 使用email登录
+                user = User.objects.filter(email=username).first()
+                if user is None:
+                    raise self.get_invalid_login_error()
+                self.cleaned_data['username'] = user.username
+                self.user_cache = authenticate(self.request, username=user.username, password=password)
+            else:
+                self.user_cache = authenticate(self.request, username=username, password=password)
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 

@@ -43,6 +43,6 @@ def webim_token_check(func):
             )
             token = json.loads(resp.text)['access_token']
             conn.hset('webim_info', 'token', token)
-        kwargs['token'] = token
+        # kwargs['token'] = token
         return func(*args, **kwargs)
     return wrapped

@@ -259,7 +259,7 @@
     layui.use('upload', function(){
     var upload = layui.upload;
     
-    //执行实例
+    // 更新头像
     var uploadInst = upload.render({
         elem: '#upload-profile-btn' //绑定元素
         ,url: '{% url "profile_image" %}' //上传接口
