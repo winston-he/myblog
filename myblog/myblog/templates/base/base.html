@@ -26,7 +26,7 @@
     <ul class="layui-nav" lay-filter="">
       <li class="layui-nav-item"><a href="{%url 'home'%}">MyBlog</a></li>
       <li class="layui-nav-item"><a href="{%url 'post_list'%}?all=true&published=true&page=1">博客</a></li>
-      <li class="layui-nav-item"><a href="{%url 'chat'%}?target=false">社区</a></li>
+      <li class="layui-nav-item"><a href="{%url 'chat'%}?target=false">私信</a></li>
       <li class="layui-nav-item right">
         <a href={%if user.is_authenticated%}"{%url 'my_zone' pk=user.pk%}"{%else%}"{%url 'login'%}"{%endif%}>个人中心<span class="layui-badge-dot"></span></a>
       </li>

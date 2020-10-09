@@ -1,14 +1,17 @@
+from functools import reduce
 from math import ceil
 
 import markdown
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.db import connection
 from django.http import HttpResponse, JsonResponse, request, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.views import View
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -103,8 +106,37 @@ class MarkedPostListView(LoginRequiredMixin, ListView):
         return Post.objects.filter(marked_by=self.request.user).order_by('-published_time')
 
 
+class PostAuthorInfo(DetailView):
+    model = User
+
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        res = {}
+        cursor = connection.cursor()
+        cursor.execute(f"select count(1) from user_userprofile_subscribe_to where user_id={self.object.id}")
+        res['subscribe_count'] = cursor.fetchone()[0]
+
+        posts = Post.objects.filter(author=self.object, status=2)
+
+        res['author_like_count'] = 0
+        for p in posts:
+            res['author_like_count'] += p.liked_by.count()
+        return JsonResponse({"data": res, "msg": "OK", "status": 200})
+
 class PostDetailView(DetailView):
     model = Post
+
+    def get_context_data(self, **kwargs):
+        # author_follow_count
+        # author_likes
+        # author_blog_count
+        cursor = connection.cursor()
+        cursor.execute(f"select count(1) from user_userprofile_subscribe_to where user_id={self.object.author.id}")
+        res = cursor.fetchone()
+        kwargs['author_subscribe_count'] = res
+
+        return super().get_context_data(**kwargs)
+
 
     @staticmethod
     def get_total_comment_count(request, pk):

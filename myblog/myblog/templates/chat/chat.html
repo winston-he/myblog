@@ -105,7 +105,7 @@ layui.use('layim', function(layim){
         onTextMessage: function(msg) {
             layim.getMessage({
             username: msg.from //消息来源用户名
-            ,avatar: "http://tp1.sinaimg.cn/1571889140/180/40030060651/1" //消息来源用户头像
+            ,avatar: "{%url 'profile_image'%}?u="+ msg.from//消息来源用户头像
             ,id: msg.from //消息的来源ID（如果是私聊，则是用户id，如果是群聊，则是群组id）
             ,type: "friend" //聊天窗口来源类型，从发送消息传递的to里面获取
             ,content: msg.data //消息内容
@@ -198,25 +198,24 @@ layui.use('layim', function(layim){
         layim.config({
             init: {
                 "mine": {
-                "username": '{{user.user.nickname}}' //我的昵称
+                "username": '{{user.username}}' //我的昵称
                 ,"id": "{{user.pk}}" //我的ID
                 ,"status": "online" //在线状态 online：在线、hide：隐身
                 ,"sign": '{%if user.chat_info.signature%}{{user.chat_info.signature}}{%else%}没有签名哦~{%endif%}' //我的签名
-                ,"avatar": "{%url 'profile_image'%}" //我的头像
+                ,"avatar": "{%url 'profile_image'%}?u={{user.username}}" //我的头像
                 },
                 "friend": friends,
                 "group": []
             },
             brief: false, //是否简约模式（如果true则不显示主面板）
             isgroup: false
-        }).chat({
+        }){%if target%}.chat({
             name: '{{target_user.username}}'
             ,type: 'friend'
             ,avatar: 'http://tp1.sinaimg.cn/5619439268/180/40030060651/1'
             ,id: '{{target_user.pk}}'
         });
-
-
+        {%endif%}
 
         // 监听发送消息的事件
         layim.on('sendMessage', function(msg) {
@@ -234,13 +233,9 @@ layui.use('layim', function(layim){
                     console.log("发送消息失败");
                 }
             });
-            console.log(deliverMessage);
             deliverMessage.body.chatType = 'singleChat';
             conn.send(deliverMessage.body);
-            console.log("消息发出去了！");
         })
-
-        // 收到消息
         
 
         // 修改签名

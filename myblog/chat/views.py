@@ -32,7 +32,7 @@ class ChatRoomView(LoginRequiredMixin, TemplateView):
                     PrivateChatRecord.objects.filter(Q(user_1=talk_to) & Q(user_2=self.request.user)).first()):
                 PrivateChatRecord(user_1=self.request.user, user_2=talk_to).save()
             context['target'] = True
-            context['target_user'] = target_user
+            context['target_user'] = talk_to
         else:
             context['target'] = False
         return self.render_to_response(context)

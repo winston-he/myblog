@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^post/(?P<pk>\d+)/delete/$', views.DeletePostView.as_view(), name='post_remove'),
     url(r'^post/(?P<pk>\d+)/comment/$', views.CreateCommentView.as_view(), name='comment_new'),
 
+    url(r'^author_info/(?P<pk>\d+)/$', views.PostAuthorInfo.as_view(), name='author_info'),
+
     url(r'^post/(?P<pk>\d+)/comment/count$', views.PostDetailView.get_total_comment_count, name='comment_count'),
     url(r'^comment/(?P<pk>\d+)/delete/$', views.DeleteCommentView.as_view(), name='comment_remove'),
     url(r'^post/(?P<pk>\d+)/comment-list/$', views.CommentListView.as_view(), name='comment_list'),
