@@ -15,16 +15,7 @@ register = template.Library()
 
 @register.filter
 def timesince_zh(val: str):
-    val = val.replace("days", "天")
-    val = val.replace("day", "天")
-    val = val.replace("hours", "小时")
-    val = val.replace("hour", "小时")
-    val = val.replace("months", "个月")
-    val = val.replace("month", "个月")
-    val = val.replace("years", "年")
-    val = val.replace('week', '周')
-    val = val.replace('weeks', '周')
-    return val.replace("year", "年")
+    return val
 
 
 @register.filter
