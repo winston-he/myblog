@@ -35,7 +35,7 @@ VIOLATION_REPORT_STATUS = ((0, '审核中'),
 
 class Post(models.Model):
     author = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
-    title = models.CharField(max_length=128, null=False)
+    title = models.CharField(max_length=100, null=False)
     content = models.TextField(null=False)
     viewed_count = models.PositiveIntegerField(default=0)
     create_time = models.DateTimeField(default=timezone.now)

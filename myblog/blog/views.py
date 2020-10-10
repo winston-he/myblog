@@ -191,7 +191,7 @@ class UpdatePostView(LoginRequiredMixin, UpdateView):
 
         if form.cleaned_data['is_publish']:
             form.instance.published_time = timezone.now()
-            form.instance.status = 1 # 审核中, 审核后才可公布
+            # form.instance.status = 1 # 审核中, 审核后才可公布
 
         form.instance.update_time = timezone.now()
         if self.request.is_ajax():
@@ -201,7 +201,6 @@ class UpdatePostView(LoginRequiredMixin, UpdateView):
             return super().form_valid(form)
 
     def get_success_url(self):
-        print("Hello World")
         return reverse('post_detail', kwargs=self.kwargs)
 
 

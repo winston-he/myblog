@@ -113,9 +113,11 @@
     </div>
 </div>
 
+{%csrf_token%}
 <script>
     var csrf = $('input[name="csrfmiddlewaretoken"]').val();
-
+    console.log("CSRF")
+    console.log(csrf);
     //Demo
     layui.use('form', function(){
         var form = layui.form;
