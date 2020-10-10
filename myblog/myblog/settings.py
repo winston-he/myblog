@@ -18,17 +18,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'myblog', 'templates')
 GENERAL_TEMPLATES_DIR = os.path.join(BASE_DIR, 'general_templates')
 
-EMAIL_HOST_PASSWORD = 'XMBIMECXJDUCJAOK'
+EMAIL_HOST_PASSWORD = ''
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.163.com'
+EMAIL_HOST = ''
 EMAIL_PORT = 25
-EMAIL_HOST_USER = 'winstonhwz@163.com'
+EMAIL_HOST_USER = ''
 EMAIL_FROM = 'Socialblog'
-DEFAULT_FROM_EMAIL = 'winstonhwz@163.com'
+DEFAULT_FROM_EMAIL = ''
 
 djcelery.setup_loader()
 
-BROKER_URL = 'amqp://123.57.201.57:5672/'
+BROKER_URL = ''
 CELERY_IMPORTS = ('myblog.mail.views', )
 
 
@@ -104,10 +104,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'myblog',
-        'HOST': '123.57.201.57',
+        'HOST': '',
         'PORT': '3306',
-        'USER': 'winston',
-        'PASSWORD': 'Hwzhen123.'
+        'USER': '',
+        'PASSWORD': ''
     }
 }
 
@@ -159,7 +159,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('123.57.201.57', 6379)],
+            "hosts": [('', 6379)],
         },
     },
 }
@@ -167,7 +167,7 @@ CHANNEL_LAYERS = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://:wins1603@123.57.201.57:6379/1",
+        "LOCATION": "",
         "OPTIONS": {
             "CONNECTION_POOL_KWARGS": {"decode_responses": True, "max_connections": 100},
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
