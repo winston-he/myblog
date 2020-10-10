@@ -59,7 +59,7 @@ class ChatListView(LoginRequiredMixin, ListView):
                 private_chat_list.append({
                     "username": friend.username,
                     "id": friend.username,
-                    "avatar": reverse("profile_image"),
+                    "avatar": reverse("profile_image")+"?u="+friend.username,
                     "sign": "Hello World",
                     "status": "online"  # default setting
                 })

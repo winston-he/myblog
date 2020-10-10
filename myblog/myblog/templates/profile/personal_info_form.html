@@ -23,15 +23,15 @@
             </span>
             <label class="layui-form-label">姓</label>
             <div class="layui-input-block">
-                <input type="text" name="last_name" required lay-verify="required" autocomplete="off" class="layui-input" value={{user.last_name}}>
+                <input type="text" name="last_name" autocomplete="off" class="layui-input" value={{user.last_name}}>
             </div>
             <label class="layui-form-label">名</label>
             <div class="layui-input-block">
-                <input type="text" name="first_name" required lay-verify="required" autocomplete="off" class="layui-input" value={{user.first_name}}>
+                <input type="text" name="first_name"  autocomplete="off" class="layui-input" value={{user.first_name}}>
             </div>
             <label class="layui-form-label">昵称</label>
             <div class="layui-input-block">
-                <input type="text" name="nickname" required lay-verify="required" autocomplete="off" class="layui-input" value={%if user.user.nickname%}{{user.user.nickname}}{%else%}{%endif%}>
+                <input type="text" name="nickname"  autocomplete="off" class="layui-input" value={%if user.user.nickname%}{{user.user.nickname}}{%else%}{%endif%}>
             </div>
             <label class="layui-form-label">头像</label>
             <div class="profile-image">

@@ -24,7 +24,7 @@
             <label class="layui-form-label">文章标题</label>
             <div class="layui-input-block">
                 <input type="text" name="title" lay-filter="title", class="layui-input" id="post-title" autocomplete="off" title="Hint" value={%if post.title%}{{post.title}}{%else%}{%endif%}>
-                <small id="post-title-text-limit" class="form-text text-muted">0/100</small>
+                <small id="post-title-text-limit" class="form-text text-muted">{{post.title | length}}/100</small>
             </div>
         </div>
         <div id="test-editormd">
@@ -114,14 +114,22 @@
       // 限制字数
       this.textInputLimit = function() {
         $("#post-title").on("input", function() {
-        if ($(this).val().length > 100) {
-            $(this).prop("disabled", "true");
-        } 
-        else {
-            if ($(this).prop("disabled"))
-                $(this).prop("disabled", "false");
-            $("#post-title-text-limit").html($(this).val().length + "/100");
-        } 
+          var titleLength = $(this).val().length;
+          if (titleLength > 100) {
+            console.log("OMG")
+              $("#post-title-text-limit").html("<span id='title-length-alert' style=\"color:red\">标题字数不能超过100！现在字数是：" + titleLength + "</span>");
+              $("#post-btn").prop("disabled", "true");
+              $("save-to-draft-btn").prop("disabled", "true");
+          } 
+          else {
+            $("#title-length-alert").html("");
+              $("#post-btn").prop("disabled", "false");
+              $("save-to-draft-btn").prop("disabled", "false");
+              if ($(this).prop("disabled"))
+                  $(this).prop("disabled", "false");
+              $("#post-title-text-limit").html($(this).val().length + "/100");
+          } 
+        
       });
     };
 

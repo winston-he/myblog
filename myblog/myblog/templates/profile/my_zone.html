@@ -18,7 +18,7 @@
             display: block;
             border-radius: 50%;">
         </div>
-        <div class="basic-personal-info-item nickname"><h1>{{user_to_visit.username}}</h1></div>
+        <div class="basic-personal-info-item nickname"><h1>{{user_to_visit.user.nickname}}</h1></div>
         <div class="basic-personal-info-item username"><h3>{{user_to_visit.username}}</h3></div>
         <div class="basic-personal-info-item email"><h3><embed src="{%static 'img/icons/email.svg'%}" type="" width="20" height="20">{{user_to_visit.email}}</h3></div>
         <div class="basic-personal-info-item location"><h3><embed src="{%static 'img/icons/location.svg'%}" type="" width="20" height="20">{{user_to_visit.user.location}}</h3></div>

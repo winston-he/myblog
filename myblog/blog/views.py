@@ -494,8 +494,13 @@ def increase_view_count(request, pk):
 # 一些数据统计
 @login_required
 def personal_summary(request, pk):
-    from collections import defaultdict
-    res = defaultdict(int)
+    # from collections import defaultdict
+    res = {
+        "my_blog_count": 0,
+        "total_marked_count": 0,
+        "total_visit_count": 0,
+        "total_likes_count": 0
+    }
     user = User.objects.filter(pk=pk).first()
     res['my_blog_count'] = Post.objects.filter(status=2, author=user).count()
     for p in Post.objects.filter(status=2, author=user):
@@ -510,7 +515,6 @@ def personal_summary(request, pk):
 def upload_image(request):
     if request.method == 'POST':
         data = {'success': 0, 'message': '图片上传失败'}
-        print(data)
         image = request.FILES.get('editormd-image-file', None)
         if image:
             # 这里做图片存储

@@ -99,7 +99,7 @@ layui.use('layim', function(layim){
 
     conn.listen({
         onOpened: function ( message ) {
-            console.log("成功，准备监听新的消息");
+            {% comment %} console.log("成功，准备监听新的消息"); {% endcomment %}
         },         //连接成功回调 
         onClosed: function ( message ) {},         //连接关闭回调
         onTextMessage: function(msg) {
@@ -184,7 +184,6 @@ layui.use('layim', function(layim){
             },
         };
         conn.open(options);
-        console.log("执行到这里啦");
 
         // 获取好友
         var friends;
@@ -212,7 +211,7 @@ layui.use('layim', function(layim){
         }){%if target%}.chat({
             name: '{{target_user.username}}'
             ,type: 'friend'
-            ,avatar: 'http://tp1.sinaimg.cn/5619439268/180/40030060651/1'
+            ,avatar: '{%url "profile_image"%}?u={{target_user.username}}'
             ,id: '{{target_user.pk}}'
         });
         {%endif%}
