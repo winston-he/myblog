@@ -210,7 +210,7 @@
         text += "    <h6 class=comment-title\">";
         text += "      <small>" + data.create_time + "</small>";
         text += "    </h6>";
-        text += "    <p class=\"comment-text\"><p class=\"mb-1\">" + data.content +"</p>";
+        text += "    <p class=\"comment-text\"><p class=\"mb-1\">" + data.content.replace( /(<([^>]+)>)/ig, '') +"</p>";
         text += "    <div class=\"comment-actions\">";
         text += "        <div class=\"comment-action-item like-comment\">";
         text += "          <a role=\"button\" class=like-comment-btn data-href=\"{% url 'like_comment' pk=123 %}\">".replace("123", data.pk);
@@ -364,7 +364,7 @@
                       $.post({
                         url: '{%url "comment_new" 123%}'.replace('123', '{{post.pk}}'),
                         data: {
-                          "content": $("#comment-content").val(),
+                          "content": $("#comment-content").val().replace( /(<([^>]+)>)/ig, ''),
                           "csrfmiddlewaretoken": csrf,
                         },
                         success: function(res) {
