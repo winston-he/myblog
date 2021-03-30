@@ -1,4 +1,4 @@
-django==3.0.3
+django==3.0.12
 django-debug-toolbar==2.2
 mysqlclient==2.0.1
 celery==4.4.2
